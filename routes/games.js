@@ -278,7 +278,7 @@ function saveScrapedGames(scrapedGames,storeName,resolve){
 
 function refreshBlizzardGames(){
 	return new Promise((resolve,reject)=>{
-		(async()=>{
+		(async()=>{ 
 			let browser = await puppeteer.launch({headless: true});
 			let page = await browser.newPage();
 
