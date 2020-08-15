@@ -11,7 +11,7 @@
 		Áruházak:
 		<div class="form-check">
 			<label class="form-check-label">
-				<input type="checkbox" name="isAllSelected" value="all" class="form-check-input" [(ngModel)]="getFilterService().getIsAllSelected()" (click)="selectAllStores()">Összes
+				<input type="checkbox" name="isAllSelected" value="all" class="form-check-input" (click)="selectAllStores()">Összes
 			</label>
 		</div>
 		<div class="form-check" *ngFor="let store of getAllStores();index as i">
