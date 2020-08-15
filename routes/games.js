@@ -279,7 +279,7 @@ function saveScrapedGames(scrapedGames,storeName,resolve){
 function refreshBlizzardGames(){
 	return new Promise((resolve,reject)=>{
 		(async()=>{
-			let browser = await puppeteer.launch({headless: false});
+			let browser = await puppeteer.launch({headless: true});
 			let page = await browser.newPage();
 
 			await page.goto(process.env.BLIZZARD_GAMES_URL,{waitUntil: 'networkidle2'});
@@ -426,7 +426,7 @@ function refreshBlizzardGames(){
 function refreshEpicGames(){
 	return new Promise((resolve,reject)=>{
 		(async()=>{
-			let browser = await puppeteer.launch({headless: false});
+			let browser = await puppeteer.launch({headless: true});
 			let page = await browser.newPage();
 
 			await page.goto(process.env.EPIC_GAMES_ALL_GAMES_URL,{waitUntil: 'networkidle0'});
@@ -764,9 +764,9 @@ function refreshSteamGames(callback){
 }
 
 async function refreshGames(){
-	/*let blizzardResponse = await refreshBlizzardGames();
+	let blizzardResponse = await refreshBlizzardGames();
 	console.log(blizzardResponse);
-	let epicGamesResponse = await refreshEpicGames();
+	/*let epicGamesResponse = await refreshEpicGames();
 	console.log(epicGamesResponse);
 	let humbleBundleResponse = await refreshHumbleBundleGames();
 	console.log(humbleBundleResponse);
