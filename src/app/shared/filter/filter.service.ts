@@ -166,4 +166,8 @@ export class FilterService {
 	isFilterOpened(){
 		return this.filterOpened;
 	}
+
+	getIsAllSelected(){
+		return this.isAllSelected;
+	}
 }

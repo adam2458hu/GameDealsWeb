@@ -24,7 +24,7 @@
 			</div>
 			<div class="col-2">
 				<label>
-					<input type="checkbox" name="geolocation" [(ngModel)]="geolocation">
+					<input type="checkbox" name="geolocation" [(ngModel)]="isGeolocationEnabled()">
 					<span class="custom-checkbox"></span>
 				</label>
 			</div>
@@ -33,7 +33,7 @@
 			</div>
 			<div class="col-2">
 				<label>
-					<input type="checkbox" name="recommendations" [(ngModel)]="recommendations">
+					<input type="checkbox" name="recommendations" [(ngModel)]="areRecommendationsEnabled()">
 					<span class="custom-checkbox"></span>
 				</label>
 			</div>
@@ -42,7 +42,7 @@
 			</div>
 			<div class="col-2">
 				<label>
-					<input type="checkbox" name="pushNotifications" [(ngModel)]="pushNotifications">
+					<input type="checkbox" name="pushNotifications" [(ngModel)]="arePushNotificationsEnabled()">
 					<span class="custom-checkbox"></span>
 				</label>
 			</div>
@@ -51,7 +51,7 @@
 			</div>
 			<div class="col-2">
 				<label>
-					<input type="checkbox" name="device" [(ngModel)]="device">
+					<input type="checkbox" name="device" [(ngModel)]="isDeviceEnabled()">
 					<span class="custom-checkbox"></span>
 				</label>
 			</div>

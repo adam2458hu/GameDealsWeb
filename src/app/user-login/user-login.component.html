@@ -44,12 +44,10 @@
 			<div class="card-header">
 				<h3 *ngIf="popupType=='appTwoFactor'">Hitelesítő alkalmazás</h3>
 				<h3 *ngIf="popupType=='emailTwoFactor'">Email hitelesítés</h3>
-				<h3 *ngIf="popupType=='smsTwoFactor'">SMS hitelesítés</h3>
 			</div>
 			<div class="card-body">
 				<p *ngIf="popupType=='appTwoFactor'">Kérjük írja be a hitelesítő alkalmázásában megjelenő 6 számjegyű kódot.</p>
 				<p *ngIf="popupType=='emailTwoFactor'">Kérjük írja be az email címére küldött üzenetben található 6 számjegyű kódot.</p>
-				<p *ngIf="popupType=='smsTwoFactor'">Kérjük írja be a telefonszámára küldött SMS-ben található 6 számjegyű kódot.</p>
 				<div class="input-group">
 					<div class="input-group-prepend">
 						<span class="input-group-text text-white">Ellenőrző kód:</span>

@@ -40,7 +40,7 @@
 					<li *ngIf="getUserService().isAuthenticated()" class="nav-item" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">
 						<a class="nav-link" [routerLink]="['/messages']" routerLinkActive="active">
 							<fa name="envelope"></fa>Üzenetek
-							<span *ngIf="userService.getMessagesUnread()>0" class="badge badge-pill badge-warning">{{ userService.getMessagesUnread() }}</span>
+							<span *ngIf="getUserService().getMessagesUnread()>0" class="badge badge-pill badge-warning">{{ userService.getMessagesUnread() }}</span>
 						</a>
 					</li>
 					<li *ngIf="getUserService().isAuthenticated()" class="nav-item" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">

@@ -34,4 +34,20 @@ export class CookieConsentComponent implements OnInit {
 		this.customizeCookies();
 	}
 
+	isGeolocationEnabled(){
+		return this.geolocation;
+	}
+
+	areRecommendationsEnabled(){
+		return this.recommendations;
+	}
+
+	arePushNotificationsEnabled(){
+		return this.pushNotifications;
+	}
+
+	isDeviceEnabled(){
+		return this.device;
+	}
+
 }
