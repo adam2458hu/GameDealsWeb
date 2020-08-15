@@ -1,0 +1,51 @@
+<div class="container-custom">
+	<div class="card">
+		<div class="card-header">
+			<h3>Üzenetek</h3>
+		</div>
+		<div class="card-body">
+			<div *ngIf="userService.returnMessages().length>0;else elseblock">
+				<div class="d-flex justify-content-between mb-2">
+					<label>
+						<input type="checkbox"(change)="selectAllMessages()" [checked]="isAllSelected" style="margin: 0 10px">Mindet kijelöl
+					</label>
+					<div>
+						<button class="btn btn-sm mr-2 btn-info" (click)="deleteSelectedMessages()">Törlés</button>
+						<button class="btn btn-sm btn-info" (click)="markSelectedMessagesAsRead()">Olvasottnak jelölés</button>
+					</div>
+				</div>
+			</div>
+			<ng-template #elseblock>
+				<p>Nincsenek üzenetek.</p>
+			</ng-template>
+			<div class="panel-group">
+				<div *ngFor="let message of userService.messages;index as i" class="panel panel-default">
+					<input type="checkbox" name="selectMessage" value="{{message._id}}" [(ngModel)]="message.selected">
+					<div class="panel-heading" (click)="!message.read && markMessagesAsRead([message._id])" data-toggle="collapse" [attr.data-target]="'#message_'+i">
+						<div class="d-flex justify-content-between">
+							<span>
+								<span *ngIf="!message.read" class="badge badge-pill badge-info">
+									ÚJ
+								</span>
+								{{ message.title }}
+								<span *ngIf="message.type==='deal'"class="badge badge-pill badge-info">
+									Akció
+								</span>
+								<span *ngIf="message.type==='feature'"class="badge badge-pill badge-success">
+									Funkció
+								</span>
+								<span *ngIf="message.type==='information'"class="badge badge-pill" style="background-color: red">
+									Tájékoztatás
+								</span>
+							</span>
+							<span>{{ message.date | date:'short'}}</span>
+						</div>
+					</div>
+					<div class="panel-collapse collapse" [attr.id]="'message_'+i">
+						<div class="panel-body">{{ message.text }}</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

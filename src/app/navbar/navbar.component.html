@@ -1,0 +1,71 @@
+<header>
+	<nav class="navbar navbar-expand-md bg-dark navbar-dark" (window:resize)="onWindowResize()">
+		<div class="container">
+			<a class="navbar-brand" [routerLink]="['/deals']">DealsOnEveryday</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#responsiveNavbar">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="responsiveNavbar">
+				<ul class="navbar-nav ml-auto">
+					<li class="nav-item" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">
+						<a class="nav-link" [routerLink]="['/home']" routerLinkActive="active">
+							<fa name="home"></fa>Főoldal
+						</a>
+					</li>
+					<li *ngIf="getUserService().isAuthenticated()" class="nav-item" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">
+						<a class="nav-link" [routerLink]="['/deals']" routerLinkActive="active">
+							<fa name="percent"></fa>Akciók
+						</a>
+					</li>
+					<li *ngIf="!getUserService().isAuthenticated()" class="nav-item" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">
+						<a class="nav-link" [routerLink]="['/login']" routerLinkActive="active">
+							<fa name="sign-in"></fa>Belépés
+						</a>
+					</li>
+					<li *ngIf="!getUserService().isAuthenticated()" class="nav-item" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">
+						<a class="nav-link" [routerLink]="['/register']" routerLinkActive="active">
+							<fa name="user-plus"></fa>Regisztráció
+						</a>
+					</li>
+					<li *ngIf="getUserService().isAuthenticated()" class="nav-item dropdown">
+						<a class="nav-link" href="#" id="navbarDropdown" [routerLink]="['/profile']" routerLinkActive="active">
+				          <fa name="user"></fa>Profilom
+				        </a>
+				        <div class="dropdown-menu">
+				          <a class="dropdown-item" [routerLink]="['/profile/details']" routerLinkActive="active" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">Adataim</a>
+				          <a class="dropdown-item" [routerLink]="['/profile/security']" routerLinkActive="active" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">Biztonság</a>
+				          <a *ngIf="isAdmin()" class="dropdown-item" [routerLink]="['/profile/admin']" routerLinkActive="active" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">Admin felület</a>
+				        </div>
+					</li>
+					<li *ngIf="getUserService().isAuthenticated()" class="nav-item" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">
+						<a class="nav-link" [routerLink]="['/messages']" routerLinkActive="active">
+							<fa name="envelope"></fa>Üzenetek
+							<span *ngIf="userService.getMessagesUnread()>0" class="badge badge-pill badge-warning">{{ userService.getMessagesUnread() }}</span>
+						</a>
+					</li>
+					<li *ngIf="getUserService().isAuthenticated()" class="nav-item" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">
+						<a class="nav-link" [routerLink]="['/logout']" routerLinkActive="active" (click)="getUserService().logoutUser('Sikeres kijelentkezés')">
+							<fa name="sign-out"></fa>Kilépés
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<!--<div class="box-shadow-container"></div>-->
+	</nav>
+	<div class="box-shadow-container"></div>
+	<div *ngIf="getUserService().isAuthenticated() && getTimeLeftAsString()!=null" id="time-left">
+		<span>Hátralévő idő: </span>
+		<span [innerHTML]="getTimeLeftAsString()"></span>
+	</div>
+	<div *ngIf="getUserService().getErrorMessage() || getUserService().getSuccessMessage()" id="info-box" class="animated text-center">
+		<div class="container">
+			<strong *ngIf="getUserService().getErrorMessage()">
+				{{ getUserService().getErrorMessage() }}
+			</strong>
+			<strong *ngIf="getUserService().getSuccessMessage()">
+				{{ getUserService().getSuccessMessage() }}
+			</strong>
+		</div>
+	</div>
+</header>

@@ -1,0 +1,82 @@
+@import '../../variables';
+@import '../../mixins';
+
+#productImage{
+	width: 144px;
+
+	img {
+		width: 120px;
+	}
+
+	.noimage {
+		display: inline-block;
+		background-color: black;
+		width: 120px;
+		height: 56px;
+		text-align: center;
+		font-size: 20px;
+		vertical-align: middle;
+	}
+}
+
+#productName {
+	max-width: 400px;
+
+	a {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+}
+
+#specialPrice {
+	width: 120px !important;
+}
+
+#originalPrice {
+	width: 120px !important;
+	text-decoration: line-through;
+}
+
+#discountPercent {
+	width: 100px !important;
+
+	span {
+		display: inline-block;
+		background-color: $color-secondary;
+		font-size: 20px;
+		line-height: 10px;
+		padding: 10px;
+	}
+}
+
+#metascore {
+	width: 100px !important;
+}
+
+.metascore {
+	display: inline;
+	border-radius: 4px;
+	padding: 10px;
+
+	&.rated {
+		background-color: #119D11;
+		color: white;
+	}
+	
+	&.tba {
+		background-color: #aaa;
+		color: black;
+	}
+}
+
+.deals {
+	th{
+		cursor: pointer;
+	}
+
+	.table-responsive + button {
+		box-shadow: 0 0 5px 2px darken($color-primary,5%);
+		border-radius: 0 0 10px 10px;
+	}
+}

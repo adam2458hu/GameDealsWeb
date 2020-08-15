@@ -1,0 +1,67 @@
+<div *ngIf="selectedGame" id="gameDetails">
+	<div class="blurred-background" (click)="onClose()"></div>
+	<div class="card">
+		<span class="close" (click)="onClose()">&times;</span>
+		<div class="card-header">
+			<div class="row">
+				<div class="col-4">
+					<img *ngIf="selectedGame.stores[0].image;else noimageBlock" src="{{ selectedGame.stores[0].image }}" alt="{{ selectedGame.name }}">
+					<ng-template #noimageBlock>
+						<span class="noimage"><fa name="photo"></fa></span>
+					</ng-template>
+				</div>
+				<div id="gameDetails" class="col-8">
+					<h4 class="text-center">{{ selectedGame.name }}</h4>
+					<div class="text-center">Műfaj: {{ selectedGame.genres }}</div>
+					<div *ngIf="selectedGame.releaseDate" class="text-center">Megjelenés: {{ selectedGame.releaseDate | date : 'longDate' }}</div>
+					<div class="text-center">Metascore: 
+						<span class="metascore rated" *ngIf="selectedGame.metascore;else elseBlock">
+							{{ selectedGame.metascore }}
+						</span>
+						<ng-template #elseBlock>
+							<span class="metascore tba" title="besorolás alatt">TBA</span>
+						</ng-template>
+					</div>
+				</div>
+			</div>
+			<div *ngIf="selectedGame.description" class="row mt-3">
+				<div class="col">
+					<button class="btn-block mb-2" (click)="descriptionOpened=!descriptionOpened">
+						<span *ngIf="!descriptionOpened;else showLess">Bővebben</span>
+						<ng-template #showLess>
+							<span>Kevesebb</span>
+						</ng-template>
+					</button>
+					<p *ngIf="descriptionOpened" class="description">{{ selectedGame.description }}</p>
+				</div>
+			</div>
+		</div>
+		<div class="card-body">
+			<table class="table table-hover table-dark mb-3">
+				<thead>
+					<tr>
+						<td class="text-center">Áruház</td>
+						<td class="text-center">Akciós ár</td>
+						<td class="text-center">Erdeti ár</td>
+						<td class="text-center">Kedvezmény</td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let store of orderStoresByDiscountedPrice(selectedGame)">
+						<td class="text-center">
+							<a href="{{ store.linkToGame }}" target="_blank" (click)="addToGameHistory(selectedGame._id)">{{ store.name }}</a>
+						</td>
+						<td class="text-center">{{ store.specialPrice }} €</td>
+						<td class="text-center" style="text-decoration: line-through;">{{ store.originalPrice }} €</td>
+						<td id="discountPercent" class="text-center">
+							<span>-{{ store.discountPercent }} %</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div id="bottomPaddingReplacer">
+				<!--a .card osztályban alkalmazott overflow-y:auto eltünteti a alsó belső margót, ezért ez pótolja azt-->
+			</div>
+		</div>
+	</div>
+</div>

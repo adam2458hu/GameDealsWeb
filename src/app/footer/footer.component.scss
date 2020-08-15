@@ -1,0 +1,28 @@
+@import "../../variables";
+@import "../../mixins";
+
+footer{
+	//position: absolute;
+	position: relative;
+	left: 0;
+	bottom: 0;
+	//box-shadow: inset 0 -20px 40px 2px darken($color-primary,10%),0 10px 40px 2px darken($color-secondary,10%);
+	box-shadow: 0 10px 40px 2px darken($color-secondary,10%);
+	width: 100%;
+	border-top: 2px solid darken($color-secondary,10%);
+	padding: 10px 20px;
+	margin-top: auto;
+
+	hr {
+		border: 0.5px solid $color-secondary;
+	}
+
+	ul {
+		@include reset-list;
+	}
+
+	.copyright {
+		font-size: 14px;
+		font-style: italic;
+	}
+}

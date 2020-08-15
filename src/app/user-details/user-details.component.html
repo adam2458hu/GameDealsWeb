@@ -1,0 +1,97 @@
+<div class="container-custom">
+	<div class="card">
+		<div class="card-header">
+			<h2 class="text-center">Adataim</h2>
+		</div>
+		<div class="card-body">
+			<form #userDetailsForm="ngForm" (ngSubmit)="onSubmit(userDetailsForm)">
+				<div class="row">
+					<div class="col-4 text-right">Azonosító:</div>
+					<div class="col-8">
+						<input type="text" name="_id" [(ngModel)]="getUserService().getUser()._id" class="form-control" disabled>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-4 text-right">
+						<label for="first_name">Keresztnév:</label>
+					</div>
+					<div class="col-8">
+						<input type="text" id="first_name" name="first_name" [(ngModel)]="getUserService().getUser().first_name" class="form-control">
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-4 text-right">
+						<label for="last_name">Vezetéknév:</label>
+					</div>
+					<div class="col-8">
+						<input type="text" id="last_name" name="last_name" [(ngModel)]="getUserService().getUser().last_name" class="form-control">
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-4 text-right">
+						<label for="email">Email:</label>
+					</div>
+					<div class="col-8">
+						<input type="text" id="email" name="email" [(ngModel)]="getUserService().getUser().email" class="form-control">
+					</div>
+				</div>
+				<div class="row mb-3">
+					<div class="col-4 text-right">
+						<label for="consentToNewsletter">Hírlevélre feliratkozva:</label>
+					</div>
+					<div class="col-8">
+						<label class="mt-1">
+							<input type="checkbox" id="consentToNewsletter" name="consentToNewsletter" [(ngModel)]="getUserService().getUser().consentToNewsletter">
+							<span *ngIf="getUserService().getUser().consentToNewsletter" class="ml-2">Igen</span>
+							<span *ngIf="!getUserService().getUser().consentToNewsletter" class="ml-2">Nem</span>
+						</label>
+					</div>
+				</div>
+				<input type="submit" class="btn-block" value="Módosítások mentése">
+				<hr>
+			</form>
+			<h3>Profil információk lekérdezése</h3>
+			<div *ngIf="!getUserService().getUser().twoFactorGoogleEnabled && !getUserService().getUser().twoFactorEmailEnabled; else elseBlock">
+				<p>Ahhoz, hogy az Önről tárolt adatokat megosszuk magával kérjük, hogy engedélyezze a kétfaktoros azonosítást a profiljához.</p>
+				<button [routerLink]="['/profile/security']" class="btn-block">Azonosítási mód kiválasztása</button>
+			</div>
+			<ng-template #elseBlock>
+				<p>Kérjük válasszon, hogy milyen formátumban szeretné megkapni az Önről tárolt információkat. A megfelelő formátum kiválasztását követően kattintson az adatigénylés gombra, ami után egy letöltő linket fog kapni az email címére.</p>
+				<form #requestedFormat="ngForm" (ngSubmit)="sendPersonalInformations(requestedFormat)">
+					<div class="row mb-3">
+						<div class="col-4 text-right">
+							<label for="format">Formátum:</label>
+						</div>
+						<div class="col-8">
+							<select name="format" [(ngModel)]="format" id="format" class="form-control">
+								<option value="pdf">PDF</option>
+								<option value="json">JSON</option>
+							</select>
+						</div>
+					</div>
+					<input class="btn-block" type="submit" value="Adatigénylés">
+				</form>
+				<!--<button class="btn-block" (click)="downloadPersonalInformations('pdf')">Adatok letöltése pdf formátumban</button>
+				<button class="btn-block" (click)="downloadPersonalInformations('json')">Adatok letöltése json formátumban</button>-->
+				<!--<button class="btn-block" [routerLink]="['/profile/security']">Azonosítási mód módosítása</button>-->
+			</ng-template>
+			<hr>
+			<h3>Profil törlése</h3>
+			<button type="button" class="btn-block" (click)="setPopup(true)">Profil törlése</button>
+		</div>
+	</div>
+</div>
+<div *ngIf="isPopupOpened()" class="modal-container">
+	<div class="custom-modal card">
+		<div class="card-header">
+			<h3>Biztosan törölni szeretné profilját?</h3>
+		</div>
+		<div class="card-body">
+			<p>A művelet végrehajtásával az adatai, köztük a személyre szabott beállításai is törlődnek. Ez a folyamat nem visszavonható.</p>
+		</div>
+		<div class="card-footer">
+			<button type="button" class="mr-3 mb-3 mb-sm-0" (click)="setPopup(false)">Mégsem</button>
+			<button type="button" (click)="deleteProfile()">Igen</button>
+		</div>
+	</div>
+</div>

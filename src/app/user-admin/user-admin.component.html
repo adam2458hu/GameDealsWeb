@@ -1,0 +1,110 @@
+<div class="container-custom">
+	<div class="card">
+		<div class="card-header">
+			<h2 class="text-center">Admin felület</h2>
+		</div>
+		<div class="card-body">
+			<form #newsletterForm="ngForm" (ngSubmit)="sendNewsletters(newsletterForm)">
+				<h3>Hírlevél küldés</h3>
+				<div class="form-check">
+					<label class="form-check-label">
+						<input type="radio" name="newsletterType" class="form-check-input" value="deals" [(ngModel)]="newsletterType">
+						Akciós ajánlatok küldése megtekintési előzmények alapján
+					</label>
+				</div>
+				<!--<div class="form-check">
+					<label class="form-check-label">
+						<input type="radio" name="newsletterType" class="form-check-input" value="feature" [(ngModel)]="newsletterType">
+						Új funkció
+					</label>
+				</div>
+				<div class="form-check">
+					<label class="form-check-label">
+						<input type="radio" name="newsletterType" class="form-check-input" value="information" [(ngModel)]="newsletterType">
+						Tájékoztatás
+					</label>
+				</div>-->
+				<div class="form-check mb-3">
+					<label class="form-check-label">
+						<input type="radio" name="newsletterType" class="form-check-input" value="other" [(ngModel)]="newsletterType">
+						Egyéb (Új funkció, tájékoztatás, stb.)
+					</label>
+				</div>
+				<div *ngIf="newsletterType!=='deals'">
+					<div *ngIf="newsletterType==='other'" class="row">
+						<div class="col-4 text-right">
+							<label for="newsletterTitle">Hírlevél tárgya:</label>
+						</div>
+						<div class="col-8">
+							<input type="text" id="newsletterTitle" name="newsletterTitle" [(ngModel)]="newsletterTitle" class="form-control" placeholder="cím">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-4 text-right">
+							<label for="messageText">Hírlevél szövege:</label>
+						</div>
+						<div class="col-8 mb-3">
+							<textarea type="text" id="newsletterText" name="newsletterText" [(ngModel)]="newsletterText" class="form-control" placeholder="szöveg"></textarea>
+						</div>
+					</div>
+				</div>
+				<button class="btn-block" type="submit">Hírlevél elküldése</button>
+				<hr>
+			</form>
+			<form #messageForm="ngForm" (ngSubmit)="sendMessages(messageForm)">
+				<h3>Oldalon belüli üzenet küldés</h3>
+				<div class="row">
+					<div class="col-4 text-right">
+						<label for="messageTitle">Üzenet típusa:</label>
+					</div>
+					<div class="col-8">
+						<select id="messageType" name="messageType" [(ngModel)]="messageType" class="form-control">
+							<option value="deal">Akció</option>
+							<option value="feature">Funkció</option>
+							<option value="information">Tájékoztató</option>
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-4 text-right">
+						<label for="messageTitle">Üzenet címe:</label>
+					</div>
+					<div class="col-8">
+						<input type="text" id="messageTitle" name="messageTitle" [(ngModel)]="messageTitle" class="form-control" placeholder="cím">
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-4 text-right">
+						<label for="messageText">Üzenet szövege:</label>
+					</div>
+					<div class="col-8 mb-3">
+						<textarea type="text" id="messageText" name="messageText" [(ngModel)]="messageText" class="form-control" placeholder="szöveg"></textarea>
+					</div>
+				</div>
+				<button class="btn-block" type="submit">Üzenet elküldése</button>
+				<hr>
+			</form>
+			<form #pushNotificationForm="ngForm" (ngSubmit)="sendPushNotifications(pushNotificationForm)">
+				<h3>Push értesítés küldés</h3>
+				<div class="row">
+					<div class="col-4 text-right">
+						<label for="pushNotificationTitle">Értesítés címe:</label>
+					</div>
+					<div class="col-8">
+						<input type="text" id="pushNotificationTitle" name="pushNotificationTitle" [(ngModel)]="pushNotificationTitle" class="form-control" placeholder="cím">
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-4 text-right">
+						<label for="pushNotificationText">Értesítés szövege:</label>
+					</div>
+					<div class="col-8 mb-3">
+						<textarea type="text" id="pushNotificationText" name="pushNotificationText" [(ngModel)]="pushNotificationText" class="form-control" placeholder="szöveg"></textarea>
+					</div>
+				</div>
+				<button class="btn-block" type="submit">Push értesítés elküldése</button>
+				<hr>
+			</form>
+		</div>
+	</div>
+</div>

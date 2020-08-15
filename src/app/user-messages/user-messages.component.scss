@@ -1,0 +1,39 @@
+@import "../../variables";
+@import "../../mixins";
+
+table,th,td{
+	border-collapse: collapse;
+	border: 1px solid white;
+}
+
+th,td {
+	padding: 5px 10px;
+}
+
+.container-custom {
+	max-width: 100%;
+}
+
+.panel {
+	position: relative;
+
+	.panel-heading{
+		//background-color: $color-primary;
+		border-bottom: 1px solid #777;
+		cursor: pointer;
+		padding: 5px 5px 5px 30px;
+	}
+
+	.panel-body{
+		border: 1px solid white;
+		background-color: white;
+		color: black;
+		padding: 5px 5px 5px 30px;
+	}
+
+	input {
+		position: absolute;
+		top: 10px;
+		left: 10px;
+	}
+}

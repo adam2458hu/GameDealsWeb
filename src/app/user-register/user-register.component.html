@@ -1,0 +1,70 @@
+<div class="container-custom">
+	<div class="card">
+		<div class="card-header">
+			<h2 class="text-center">Regisztráció</h2>
+		</div>
+		<div class="card-body">
+			<form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)">
+				<div class="form-group">
+					<label for="fname">Keresztnév</label>
+					<input type="text" id="fname" class="form-control" name="first_name" [(ngModel)]="user.first_name" #fname="ngModel" placeholder="Keresztnév" required>
+					<div *ngIf="!fname.valid && fname.dirty">
+						<label *ngIf="fname.errors.required">Ezt a mezőt kötelező kitölteni</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="lname">Vezetéknév</label>
+					<input type="text" id="lname" class="form-control" name="last_name" [(ngModel)]="user.last_name" #lname="ngModel" placeholder="Vezetéknév" required>
+					<div *ngIf="!lname.valid && lname.dirty">
+						<label *ngIf="lname.errors.required">Ezt a mezőt kötelező kitölteni</label>
+					</div>
+				</div><!--
+				<div class="form-group">
+					<label for="name">Teljes név</label>
+					<input type="text" id="name" class="form-control" name="name" [(ngModel)]="user.name" #lname="ngModel" placeholder="Teljes név" required>
+					<div *ngIf="!name.valid && name.dirty">
+						<label *ngIf="name.error.required">Ezt a mezőt kötelező kitölteni</label>
+					</div>
+				</div>-->
+				<div class="form-group">
+					<label for="email">Email</label>
+					<input type="email" id="email" class="form-control" name="email" [(ngModel)]="user.email" #email="ngModel" [pattern]="emailRegex" placeholder="example@mail.com" required>
+					<div *ngIf="!email.valid && email.dirty">
+						<label *ngIf="email.errors.required">Ezt a mezőt kötelező kitölteni</label>
+						<label *ngIf="email.errors.pattern">Érvénytelen email cím</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="password">Jelszó</label>
+					<input type="password" id="password" class="form-control" name="password" [(ngModel)]="user.password" #password="ngModel" minlength="8" placeholder="********" required>
+					<div *ngIf="!password.valid && password.dirty">
+						<div *ngIf="password.errors.required">Ezt a mezőt kötelező kitölteni</div>
+						<div *ngIf="password.errors.minlength">A jelszónak minimum 8 karakterből kell állnia</div>
+					</div>
+				</div>
+				<div class="form-group mb-3">
+					<label for="confirmPassword">Jelszó újra</label>
+					<input type="password" id="confirmPassword" class="form-control" name="confirmPassword" [(ngModel)]="user.confirmPassword" appEqualPasswordValidator="password" #confirmPassword="ngModel" minlength="8" placeholder="********" required>
+					<div *ngIf="!confirmPassword.valid && confirmPassword.dirty">
+						<div *ngIf="confirmPassword.errors.required">Ezt a mezőt kötelező kitölteni</div>
+						<div *ngIf="confirmPassword.errors.minlength">A jelszónak minimum 8 karakterből kell állnia</div>
+						<div *ngIf="confirmPassword.errors.notEqual && !confirmPassword.errors.required">A két jelszó nem egyezik</div>
+					</div>
+				</div>
+				<div class="form-check mb-2">
+					<label class="form-check-label">
+						<input type="checkbox" name="consentToGDPR" [(ngModel)]="user.consentToGDPR" class="form-check-input" required>Igen, elolvastam és elfogadom az <a [routerLink]="['/privacy-policy']">Adatvédelmi tájékoztatóban</a> foglaltakat.
+					</label>
+				</div>
+				<div class="form-check mb-3">
+					<label class="form-check-label">
+						<input type="checkbox" name="consentToNewsletter" [(ngModel)]="user.consentToNewsletter" class="form-check-input">Igen, szeretnék a Digital Deals oldaltól hírlevelet kapni, hogy a legfrissebb akciókról és az oldalon megjelenő új funkciókról értesüljek. (A hírlevélről bármikor leiratkozhat a profiljában vagy a hirlevelekben található "leiratkozás" linkre kattintva.)
+					</label>
+				</div>
+				<div class="text-center">
+					<input type="submit" class="btn-block" value="Regisztrálok" [disabled]="!registerForm.valid">
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

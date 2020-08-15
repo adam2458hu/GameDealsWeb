@@ -1,0 +1,37 @@
+<div class="main">
+	<div class="container">
+		<h1 style="text-align: center">Tisztelt {{lastName}} {{firstName}}!</h1>
+		<p>A profiljába egy új eszközről jelentkeztek be.</p>
+		<table>
+			<tbody>
+				<tr>
+					<td>IP cím:</td>
+					<td>{{loginDetails.ip}}</td>
+				</tr>
+				<tr>
+					<td>Eszköz:</td>
+					<td>{{loginDetails.device}}</td>
+				</tr>
+				</tr>
+					<td>OS:</td>
+					<td>{{loginDetails.os_version}}</td>
+				</tr>
+				<tr>
+					<td>Böngésző:</td>
+					<td>{{loginDetails.browser}}</td>
+				<tr>
+					<td>Dátum:</td>
+					<td>{{localeDate}}</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>Azért kapta ezt az üzenetet, mert valaki sikeresen bejelentkezett az Ön profiljába egy számunkra ismeretlen eszközről. Amennyiben Ön volt aki bejelentkezett, és nem szeretne több biztonsági értesítő üzenetet kapni, amikor erről az eszközről lép be a profiljába, akkor kattintson a következő gombra:</p>
+		<div class="button-container">
+			<a href="{{securityAlertUrl}}">Igen, én voltam.</a>
+		</div>
+		<p>Ha nem Ön volt, aki belépett, akkor kérjük, hogy készítsen új jelszót az alábbi gombra kattintva:</p><div class="button-container">
+			<a href="{{newPasswordUrl}}">Új jelszó létrehozása.</a>
+		</div>
+		<p><b>Üdvözlettel,<br>Digital Deals</b></p>
+	</div>
+</div>

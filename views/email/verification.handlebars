@@ -1,0 +1,22 @@
+<div class="main">
+	<div class="container">
+		<h1 style="text-align: center">Tisztelt {{lastName}} {{firstName}}!</h1>
+		<p>
+			Azért kapta ezt az üzenetet, mert a(z) {{ email }} email címet megadva létrehoztak egy felhasználói fiókot a <a href="{{ siteUrl }}">Digital Deals</a> oldalon. Ha Ön volt aki regisztrált, akkor biztonsági okból kérjük, hogy kattintson az alábbi gombra a regisztráció befejezéséhez:
+		</p>
+		<div class="button-container">
+			<a href="{{verificationUrl}}">Regisztráció megerősítése</a>
+		</div>
+		<p>
+			Miután a regisztrációját visszaigazolta, a belépést követően megtekintheti a naponta frissülő akciók listáját és szerkesztheti a profiljához tartozó adatait.
+			<br>
+			<p>
+				Amennyiben a gomb nem működik kérjük, hogy másolja és illessze be a következő url címet a böngésző keresési sávjába:
+				<br>
+				<a href="{{verificationUrl}}">{{verificationUrl}}</a>
+			</p>
+			A megerősítő link 24 óráig érvényes. Amennyiben az lejárt, akkor a honlapra bejelentkezve kérheti a megerősítő link újraküldését. Ha egy héten belül nem erősíti meg az email címét, akkor a regisztrált profil automatikusan törlésre kerül. Amennyiben nem ön regisztrált az oldalra kérjük, hogy törölje ezt az üzenetet.
+		</p>
+		<p><b>Üdvözlettel,<br>Digital Deals</b></p>
+	</div>
+</div>

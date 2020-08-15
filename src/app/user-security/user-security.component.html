@@ -1,0 +1,73 @@
+<div class="container-custom animated">
+	<div class="card">
+		<div class="card-header">
+			<h2 class="text-center">Biztonság</h2>
+		</div>
+		<div class="card-body">
+			<form #changePassword="ngForm" (ngSubmit)="onSubmit(changePassword)">
+				<h3>Jelszó változtatása</h3>
+				<div class="form-group">
+					<label for="password">Új jelszó</label>
+					<input type="password" id="password" class="form-control" name="password" [(ngModel)]="user.password" #password="ngModel" minlength="8" placeholder="********" required>
+					<div *ngIf="!password.valid && password.dirty">
+						<div *ngIf="password.errors.required">Ezt a mezőt kötelező kitölteni</div>
+						<div *ngIf="password.errors.minlength">A jelszónak minimum 8 karakterből kell állnia</div>
+					</div>
+				</div>
+				<div class="form-group mb-3">
+					<label for="confirmPassword">Új jelszó újra</label>
+					<input type="password" id="confirmPassword" class="form-control" name="confirmPassword" [(ngModel)]="user.confirmPassword" appEqualPasswordValidator="password" #confirmPassword="ngModel" minlength="8" placeholder="********" required>
+					<div *ngIf="!confirmPassword.valid && confirmPassword.dirty">
+						<div *ngIf="confirmPassword.errors.required">Ezt a mezőt kötelező kitölteni</div>
+						<div *ngIf="confirmPassword.errors.minlength">A jelszónak minimum 8 karakterből kell állnia</div>
+						<div *ngIf="confirmPassword.errors.notEqual && !confirmPassword.errors.required">A két jelszó nem egyezik</div>
+					</div>
+				</div>
+				<input type="submit" class="btn-block" value="Módosítások mentése">
+			</form>
+			<hr>
+			<h3>Két faktoros hitelesítés bekapcsolása</h3>
+			<div class="alert alert-info">
+				A két faktoros hitelesítéssel tovább növelheti felhasználói fiókjának biztonságát. Ekkor az Ön által igényelt úton keresztül juttatjunk el a belépéshez szükséges 6 számjegyű kódot, amit az emailcím és jelszó megadását követően kell majd megadnia egy felugró ablakban.
+			</div>
+			<p>
+				A Google Hitelesítő használatához először töltse le az alkalmazást az <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2">Android</a> vagy <a href="https://apps.apple.com/us/app/google-authenticator/id388497605">IOS</a> eszközére.
+			</p>
+			<button type="button" *ngIf="!getUserService().getUser().twoFactorGoogleEnabled" class="btn-block mb-3" (click)="toggleTwoFactor('App')">Alkalmazás hitelesítés bekapcsolása</button>
+			<button type="button" *ngIf="getUserService().getUser().twoFactorGoogleEnabled" class="btn-block mb-3" (click)="toggleTwoFactor('App')">Alkalmazás hitelesítés kikapcsolása</button>
+			<p>Az emailes hitelesítés választása esetén az email címére küldjük a megerősítő kódot.</p>
+			<button type="button" *ngIf="!getUserService().getUser().twoFactorEmailEnabled" class="btn-block" (click)="toggleTwoFactor('Email')">Email hitelesítés bekapcsolása</button>
+			<button type="button" *ngIf="getUserService().getUser().twoFactorEmailEnabled" class="btn-block" (click)="toggleTwoFactor('Email')">Email hitelesítés kikapcsolása</button>
+		</div>
+	</div>
+</div>
+<div *ngIf="isPopupOpened()" class="modal-container">
+	<div class="custom-modal card">
+		<form #twoFactorForm="ngForm" (ngSubmit)="enableTwoFactor(twoFactorForm)">
+			<div class="card-header">
+				<h3 *ngIf="popupType=='appTwoFactor'">Hitelesítő alkalmazás bekapcsolása</h3>
+				<h3 *ngIf="popupType=='emailTwoFactor'">Email hitelesítés bekapcsolása</h3>
+				<h3 *ngIf="popupType=='smsTwoFactor'">SMS hitelesítés bekapcsolása</h3>
+			</div>
+			<div class="card-body">
+				<div *ngIf="popupType=='appTwoFactor'" class="text-center mb-3">
+					<p>Kérjük, hogy szkennelje be az alábbi QR kódot az okostelefonjára telepített valamely hitelesítő alkalmazást használva, és írja be a lent található beviteli mezőbe az alkalmázásban megjelenő 6 számjegyű kódot.</p>
+					<img src="{{ qrcodeImgSrc }}" alt="QRcode">
+				</div>
+				<p *ngIf="popupType=='emailTwoFactor'">Kérjük írja be az email címére küldött üzenetben található 6 számjegyű kódot.</p>
+				<p *ngIf="popupType=='smsTwoFactor'">Kérjük írja be a telefonszámára küldött SMS-ben található 6 számjegyű kódot.</p>
+				<div class="input-group">
+					<div class="input-group-prepend">
+						<span class="input-group-text text-white">Ellenőrző kód:</span>
+					</div>
+					<input type="text" class="form-control" id="code" name="code" [(ngModel)]="code" placeholder="******">
+				</div>
+				<input type="hidden" id="type" name="type" [(ngModel)]="popupType">
+			</div>
+			<div class="card-footer">
+				<button type="button" class="mr-3" (click)="setPopup(false);deleteProperties({twoFactorTempSecret:1});">Mégsem</button>
+				<input type="submit" value="Küldés">
+			</div>
+		</form>
+	</div>
+</div>

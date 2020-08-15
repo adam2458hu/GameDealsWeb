@@ -1,0 +1,40 @@
+<td>
+	<button type="submit">Keresés</button>
+</td>
+<td>
+	<input type="text" class="form-control" id="name" name="name" [(ngModel)]="getFilterService().filter.name" placeholder="Név szerinti keresés...">
+	<select class="form-control" name="filterCurrency" id="filterCurrency" [(ngModel)]="getFilterService().filter.currency" (change)="getFilterService().onCurrencyChange($event.target.value)" title="Választott pénznem">
+		<option *ngFor="let currency of getCurrencies()" value="{{ currency.name }}">{{ currency.name }}</option>
+	</select>
+
+	<div id="storeSelection" class="my-3">
+		Áruházak:
+		<div class="form-check">
+			<label class="form-check-label">
+				<input type="checkbox" name="isAllSelected" value="all" class="form-check-input" [(ngModel)]="getFilterService().isAllSelected" (click)="selectAllStores()">Összes
+			</label>
+		</div>
+		<div class="form-check" *ngFor="let store of getAllStores();index as i">
+			<label class="form-check-label">
+				<input type="checkbox" class="form-check-input" name="selectedStores" [(ngModel)]="store.isSelected" (click)="selectStore(store.name)">{{ store.name }}
+			</label>
+		</div>
+	</div>
+</td>
+<td>
+	<!--<input type="number" class="form-control" min="0" id="minSpecialPrice" name="minSpecialPrice" [(ngModel)]="getFilterService().filter.minSpecialPrice" title="Minimum akciós ár" placeholder="min">-->
+	<input type="number" class="form-control" min="0" id="minSpecialPrice" name="minSpecialPrice" [(ngModel)]="getFilterService().filter.minSpecialPrice" title="Minimum akciós ár" placeholder="min">
+	<input type="number" class="form-control" min="0" id="maxSpecialPrice" name="maxSpecialPrice" [(ngModel)]="getFilterService().filter.maxSpecialPrice" title="Maximum akciós ár" placeholder="max">
+</td>
+<td>
+	<input type="number" class="form-control" min="0" id="minOriginalPrice" name="minOriginalPrice" [(ngModel)]="getFilterService().filter.minOriginalPrice" title="Minimum eredeti ár" placeholder="min">
+	<input type="number" class="form-control" min="0" id="maxOriginalPrice" name="maxOriginalPrice" [(ngModel)]="getFilterService().filter.maxOriginalPrice" title="Maximum eredeti ár" placeholder="max">
+</td>
+<td>
+	<input type="number" class="form-control" min="0" max="100" id="minDiscountPercent" name="minDiscountPercent" [(ngModel)]="getFilterService().filter.minDiscountPercent" title="Minimum kedvezmény" placeholder="min">
+	<input type="number" class="form-control" min="0" max="100" id="maxDiscountPercent" name="maxDiscountPercent" [(ngModel)]="getFilterService().filter.maxDiscountPercent" title="Maximum kedvezmény" placeholder="max">
+</td>
+<td>
+	<input type="number" class="form-control" min="0" max="100" id="minMetascore" name="minMetascore" [(ngModel)]="getFilterService().filter.minMetascore" title="Minimum metascore" placeholder="min">
+	<input type="number" class="form-control" min="0" max="100" id="maxMetascore" name="maxMetascore" [(ngModel)]="getFilterService().filter.maxMetascore" title="Maximum metascore" placeholder="max">
+</td>
