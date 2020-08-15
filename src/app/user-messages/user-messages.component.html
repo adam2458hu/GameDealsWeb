@@ -19,7 +19,7 @@
 				<p>Nincsenek üzenetek.</p>
 			</ng-template>
 			<div class="panel-group">
-				<div *ngFor="let message of getUserService().messages;index as i" class="panel panel-default">
+				<div *ngFor="let message of getUserService().returnMessages();index as i" class="panel panel-default">
 					<input type="checkbox" name="selectMessage" value="{{message._id}}" [(ngModel)]="message.selected">
 					<div class="panel-heading" (click)="!message.read && markMessagesAsRead([message._id])" data-toggle="collapse" [attr.data-target]="'#message_'+i">
 						<div class="d-flex justify-content-between">
