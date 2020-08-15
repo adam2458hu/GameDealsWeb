@@ -11,4 +11,5 @@ export class Game {
 	metascore?: Number;
 	description?: String;
 	releaseDate?: Date;
+	genres?: String[];
 }
