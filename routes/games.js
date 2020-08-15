@@ -527,7 +527,7 @@ function refreshEpicGames(){
 			  ]
 			});
 			let page = await browser.newPage();
-
+			await page.setDefaultNavigationTimeout(0);
 			await page.goto(process.env.EPIC_GAMES_ALL_GAMES_URL,{waitUntil: 'networkidle0'});
 
 			let scrapedGames = await page.evaluate(async()=>{
