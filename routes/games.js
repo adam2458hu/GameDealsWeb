@@ -279,7 +279,13 @@ function saveScrapedGames(scrapedGames,storeName,resolve){
 function refreshBlizzardGames(){
 	return new Promise((resolve,reject)=>{
 		(async()=>{ 
-			let browser = await puppeteer.launch({headless: true});
+			let browser = await puppeteer.launch({
+			  'args' : [
+			    '--no-sandbox',
+			    '--disable-setuid-sandbox'
+			  ]
+			});
+			
 			let page = await browser.newPage();
 
 			await page.goto(process.env.BLIZZARD_GAMES_URL,{waitUntil: 'networkidle2'});
