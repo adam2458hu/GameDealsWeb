@@ -7,11 +7,11 @@ import { CookieService } from '../shared/cookie/cookie.service';
   styleUrls: ['./cookie-consent.component.scss']
 })
 export class CookieConsentComponent implements OnInit {
-	private customize: boolean=false;
-	private device: boolean=false;
-	private geolocation: boolean=false;
-	private pushNotifications: boolean=false;
-	private recommendations: boolean= false;
+	customize: boolean=false;
+	device: boolean=false;
+	geolocation: boolean=false;
+	pushNotifications: boolean=false;
+	recommendations: boolean= false;
 
 	constructor(private cookieService: CookieService) { }
 

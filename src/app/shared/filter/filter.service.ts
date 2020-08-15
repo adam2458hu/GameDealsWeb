@@ -28,7 +28,7 @@ export class FilterService {
 		decimalPlaces: 2
 	}
 	private filterOpened: boolean = true;
-	private isAllSelected: boolean = true;
+	isAllSelected: boolean = true;
 	private allStores: {name: String,isSelected: Boolean}[] = [];
 
 	constructor(
