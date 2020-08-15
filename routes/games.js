@@ -15,7 +15,7 @@ var requestStartIndex=32800;
 var requestEndIndex=33000;
 var stepToNextStore = false;
 
-refreshGames();
+start();
 
 router.post('/getRecommendedGames',async(req,res)=>{
 	try {
@@ -774,7 +774,14 @@ function refreshSteamGames(callback){
 	});
 }
 
-async function refreshGames(){
+function start(){
+	refreshGames();
+	setInterval(refreshGames,300000);
+}
+
+async function refreshGames() {
+	await Game.collection.drop();
+	console.log("Játék lista törölve");
 	let blizzardResponse = await refreshBlizzardGames();
 	console.log(blizzardResponse);
 	let epicGamesResponse = await refreshEpicGames();
@@ -783,7 +790,6 @@ async function refreshGames(){
 	console.log(humbleBundleResponse);
 	let GoGGamesResponse = await refreshGoGGames();
 	console.log(GoGGamesResponse);
-	//refreshSteamGames(getGameDetails);
 }
 
 function getGameDetails(){
