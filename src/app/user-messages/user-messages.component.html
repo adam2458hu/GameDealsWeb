@@ -4,7 +4,7 @@
 			<h3>Üzenetek</h3>
 		</div>
 		<div class="card-body">
-			<div *ngIf="userService.returnMessages().length>0;else elseblock">
+			<div *ngIf="getUserService().returnMessages().length>0;else elseblock">
 				<div class="d-flex justify-content-between mb-2">
 					<label>
 						<input type="checkbox"(change)="selectAllMessages()" [checked]="isAllSelected" style="margin: 0 10px">Mindet kijelöl
@@ -19,7 +19,7 @@
 				<p>Nincsenek üzenetek.</p>
 			</ng-template>
 			<div class="panel-group">
-				<div *ngFor="let message of userService.messages;index as i" class="panel panel-default">
+				<div *ngFor="let message of getUserService().messages;index as i" class="panel panel-default">
 					<input type="checkbox" name="selectMessage" value="{{message._id}}" [(ngModel)]="message.selected">
 					<div class="panel-heading" (click)="!message.read && markMessagesAsRead([message._id])" data-toggle="collapse" [attr.data-target]="'#message_'+i">
 						<div class="d-flex justify-content-between">

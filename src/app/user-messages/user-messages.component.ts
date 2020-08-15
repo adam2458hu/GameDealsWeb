@@ -69,4 +69,8 @@ export class UserMessagesComponent implements OnInit {
 			})
 	}
 
+	getUserService(){
+		return this.userService;
+	}
+
 }

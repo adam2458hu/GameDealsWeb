@@ -118,6 +118,10 @@ export class HomeComponent implements OnInit {
 		window.location.href = url;
 	}
 
+	getUserService(){
+		return this.userService;
+	}
+
 	getRecommendedGamesByHistory(){
 		this.userService.getGameHistory().subscribe(
 			(res: any)=>{

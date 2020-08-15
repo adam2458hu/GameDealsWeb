@@ -26,7 +26,7 @@
 		<span *ngFor="let img of images;index as i" [class.active]="index==i" [class.passed]="index>i" (click)="changeNews(i)"></span>
 	</div>
 </div>
-<div *ngIf="!userService.isAuthenticated();else elseBlock" class="text-center m-2 p-3">
+<div *ngIf="!getUserService().isAuthenticated();else elseBlock" class="text-center m-2 p-3">
 	<h4>Az akciók teljes listájáért kérjük, hogy jelentkezzen be.</h4>
 	<button [routerLink]="['/login']">Bejelentkezés</button>
 </div>
