@@ -4,6 +4,7 @@ if (process.env.NODE_ENV !== 'production'){
 
 const express = require('express');
 const ObjectId = require('mongoose').Types.ObjectId;
+const mongoose = require('mongoose');
 const router = express.Router();
 const request = require('request');
 const puppeteer = require('puppeteer');
@@ -198,6 +199,32 @@ function checkCurrency(currency,amount){
 	return currency=='EUR'?amount*100:amount;
 }
 
+async function resetStillOnSaleFields(storeName){
+	let games = await Game.find({'stores.name':storeName});
+	games.forEach(game=>{
+		for(let i=0;i<game.stores.length;i++){
+			if (game.stores[i].name==storeName && !game.stores[i].expired){
+				game.stores[i].stillOnSale = false;
+				break;
+			}
+		}
+		saveToDatabase(game);
+	})
+}
+
+async function markExpiredDeals(storeName){
+	let games = await Game.find({'stores.name':storeName});
+	games.forEach(game=>{
+		for(let i=0;i<game.stores.length;i++){
+			if (game.stores[i].name==storeName && !game.stores[i].expired && !game.stores[i].stillOnSale){
+				game.stores[i].expired = true;
+				break;
+			}
+		}
+		saveToDatabase(game);
+	})
+}
+
 function saveScrapedGames(scrapedGames,storeName,resolve){
 	let gameObjects = [];
 	for(var j=0;j<scrapedGames.titles.length;j++){
@@ -253,7 +280,9 @@ function saveScrapedGames(scrapedGames,storeName,resolve){
 					saveToDatabase(newGame);
 				});
 			} else {
-				//console.log(gameFoundInDatabase);
+				if (gameFoundInDatabase.stores.length>1){
+					console.log(gameFoundInDatabase);
+				}
 
 				gameFoundInDatabase.stores.push({
 					name : storeName,
@@ -278,7 +307,15 @@ function saveScrapedGames(scrapedGames,storeName,resolve){
 
 function refreshBlizzardGames(){
 	return new Promise((resolve,reject)=>{
-		(async()=>{ 
+		(async()=>{
+
+			var storeName = "Blizzard";
+			// hamisra állítjuk az adatbázisban azokat a mezőket,
+			// amik azt jelzik, hogy az adott áruházban az adott játék akciós-e még,
+			// és lentebb elvégezzük azt az ellenőrzést ami igazat ad, ha a játék még mindig akciós
+			// az áruház honlapján és az adatbázisba már korábban bekerült
+			resetStillOnSaleFields(storeName);
+
 			let browser = await puppeteer.launch({
 			  'args' : [
 			    '--no-sandbox',
@@ -346,7 +383,7 @@ function refreshBlizzardGames(){
 					continue;
 				} else {
 					let gameObjects = [];
-					var storeName = "Blizzard";
+
 					for(var j=0;j<scrapedGames.titles.length;j++){
 						gameObjects.push({
 							title : scrapedGames.titles[j],
@@ -384,7 +421,9 @@ function refreshBlizzardGames(){
 										originalPrice : game.originalPrice,
 										specialPrice : game.discountPrice,
 										discountPercent : Math.round((1-(game.discountPrice/game.originalPrice))*100),
-										linkToGame : game.linkToGame
+										linkToGame : game.linkToGame,
+										expired : false,
+										stillOnSale : true
 									})
 
 									if (JSON.parse(body).result && JSON.parse(body).result.score) {
@@ -400,19 +439,65 @@ function refreshBlizzardGames(){
 									saveToDatabase(newGame);
 								});
 							} else {
-								console.log(gameFoundInDatabase);
-								gameFoundInDatabase.stores.push({
-									name : storeName,
-									originalPrice : game.originalPrice,
-									specialPrice : game.discountPrice,
-									discountPercent : Math.round((1-(game.discountPrice/game.originalPrice))*100),
-									linkToGame : game.linkToGame
-								})
 
-								saveToDatabase(gameFoundInDatabase);
+								if (gameFoundInDatabase.stores.length>1){
+									console.log(gameFoundInDatabase);
+								}
+
+								if (gameFoundInDatabase.stores.filter(function(store){
+									return store.name==storeName; }).length > 0) {
+									let gameStillOnSale = await Game.findOne({
+										name: game.title,
+										$and:[
+											{'stores.name':storeName},
+											{'stores.specialPrice':game.discountPrice},
+											{'stores.expired':false}
+										]
+									});
+
+									//ha a játék szerepel az adatbázisban és még akciós
+									if (gameStillOnSale){
+										gameStillOnSale.stores.forEach(store=>{
+											if (store.name==storeName){
+												store.stillOnSale = true;
+											}
+										});
+
+										saveToDatabase(gameStillOnSale);
+									} else {
+										//ha a játék már szerepel az adatbázisban és az előző akciós ár lejárt
+										//vagy eltérő a jelenlegi akciós ártól, akkor a korábbi adatokat
+										//felül írjuk
+										gameFoundInDatabase.stores.forEach(store=>{
+											if (store.name==storeName){
+												store.originalPrice = game.originalPrice;
+												store.specialPrice = game.discountPrice;
+												store.discountPercent = Math.round((1-(game.discountPrice/game.originalPrice))*100);
+												store.linkToGame = game.linkToGame;
+												store.expired = false;
+												store.stillOnSale = true;
+											}
+										})
+
+										saveToDatabase(gameFoundInDatabase);
+									}
+								} else {
+									gameFoundInDatabase.stores.push({
+										name : storeName,
+										originalPrice : game.originalPrice,
+										specialPrice : game.discountPrice,
+										discountPercent : Math.round((1-(game.discountPrice/game.originalPrice))*100),
+										linkToGame : game.linkToGame,
+										expired : false,
+										stillOnSale : true
+									})
+
+									saveToDatabase(gameFoundInDatabase);
+								}
 							}
 
 							if ((i==scrapedPage.gameUrlList.length-1) && (game==gameObjects[gameObjects.length-1])){
+								markExpiredDeals(storeName);
 								resolve(`Blizzard játékok frissítve`);
 							}
 						} catch(err){
@@ -432,6 +517,9 @@ function refreshBlizzardGames(){
 function refreshEpicGames(){
 	return new Promise((resolve,reject)=>{
 		(async()=>{
+			var storeName = 'Epic Games Store';
+			resetStillOnSaleFields(storeName);
+
 			let browser = await puppeteer.launch({
 			  'args' : [
 			    '--no-sandbox',
@@ -488,7 +576,6 @@ function refreshEpicGames(){
 
 			if (scrapedGames) {
 				let gameObjects = [];
-				var storeName = 'Epic Games Store';
 				for(var j=0;j<scrapedGames.titles.length;j++){
 					gameObjects.push({
 						title : scrapedGames.titles[j],
@@ -526,7 +613,9 @@ function refreshEpicGames(){
 									originalPrice : game.originalPrice,
 									specialPrice : game.discountPrice,
 									discountPercent : Math.round((1-(game.discountPrice/game.originalPrice))*100),
-									linkToGame : game.linkToGame
+									linkToGame : game.linkToGame,
+									expired : false,
+									stillOnSale : true
 								})
 
 								if (JSON.parse(body).result && JSON.parse(body).result.score) {
@@ -542,20 +631,65 @@ function refreshEpicGames(){
 								saveToDatabase(newGame);
 							});
 						} else {
-							console.log(gameFoundInDatabase);
 
-							gameFoundInDatabase.stores.push({
-								name : storeName,
-								originalPrice : game.originalPrice,
-								specialPrice : game.discountPrice,
-								discountPercent : Math.round((1-(game.discountPrice/game.originalPrice))*100),
-								linkToGame : game.linkToGame
-							})
+							if (gameFoundInDatabase.stores.length>1){
+								console.log(gameFoundInDatabase);
+							}
 
-							saveToDatabase(gameFoundInDatabase);
+							if (gameFoundInDatabase.stores.filter(function(store){
+								return store.name==storeName; }).length > 0) {
+								let gameStillOnSale = await Game.findOne({
+									name: game.title,
+									$and:[
+										{'stores.name':storeName},
+										{'stores.specialPrice':game.discountPrice},
+										{'stores.expired':false}
+									]
+								});
+
+								//ha a játék szerepel az adatbázisban és még akciós
+								if (gameStillOnSale){
+									gameStillOnSale.stores.forEach(store=>{
+										if (store.name==storeName){
+											store.stillOnSale = true;
+										}
+									});
+
+									saveToDatabase(gameStillOnSale);
+								} else {
+									//ha a játék már szerepel az adatbázisban és az előző akciós ár lejárt
+									//vagy eltérő a jelenlegi akciós ártól, akkor a korábbi adatokat
+									//felül írjuk
+									gameFoundInDatabase.stores.forEach(store=>{
+										if (store.name==storeName){
+											store.originalPrice = game.originalPrice;
+											store.specialPrice = game.discountPrice;
+											store.discountPercent = Math.round((1-(game.discountPrice/game.originalPrice))*100);
+											store.linkToGame = game.linkToGame;
+											store.expired = false;
+											store.stillOnSale = true;
+										}
+									})
+
+									saveToDatabase(gameFoundInDatabase);
+								}
+							} else {
+								gameFoundInDatabase.stores.push({
+									name : storeName,
+									originalPrice : game.originalPrice,
+									specialPrice : game.discountPrice,
+									discountPercent : Math.round((1-(game.discountPrice/game.originalPrice))*100),
+									linkToGame : game.linkToGame,
+									expired : false,
+									stillOnSale : true
+								})
+
+								saveToDatabase(gameFoundInDatabase);
+							}
 						}
 
 						if (game==gameObjects[gameObjects.length-1]){
+							markExpiredDeals(storeName);
 							resolve(`${storeName} játékok frissítve`);
 						}
 					} catch(err){
@@ -575,6 +709,8 @@ function refreshHumbleBundleGames(){
 	return new Promise((resolve,reject)=>{
 		let totalPages;
 		var storeName="Humble Bundle";
+		resetStillOnSaleFields(storeName);
+
 		request(process.env.HUMBLE_BUNDLE_DISCOUNTED_GAMES_URL,function(error,response,body){
 			if (error) {
 				console.log(error);
@@ -591,7 +727,7 @@ function refreshHumbleBundleGames(){
 					humbleBundleGamesList = JSON.parse(response.body).results;
 					humbleBundleGamesList.forEach(async game=>{
 						try {
-							let gameFoundInDatabase = await Game.findOne({name: game.title});
+							let gameFoundInDatabase = await Game.findOne({name: game.human_name});
 
 							if (!gameFoundInDatabase) {
 								var options = {
@@ -613,11 +749,13 @@ function refreshHumbleBundleGames(){
 									})
 
 									humbleBundleGame.stores.push({
-										name : 'Humble Bundle',
+										name : storeName,
 										originalPrice : game.full_price.amount,
 										specialPrice : game.current_price.amount,
 										discountPercent : Math.round((1-(game.current_price.amount/game.full_price.amount))*100),
-										linkToGame : process.env.HUMBLE_BUNDLE_URL+game.human_url
+										linkToGame : process.env.HUMBLE_BUNDLE_URL+game.human_url,
+										expired : false,
+										stillOnSale : true
 									})
 
 									if (game.standard_carousel_image) {
@@ -641,19 +779,65 @@ function refreshHumbleBundleGames(){
 									}
 								});
 							} else {
-								console.log(gameFoundInDatabase);
 
-								gameFoundInDatabase.stores.push({
-									name : 'Humble Bundle',
-									originalPrice : game.full_price.amount,
-									specialPrice : game.current_price.amount,
-									discountPercent : Math.round((1-(game.current_price.amount/game.full_price.amount))*100),
-									linkToGame : process.env.HUMBLE_BUNDLE_URL+game.human_url
-								})
+								if (gameFoundInDatabase.stores.length>1){
+									console.log(gameFoundInDatabase);
+								}
 
-								saveToDatabase(gameFoundInDatabase);
+								if (gameFoundInDatabase.stores.filter(function(store){
+								return store.name==storeName; }).length > 0) {
+									let gameStillOnSale = await Game.findOne({
+										name: game.human_name,
+										$and:[
+											{'stores.name':storeName},
+											{'stores.specialPrice':game.current_price.amount},
+											{'stores.expired':false}
+										]
+									});
 
-								if (game==gogDiscountedGamesList[gogDiscountedGamesList.length-1]){
+									//ha a játék szerepel az adatbázisban és még akciós
+									if (gameStillOnSale){
+										gameStillOnSale.stores.forEach(store=>{
+											if (store.name==storeName){
+												store.stillOnSale = true;
+											}
+										});
+
+										saveToDatabase(gameStillOnSale);
+									} else {
+										//ha a játék már szerepel az adatbázisban és az előző akciós ár lejárt
+										//vagy eltérő a jelenlegi akciós ártól, akkor a korábbi adatokat
+										//felül írjuk
+										gameFoundInDatabase.stores.forEach(store=>{
+											if (store.name==storeName){
+												store.name = storeName;
+												store.originalPrice = game.full_price.amount;
+												store.specialPrice = game.current_price.amount;
+												store.discountPercent = Math.round((1-(game.current_price.amount/game.full_price.amount))*100);
+												store.linkToGame = process.env.HUMBLE_BUNDLE_URL+game.human_url;
+												store.expired = false;
+												store.stillOnSale = true;
+											}
+										})
+
+										saveToDatabase(gameFoundInDatabase);
+									}
+								} else {
+									gameFoundInDatabase.stores.push({
+										name : storeName,
+										originalPrice : game.full_price.amount,
+										specialPrice : game.current_price.amount,
+										discountPercent : Math.round((1-(game.current_price.amount/game.full_price.amount))*100),
+										linkToGame : process.env.HUMBLE_BUNDLE_URL+game.human_url,
+										expired : false,
+										stillOnSale : true
+									})
+
+									saveToDatabase(gameFoundInDatabase);
+								}
+
+								if (game==humbleBundleGamesList[humbleBundleGamesList.length-1]){
+									markExpiredDeals(storeName);
 									resolve(`${storeName} játékok frissítve`);
 								}
 							}
@@ -671,6 +855,8 @@ function refreshGoGGames(){
 	return new Promise((resolve,reject)=>{
 		let totalPages;
 		var storeName = "GoG";
+		resetStillOnSaleFields(storeName);
+
 		request(process.env.GOG_DISCOUNTED_GAMES_URL,function(error,response,body){
 			if (error) {
 				console.log(error);
@@ -716,7 +902,9 @@ function refreshGoGGames(){
 										specialPrice : game.price.finalAmount,
 										discountPercent : game.price.discount,
 										linkToGame : process.env.GOG_URL+game.url,
-										image : game.image+'.jpg'
+										image : game.image+'.jpg',
+										expired : false,
+										stillOnSale : true
 									})
 
 									if (IsJsonString(body) && JSON.parse(body).result && JSON.parse(body).result.score) {
@@ -735,20 +923,67 @@ function refreshGoGGames(){
 									}
 								});
 							} else {
-								console.log(gameFoundInDatabase);
 
-								gameFoundInDatabase.stores.push({
-									name : 'GoG',
-									originalPrice : game.price.baseAmount,
-									specialPrice : game.price.finalAmount,
-									discountPercent : game.price.discount,
-									linkToGame : process.env.GOG_URL+game.url,
-									image : game.image+'.jpg'
-								})
+								if (gameFoundInDatabase.stores.length>1){
+									console.log(gameFoundInDatabase);
+								}
 
-								saveToDatabase(gameFoundInDatabase);
+								if (gameFoundInDatabase.stores.filter(function(store){
+								return store.name==storeName; }).length > 0) {
+									let gameStillOnSale = await Game.findOne({
+										name: game.title,
+										$and:[
+											{'stores.name':storeName},
+											{'stores.specialPrice':game.price.finalAmount},
+											{'stores.expired':false}
+										]
+									});
+
+									//ha a játék szerepel az adatbázisban és még akciós
+									if (gameStillOnSale){
+										gameStillOnSale.stores.forEach(store=>{
+											if (store.name==storeName){
+												store.stillOnSale = true;
+											}
+										});
+
+										saveToDatabase(gameStillOnSale);
+									} else {
+										//ha a játék már szerepel az adatbázisban és az előző akciós ár lejárt
+										//vagy eltérő a jelenlegi akciós ártól, akkor a korábbi adatokat
+										//felül írjuk
+										gameFoundInDatabase.stores.forEach(store=>{
+											if (store.name==storeName){
+												store.name = storeName;
+												store.originalPrice = game.price.baseAmount;
+												store.specialPrice = game.price.finalAmount;
+												store.discountPercent = game.price.discount;
+												store.linkToGame = process.env.GOG_URL+game.url;
+												store.image = game.image+'.jpg';
+												store.expired = false;
+												store.stillOnSale = true;
+											}
+										})
+
+										saveToDatabase(gameFoundInDatabase);
+									}
+								} else {
+									gameFoundInDatabase.stores.push({
+										name : storeName,
+										originalPrice : game.price.baseAmount,
+										specialPrice : game.price.finalAmount,
+										discountPercent : game.price.discount,
+										linkToGame : process.env.GOG_URL+game.url,
+										image : game.image+'.jpg',
+										expired : false,
+										stillOnSale : true
+									})
+
+									saveToDatabase(gameFoundInDatabase);
+								}
 
 								if (game==gogDiscountedGamesList[gogDiscountedGamesList.length-1]){
+									markExpiredDeals(storeName);
 									resolve(`${storeName} játékok frissítve`);
 								}
 							}
@@ -780,8 +1015,6 @@ function start(){
 }
 
 async function refreshGames() {
-	await Game.collection.drop();
-	console.log("Játék lista törölve");
 	let blizzardResponse = await refreshBlizzardGames();
 	console.log(blizzardResponse);
 	let epicGamesResponse = await refreshEpicGames();

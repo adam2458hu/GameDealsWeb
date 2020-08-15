@@ -28,15 +28,14 @@ export class DealsComponent implements OnInit {
 	) { }
 
 	ngOnInit() {
-		if (!this.userService.isAuthenticated()){
-			this.router.navigate(['/login']);
-		} else {
-			this.loadingScreenService.setAnimation(true);
-			this.gameService.resetGamesData();
-			this.filterService.resetFilter();
+		if (this.userService.isAuthenticated()){
 			this.userService.getMessages();
-			this.getGameList(this.filterService.filter,true);
-		}
+		} 
+		
+		this.loadingScreenService.setAnimation(true);
+		this.gameService.resetGamesData();
+		this.filterService.resetFilter();
+		this.getGameList(this.filterService.filter,true);
 	}
 
 	getGameList(filter,startLoadingAnimation){

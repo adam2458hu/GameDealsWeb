@@ -12,7 +12,7 @@
 							<fa name="home"></fa>Főoldal
 						</a>
 					</li>
-					<li *ngIf="getUserService().isAuthenticated()" class="nav-item" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">
+					<li class="nav-item" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">
 						<a class="nav-link" [routerLink]="['/deals']" routerLinkActive="active">
 							<fa name="percent"></fa>Akciók
 						</a>

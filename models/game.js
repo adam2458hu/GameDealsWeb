@@ -43,6 +43,14 @@ const gameSchema = new mongoose.Schema({
 		},
 		steamID : {
 			type : String
+		},
+		expired : {
+			type : Boolean,
+			required : true
+		},
+		stillOnSale : {
+			type : Boolean,
+			required : true
 		}
 	}]
 },
