@@ -743,7 +743,7 @@ function refreshHumbleBundleGames(){
 
 								request(options, function (error, response, body) {
 									if (error) throw new Error(error);
-
+									if (game.human_name=="Battle Brothers") console.log(game);
 									const humbleBundleGame = new Game({
 										name : game.human_name
 									})
