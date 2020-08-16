@@ -717,7 +717,7 @@ function refreshHumbleBundleGames(){
 				process.exit(1);
 			}
 
-			totalPages = JSON.parse(response.body).num_pages;
+			if (JSON.parse(body)) totalPages = JSON.parse(body).num_pages;
 			for(page=0;page<totalPages;page++){
 				request(process.env.HUMBLE_BUNDLE_DISCOUNTED_GAMES_URL+`&page=${page}`,function(error,response,body){
 					if (error) {
