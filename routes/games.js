@@ -280,9 +280,9 @@ function saveScrapedGames(scrapedGames,storeName,resolve){
 					saveToDatabase(newGame);
 				});
 			} else {
-				if (gameFoundInDatabase.stores.length>1){
-					console.log(gameFoundInDatabase);
-				}
+				/*if (gameFoundInDatabase.stores.length>1){
+									console.log(gameFoundInDatabase);
+								}*/
 
 				gameFoundInDatabase.stores.push({
 					name : storeName,
@@ -440,9 +440,9 @@ function refreshBlizzardGames(){
 								});
 							} else {
 
-								if (gameFoundInDatabase.stores.length>1){
+								/*if (gameFoundInDatabase.stores.length>1){
 									console.log(gameFoundInDatabase);
-								}
+								}*/
 
 								if (gameFoundInDatabase.stores.filter(function(store){
 									return store.name==storeName; }).length > 0) {
@@ -632,9 +632,9 @@ function refreshEpicGames(){
 							});
 						} else {
 
-							if (gameFoundInDatabase.stores.length>1){
-								console.log(gameFoundInDatabase);
-							}
+							/*if (gameFoundInDatabase.stores.length>1){
+									console.log(gameFoundInDatabase);
+								}*/
 
 							if (gameFoundInDatabase.stores.filter(function(store){
 								return store.name==storeName; }).length > 0) {
@@ -780,9 +780,9 @@ function refreshHumbleBundleGames(){
 								});
 							} else {
 
-								if (gameFoundInDatabase.stores.length>1){
+								/*if (gameFoundInDatabase.stores.length>1){
 									console.log(gameFoundInDatabase);
-								}
+								}*/
 
 								if (gameFoundInDatabase.stores.filter(function(store){
 								return store.name==storeName; }).length > 0) {
@@ -924,9 +924,9 @@ function refreshGoGGames(){
 								});
 							} else {
 
-								if (gameFoundInDatabase.stores.length>1){
+								/*if (gameFoundInDatabase.stores.length>1){
 									console.log(gameFoundInDatabase);
-								}
+								}*/
 
 								if (gameFoundInDatabase.stores.filter(function(store){
 								return store.name==storeName; }).length > 0) {
@@ -1015,14 +1015,14 @@ function start(){
 }
 
 async function refreshGames() {
-	let blizzardResponse = await refreshBlizzardGames();
+	/*let blizzardResponse = await refreshBlizzardGames();
 	console.log(blizzardResponse);
 	let epicGamesResponse = await refreshEpicGames();
-	console.log(epicGamesResponse);
+	console.log(epicGamesResponse);*/
 	let humbleBundleResponse = await refreshHumbleBundleGames();
 	console.log(humbleBundleResponse);
-	let GoGGamesResponse = await refreshGoGGames();
-	console.log(GoGGamesResponse);
+	/*let GoGGamesResponse = await refreshGoGGames();
+	console.log(GoGGamesResponse);*/
 }
 
 function getGameDetails(){
