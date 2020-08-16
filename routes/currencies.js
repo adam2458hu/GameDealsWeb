@@ -29,9 +29,9 @@ function updateCurrencies(){
 }
 
 function start(){
-	var dayInMiliseconds = 1000*60*60*24;
+	var threeHours = 1000*60*60*3;
 	updateCurrencies();
-	setInterval(updateCurrencies,dayInMiliseconds);
+	setInterval(updateCurrencies,threeHours);
 }
 
 router.get('/',async(req,res)=>{
@@ -74,6 +74,7 @@ async function updateCurrencyInDatabase(currency){
 			{$set: { rate: currency.rate }},
 			{new: true, upsert: true}
 		);
+		console.log(`${currency.name} pénznem frissítve`);
 	} catch(err){
 		console.log(err);
 	}

@@ -1026,14 +1026,14 @@ function start(){
 }
 
 async function refreshGames() {
-	/*let blizzardResponse = await refreshBlizzardGames();
+	let blizzardResponse = await refreshBlizzardGames();
 	console.log(blizzardResponse);
 	let epicGamesResponse = await refreshEpicGames();
-	console.log(epicGamesResponse);*/
+	console.log(epicGamesResponse);
 	let humbleBundleResponse = await refreshHumbleBundleGames();
 	console.log(humbleBundleResponse);
-	/*let GoGGamesResponse = await refreshGoGGames();
-	console.log(GoGGamesResponse);*/
+	let GoGGamesResponse = await refreshGoGGames();
+	console.log(GoGGamesResponse);
 }
 
 function getGameDetails(){
