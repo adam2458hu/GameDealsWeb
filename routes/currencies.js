@@ -7,6 +7,33 @@ const router = express.Router();
 const request = require('request');
 const Currency = require('../models/currency');
 
+start();
+
+function updateCurrencies(){
+	request(process.env.EXCHANGE_RATE_API,function (error, response, body) {
+		if (error) {
+			console.log(error);
+			process.exit(1);
+		}
+		
+		exchangeRates = JSON.parse(response.body);
+		Object.keys(exchangeRates.rates).forEach(key=>{
+			currency = new Currency({
+				name : key,
+				rate : exchangeRates.rates[key]
+			})
+
+			updateCurrencyInDatabase(currency);
+		})
+	});
+}
+
+function start(){
+	var dayInMiliseconds = 1000*60*60*24;
+	updateCurrencies();
+	setInterval(updateCurrencies,dayInMiliseconds);
+}
+
 router.get('/',async(req,res)=>{
 	try {
 		const currencies = await Currency.find().sort('name');

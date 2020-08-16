@@ -10,6 +10,7 @@ const request = require('request');
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 const Game = require('../models/game');
+const Currency = require('../models/currency');
 const m = require('../config/middlewares');
 var appList=[];
 var requestStartIndex=32800;
@@ -705,11 +706,28 @@ function refreshEpicGames(){
 	})
 }
 
+async function getCurrency(name){
+	return await Currency.find({name: name});
+}
+
 function refreshHumbleBundleGames(){
 	return new Promise((resolve,reject)=>{
 		let totalPages;
 		var storeName="Humble Bundle";
 		resetStillOnSaleFields(storeName);
+		var usd;
+
+		/*erre azért van szükség, mert a herokura telepített alkalmazás esetében a lekérdezett
+		játékok listájában $ ban szerepelnek az árak, ezért át kell alakítani €-ra, és ehhez kell
+		az currency adatbázisban rögzített arányszám*/
+		if (process.env.NODE_ENV !== 'production'){
+			usd = {
+				name : 'USD',
+				rate : 1
+			}
+		} else {
+			usd = getCurrency('USD');
+		}
 
 		request(process.env.HUMBLE_BUNDLE_DISCOUNTED_GAMES_URL,function(error,response,body){
 			if (error) {
@@ -743,16 +761,18 @@ function refreshHumbleBundleGames(){
 
 								request(options, function (error, response, body) {
 									if (error) throw new Error(error);
-									if (game.human_name=="Battle Brothers") console.log(game);
+
 									const humbleBundleGame = new Game({
 										name : game.human_name
 									})
 
+
+
 									humbleBundleGame.stores.push({
 										name : storeName,
-										originalPrice : game.full_price.amount,
-										specialPrice : game.current_price.amount,
-										discountPercent : Math.round((1-(game.current_price.amount/game.full_price.amount))*100),
+										originalPrice : game.full_price.amount/usd.rate,
+										specialPrice : game.current_price.amount/usd.rate,
+										discountPercent : Math.round((1-((game.current_price.amount/usd.rate)/(game.full_price.amount/usd.rate)))*100),
 										linkToGame : process.env.HUMBLE_BUNDLE_URL+game.human_url,
 										expired : false,
 										stillOnSale : true
@@ -811,9 +831,9 @@ function refreshHumbleBundleGames(){
 										gameFoundInDatabase.stores.forEach(store=>{
 											if (store.name==storeName){
 												store.name = storeName;
-												store.originalPrice = game.full_price.amount;
-												store.specialPrice = game.current_price.amount;
-												store.discountPercent = Math.round((1-(game.current_price.amount/game.full_price.amount))*100);
+												store.originalPrice = game.full_price.amount/usd.rate;
+												store.specialPrice = game.current_price.amount/usd.rate;
+												store.discountPercent = Math.round((1-((game.current_price.amount/usd.rate)/(game.full_price.amount/usd.rate)))*100);
 												store.linkToGame = process.env.HUMBLE_BUNDLE_URL+game.human_url;
 												store.expired = false;
 												store.stillOnSale = true;
@@ -825,9 +845,9 @@ function refreshHumbleBundleGames(){
 								} else {
 									gameFoundInDatabase.stores.push({
 										name : storeName,
-										originalPrice : game.full_price.amount,
-										specialPrice : game.current_price.amount,
-										discountPercent : Math.round((1-(game.current_price.amount/game.full_price.amount))*100),
+										originalPrice : game.full_price.amount/usd.rate,
+										specialPrice : game.current_price.amount/usd.rate,
+										discountPercent : Math.round((1-((game.current_price.amount/usd.rate)/(game.full_price.amount/usd.rate)))*100),
 										linkToGame : process.env.HUMBLE_BUNDLE_URL+game.human_url,
 										expired : false,
 										stillOnSale : true
