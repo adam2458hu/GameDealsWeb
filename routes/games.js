@@ -759,8 +759,6 @@ function refreshHumbleBundleGames(){
 										name : game.human_name
 									})
 
-
-
 									humbleBundleGame.stores.push({
 										name : storeName,
 										originalPrice : game.full_price.amount,
