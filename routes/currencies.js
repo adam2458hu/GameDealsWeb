@@ -15,15 +15,19 @@ function updateCurrencies(){
 			console.log(error);
 			process.exit(1);
 		}
-		
-		exchangeRates = JSON.parse(response.body);
-		Object.keys(exchangeRates.rates).forEach(key=>{
+
+		exchangeRates = JSON.parse(body).rates;
+		arrayOfExchangeRates = Object.keys(exchangeRates);
+		Object.keys(exchangeRates).forEach(async currencyName=>{
 			currency = new Currency({
-				name : key,
-				rate : exchangeRates.rates[key]
+				name : currencyName,
+				rate : exchangeRates[currencyName]
 			})
 
-			updateCurrencyInDatabase(currency);
+			let updateResponse = await updateCurrencyInDatabase(currency);
+			if (updateResponse==='OK' && arrayOfExchangeRates[arrayOfExchangeRates.length-1]===currencyName) {
+				console.log("Pénznemek frissítve");
+			}
 		})
 	});
 }
@@ -51,16 +55,20 @@ router.get('/update',async(req,res)=>{
 				process.exit(1);
 			}
 			
-			exchangeRates = JSON.parse(response.body);
-			Object.keys(exchangeRates.rates).forEach(key=>{
+			exchangeRates = JSON.parse(body).rates;
+			arrayOfExchangeRates = Object.keys(exchangeRates);
+			Object.keys(exchangeRates).forEach(async currencyName=>{
 				currency = new Currency({
-					name : key,
-					rate : exchangeRates.rates[key]
+					name : currencyName,
+					rate : exchangeRates[currencyName]
 				})
-
-				updateCurrencyInDatabase(currency);
+				
+				let updateResponse = await updateCurrencyInDatabase(currency);
+				if (updateResponse==='OK' && arrayOfExchangeRates[arrayOfExchangeRates.length-1]===currencyName) {
+					console.log("Pénznemek frissítve");
+				}
 			})
-			res.json(exchangeRates);
+			res.json(JSON.parse(body));
 		});
 	} catch(err){
 		res.status(500).json({message: err.message});
@@ -68,16 +76,20 @@ router.get('/update',async(req,res)=>{
 });
 
 async function updateCurrencyInDatabase(currency){
-	try {
-		await Currency.findOneAndUpdate(
-			{name: currency.name},
-			{$set: { rate: currency.rate }},
-			{new: true, upsert: true}
-		);
-		console.log(`${currency.name} pénznem frissítve`);
-	} catch(err){
-		console.log(err);
-	}
+	return new Promise((resolve,reject)=>{
+		(async()=>{
+			try {
+				await Currency.findOneAndUpdate(
+					{name: currency.name},
+					{$set: { rate: currency.rate }},
+					{new: true, upsert: true}
+				);
+				resolve('OK');
+			} catch(err){
+				reject(err);
+			}
+		})();
+	})
 }
 
 module.exports = router;
