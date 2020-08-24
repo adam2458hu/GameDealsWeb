@@ -1,43 +1,45 @@
 <div class="container-custom animated">
 	<div class="card">
 		<div class="card-header">
-			<h2 class="text-center">Biztonság</h2>
+			<h2 class="text-center">{{ 'security' | translate }}</h2>
 		</div>
 		<div class="card-body">
 			<form #changePassword="ngForm" (ngSubmit)="onSubmit(changePassword)">
-				<h3>Jelszó változtatása</h3>
+				<h3>{{ 'passwordChange' | translate }}</h3>
 				<div class="form-group">
-					<label for="password">Új jelszó</label>
+					<label for="password">{{ 'passwordNew' | translate }}</label>
 					<input type="password" id="password" class="form-control" name="password" [(ngModel)]="user.password" #password="ngModel" minlength="8" placeholder="********" required>
 					<div *ngIf="!password.valid && password.dirty">
-						<div *ngIf="password.errors.required">Ezt a mezőt kötelező kitölteni</div>
-						<div *ngIf="password.errors.minlength">A jelszónak minimum 8 karakterből kell állnia</div>
+						<div *ngIf="password.errors.required">{{ 'fieldRequired' | translate }}</div>
+						<div *ngIf="password.errors.minlength">{{ 'passwordLength' | translate }}</div>
 					</div>
 				</div>
 				<div class="form-group mb-3">
-					<label for="confirmPassword">Új jelszó újra</label>
+					<label for="confirmPassword">{{ 'passwordNewAgain' | translate }}</label>
 					<input type="password" id="confirmPassword" class="form-control" name="confirmPassword" [(ngModel)]="user.confirmPassword" appEqualPasswordValidator="password" #confirmPassword="ngModel" minlength="8" placeholder="********" required>
 					<div *ngIf="!confirmPassword.valid && confirmPassword.dirty">
-						<div *ngIf="confirmPassword.errors.required">Ezt a mezőt kötelező kitölteni</div>
-						<div *ngIf="confirmPassword.errors.minlength">A jelszónak minimum 8 karakterből kell állnia</div>
+						<div *ngIf="confirmPassword.errors.required">{{ 'fieldRequired' | translate }}</div>
+						<div *ngIf="confirmPassword.errors.minlength">{{ 'passwordLength' | translate }}</div>
 						<div *ngIf="confirmPassword.errors.notEqual && !confirmPassword.errors.required">A két jelszó nem egyezik</div>
 					</div>
 				</div>
-				<input type="submit" class="btn-block" value="Módosítások mentése">
+				<input type="submit" class="btn-block" value="{{ 'saveChanges' | translate }}">
 			</form>
 			<hr>
-			<h3>Két faktoros hitelesítés bekapcsolása</h3>
+			<h3>{{ 'twoFactorAuthentication' | translate }}</h3>
 			<div class="alert alert-info">
-				A két faktoros hitelesítéssel tovább növelheti felhasználói fiókjának biztonságát. Ekkor az Ön által igényelt úton keresztül juttatjunk el a belépéshez szükséges 6 számjegyű kódot, amit az emailcím és jelszó megadását követően kell majd megadnia egy felugró ablakban.
+				{{ 'twoFactorAuthenticationInfo' | translate }}
 			</div>
-			<p>
+			<p>{{ 'twoFactorAppInfo' | translate }}
 				A Google Hitelesítő használatához először töltse le az alkalmazást az <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2">Android</a> vagy <a href="https://apps.apple.com/us/app/google-authenticator/id388497605">IOS</a> eszközére.
+			}
+			}
 			</p>
-			<button type="button" *ngIf="!getUserService().getUser().twoFactorGoogleEnabled" class="btn-block mb-3" (click)="toggleTwoFactor('App')">Alkalmazás hitelesítés bekapcsolása</button>
-			<button type="button" *ngIf="getUserService().getUser().twoFactorGoogleEnabled" class="btn-block mb-3" (click)="toggleTwoFactor('App')">Alkalmazás hitelesítés kikapcsolása</button>
-			<p>Az emailes hitelesítés választása esetén az email címére küldjük a megerősítő kódot.</p>
-			<button type="button" *ngIf="!getUserService().getUser().twoFactorEmailEnabled" class="btn-block" (click)="toggleTwoFactor('Email')">Email hitelesítés bekapcsolása</button>
-			<button type="button" *ngIf="getUserService().getUser().twoFactorEmailEnabled" class="btn-block" (click)="toggleTwoFactor('Email')">Email hitelesítés kikapcsolása</button>
+			<button type="button" *ngIf="!getUserService().getUser().twoFactorGoogleEnabled" class="btn-block mb-3" (click)="toggleTwoFactor('App')">{{ 'twoFactorAppEnable' | translate }}</button>
+			<button type="button" *ngIf="getUserService().getUser().twoFactorGoogleEnabled" class="btn-block mb-3" (click)="toggleTwoFactor('App')">{{ 'twoFactorAppDisable' | translate }}</button>
+			<p>{{ 'twoFactorEmailInfo' | translate }}</p>
+			<button type="button" *ngIf="!getUserService().getUser().twoFactorEmailEnabled" class="btn-block" (click)="toggleTwoFactor('Email')">{{ 'twoFactorEmailEnable' | translate }}</button>
+			<button type="button" *ngIf="getUserService().getUser().twoFactorEmailEnabled" class="btn-block" (click)="toggleTwoFactor('Email')">{{ 'twoFactorEmailDisable' | translate }}</button>
 		</div>
 	</div>
 </div>

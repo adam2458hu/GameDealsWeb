@@ -35,8 +35,13 @@ export class GameService {
 			}
 		})//
 		const queryString = '?'+queries.join('&');
-		var headers = new HttpHeaders({'authorization':'Bearer '+this.userService.getAccessToken()});
-		return this.http.post(environment.apiGamesURL+queryString,{refreshToken: this.userService.getRefreshToken()},{headers:headers});
+
+		if (this.userService.isAuthenticated()){
+			var headers = new HttpHeaders({'authorization':'Bearer '+this.userService.getAccessToken()});
+			return this.http.post(environment.apiGamesURL+queryString,{refreshToken: this.userService.getRefreshToken()},{headers:headers});
+		} else {
+			return this.http.get(environment.apiGamesURL+queryString);
+		}
 	}
 
 	getRecommendedGamesByHistory(gameHistory){

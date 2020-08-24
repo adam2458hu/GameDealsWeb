@@ -1,19 +1,19 @@
 <div class="container-custom">
 	<div class="card">
 		<div class="card-header">
-			<h2 class="text-center">Adataim</h2>
+			<h2 class="text-center">{{ 'details' | translate }}</h2>
 		</div>
 		<div class="card-body">
 			<form #userDetailsForm="ngForm" (ngSubmit)="onSubmit(userDetailsForm)">
 				<div class="row">
-					<div class="col-4 text-right">Azonosító:</div>
+					<div class="col-4 text-right">{{ 'identifier' | translate }}:</div>
 					<div class="col-8">
 						<input type="text" name="_id" [(ngModel)]="getUserService().getUser()._id" class="form-control" disabled>
 					</div>
 				</div>
 				<div class="row">
 					<div class="col-4 text-right">
-						<label for="first_name">Keresztnév:</label>
+						<label for="first_name">{{ 'firstName' | translate }}:</label>
 					</div>
 					<div class="col-8">
 						<input type="text" id="first_name" name="first_name" [(ngModel)]="getUserService().getUser().first_name" class="form-control">
@@ -21,7 +21,7 @@
 				</div>
 				<div class="row">
 					<div class="col-4 text-right">
-						<label for="last_name">Vezetéknév:</label>
+						<label for="last_name">{{ 'lastName' | translate }}:</label>
 					</div>
 					<div class="col-8">
 						<input type="text" id="last_name" name="last_name" [(ngModel)]="getUserService().getUser().last_name" class="form-control">
@@ -37,30 +37,30 @@
 				</div>
 				<div class="row mb-3">
 					<div class="col-4 text-right">
-						<label for="consentToNewsletter">Hírlevélre feliratkozva:</label>
+						<label for="consentToNewsletter">{{ 'subscribedToNewsletter' | translate }}:</label>
 					</div>
 					<div class="col-8">
 						<label class="mt-1">
 							<input type="checkbox" id="consentToNewsletter" name="consentToNewsletter" [(ngModel)]="getUserService().getUser().consentToNewsletter">
-							<span *ngIf="getUserService().getUser().consentToNewsletter" class="ml-2">Igen</span>
-							<span *ngIf="!getUserService().getUser().consentToNewsletter" class="ml-2">Nem</span>
+							<span *ngIf="getUserService().getUser().consentToNewsletter" class="ml-2">{{ 'yes' | translate }}</span>
+							<span *ngIf="!getUserService().getUser().consentToNewsletter" class="ml-2">{{ 'no' | translate }}</span>
 						</label>
 					</div>
 				</div>
-				<input type="submit" class="btn-block" value="Módosítások mentése">
+				<input type="submit" class="btn-block" value="{{ 'saveChanges' | translate }}">
 				<hr>
 			</form>
-			<h3>Profil információk lekérdezése</h3>
+			<h3>{{ 'downloadPersonalData' | translate }}</h3>
 			<div *ngIf="!getUserService().getUser().twoFactorGoogleEnabled && !getUserService().getUser().twoFactorEmailEnabled; else elseBlock">
-				<p>Ahhoz, hogy az Önről tárolt adatokat megosszuk magával kérjük, hogy engedélyezze a kétfaktoros azonosítást a profiljához.</p>
-				<button [routerLink]="['/profile/security']" class="btn-block">Azonosítási mód kiválasztása</button>
+				<p>{{ 'downloadPersonalDataRequirements' | translate }}</p>
+				<button [routerLink]="['/profile/security']" class="btn-block">{{ 'selectAuthentication' | translate }}</button>
 			</div>
 			<ng-template #elseBlock>
-				<p>Kérjük válasszon, hogy milyen formátumban szeretné megkapni az Önről tárolt információkat. A megfelelő formátum kiválasztását követően kattintson az adatigénylés gombra, ami után egy letöltő linket fog kapni az email címére.</p>
+				<p>{{ 'chooseFormat' | translate }}</p>
 				<form #requestedFormat="ngForm" (ngSubmit)="sendPersonalInformations(requestedFormat)">
 					<div class="row mb-3">
 						<div class="col-4 text-right">
-							<label for="format">Formátum:</label>
+							<label for="format">{{ 'format' | translate }}:</label>
 						</div>
 						<div class="col-8">
 							<select name="format" [(ngModel)]="format" id="format" class="form-control">
@@ -69,29 +69,26 @@
 							</select>
 						</div>
 					</div>
-					<input class="btn-block" type="submit" value="Adatigénylés">
+					<input class="btn-block" type="submit" value="{{ 'requestData' | translate }}">
 				</form>
-				<!--<button class="btn-block" (click)="downloadPersonalInformations('pdf')">Adatok letöltése pdf formátumban</button>
-				<button class="btn-block" (click)="downloadPersonalInformations('json')">Adatok letöltése json formátumban</button>-->
-				<!--<button class="btn-block" [routerLink]="['/profile/security']">Azonosítási mód módosítása</button>-->
 			</ng-template>
 			<hr>
-			<h3>Profil törlése</h3>
-			<button type="button" class="btn-block" (click)="setPopup(true)">Profil törlése</button>
+			<h3>{{ 'deleteProfile' | translate }}</h3>
+			<button type="button" class="btn-block" (click)="setPopup(true)">{{ 'deleteProfile' | translate }}</button>
 		</div>
 	</div>
 </div>
 <div *ngIf="isPopupOpened()" class="modal-container">
 	<div class="custom-modal card">
 		<div class="card-header">
-			<h3>Biztosan törölni szeretné profilját?</h3>
+			<h3>{{ 'deleteProfileConfirm' | translate }}</h3>
 		</div>
 		<div class="card-body">
-			<p>A művelet végrehajtásával az adatai, köztük a személyre szabott beállításai is törlődnek. Ez a folyamat nem visszavonható.</p>
+			<p>{{ 'deleteProfileInfo' | translate }}</p>
 		</div>
 		<div class="card-footer">
-			<button type="button" class="mr-3 mb-3 mb-sm-0" (click)="setPopup(false)">Mégsem</button>
-			<button type="button" (click)="deleteProfile()">Igen</button>
+			<button type="button" class="mr-3 mb-3 mb-sm-0" (click)="setPopup(false)">{{ 'cancel' | translate }}</button>
+			<button type="button" (click)="deleteProfile()">{{ 'yes' | translate }}</button>
 		</div>
 	</div>
 </div>

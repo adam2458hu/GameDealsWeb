@@ -1,7 +1,7 @@
 <div class="container-custom">
 	<div class="card">
 		<div class="card-header">
-			<h2 class="text-center">Belépés</h2>
+			<h2 class="text-center">{{ 'signIn' | translate }}</h2>
 		</div>
 		<div class="card-body">
 			<form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)">
@@ -10,17 +10,17 @@
 					<input type="email" id="email" class="form-control" name="email" [(ngModel)]="user.email" placeholder="example@mail.com">
 				</div>
 				<div class="form-group">
-					<label for="psw">Jelszó</label>
+					<label for="psw">{{ 'password' | translate }}</label>
 					<input type="password" id="psw" class="form-control" name="password" [(ngModel)]="user.password" placeholder="********">
 				</div>
 				<div class="d-flex justify-content-between mb-2">
 					<label>
-						<input type="checkbox" name="rememberMe" [(ngModel)]="user.rememberMe"> Emlékezzen rám
+						<input type="checkbox" name="rememberMe" [(ngModel)]="user.rememberMe"> {{ 'rememberMe' | translate }}
 					</label>
-					<a [routerLink]="['/forgot-password']">Elfelejtett jelszó</a>
+					<a [routerLink]="['/forgot-password']">{{ 'passwordForgotten' | translate}}?</a>
 				</div>
 				<div class="text-center">
-					<input type="submit" class="btn-block" value="Belépek">
+					<input type="submit" class="btn-block" value="{{ 'signIn' | translate }}">
 				</div>
 			</form>
 		</div>
@@ -29,35 +29,35 @@
 <div *ngIf="isPopupOpened()" class="modal-container">
 	<div *ngIf="popupType=='verificationRequired'" class="custom-modal card">
 		<div class="card-header">
-			<h3>Kérjük erősítse meg email címét</h3>
+			<h3>{{ 'verifyEmail' | translate }}</h3>
 		</div>
 		<div class="card-body">
-			<p>Amennyiben nem kapta meg a megerősítő liket tartalmazó üzenetet, akkor kérjük próbálkozzon az üzenet újra küldésével.</p>
+			<p>{{ 'verificationEmailInfo' | translate }}</p>
 		</div>
 		<div class="card-footer">
-			<button type="button" class="mr-3" (click)="setPopup(false)">Mégsem</button>
-			<button type="button" (click)="resendVerificationLink(user.email)">Link újraküldése</button>
+			<button type="button" class="mr-3" (click)="setPopup(false)">{{ 'cancel' | translate }}</button>
+			<button type="button" (click)="resendVerificationLink(user.email)">{{ 'verificationEmailResend' | translate }}</button>
 		</div>
 	</div>
 	<div *ngIf="popupType=='appTwoFactor' || popupType=='emailTwoFactor'" class="custom-modal card">
 		<form #twoFactorForm="ngForm" (ngSubmit)="verifyTwoFactorCode(twoFactorForm)">
 			<div class="card-header">
-				<h3 *ngIf="popupType=='appTwoFactor'">Hitelesítő alkalmazás</h3>
-				<h3 *ngIf="popupType=='emailTwoFactor'">Email hitelesítés</h3>
+				<h3 *ngIf="popupType=='appTwoFactor'">{{ 'twoFactorApp' | translate }}</h3>
+				<h3 *ngIf="popupType=='emailTwoFactor'">{{ 'twoFactorEmail' | translate }}</h3>
 			</div>
 			<div class="card-body">
 				<p *ngIf="popupType=='appTwoFactor'">Kérjük írja be a hitelesítő alkalmázásában megjelenő 6 számjegyű kódot.</p>
 				<p *ngIf="popupType=='emailTwoFactor'">Kérjük írja be az email címére küldött üzenetben található 6 számjegyű kódot.</p>
 				<div class="input-group">
 					<div class="input-group-prepend">
-						<span class="input-group-text text-white">Ellenőrző kód:</span>
+						<span class="input-group-text text-white">{{ 'securityCode' | translate }}:</span>
 					</div>
 					<input type="text" class="form-control" id="code" name="code" [(ngModel)]="code" placeholder="******">
 				</div>
 				<input type="hidden" id="type" name="type" [(ngModel)]="popupType">
 			</div>
 			<div class="card-footer">
-				<button type="button" class="mr-3" (click)="setPopup(false)">Mégsem</button>
+				<button type="button" class="mr-3" (click)="setPopup(false)">{{ 'cancel' | translate }}</button>
 				<input type="submit" value="Küldés">
 			</div>
 		</form>
@@ -65,26 +65,26 @@
 	<div *ngIf="popupType=='twoFactorMethod'" class="custom-modal card">
 		<form #twoFactorMethodForm="ngForm" (ngSubmit)="selectTwoFactorMethod(twoFactorMethodForm)">
 			<div class="card-header">
-				<h3>Hitelesítési mód választása</h3>
+				<h3>{{ 'twoFactorAuthenticationSelection' | translate }}</h3>
 			</div>
 			<div class="card-body">
-				<p>Kérjük válasszon, hogy melyik módon szeretné megkapni az azonosításhoz szükséges 6 számjegyű kódot.</p>
+				<p>{{ 'twoFactorAuthenticationSelectionInfo' | translate }}</p>
 				<div class="radio">
 					<label>
 						<input type="radio" name="authMethod" value="appTwoFactor" ngModel>
-						Hitelesítő alkalmazás
+						{{ 'twoFactorApp' | translate }}
 					</label>
 				</div>
 				<div class="radio">
 					<label>
 						<input type="radio" name="authMethod" value="emailTwoFactor" ngModel>
-						Emailes azonosítás
+						{{ 'twoFactorEmail' | translate }}
 					</label>
 				</div>
 			</div>
 			<div class="card-footer">
-				<button type="button" class="mr-3" (click)="setPopup(false)">Mégsem</button>
-				<input type="submit" value="Küldés">
+				<button type="button" class="mr-3" (click)="setPopup(false)">{{ 'cancel' | translate }}</button>
+				<input type="submit" value="{{ 'send' | translate }}">
 			</div>
 		</form>
 	</div>

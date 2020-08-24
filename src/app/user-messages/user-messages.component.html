@@ -1,7 +1,7 @@
 <div class="container-custom">
 	<div class="card">
 		<div class="card-header">
-			<h3>Üzenetek</h3>
+			<h3>{{ 'messages' | translate }}</h3>
 		</div>
 		<div class="card-body">
 			<div *ngIf="getUserService().returnMessages().length>0;else elseblock">
@@ -16,7 +16,7 @@
 				</div>
 			</div>
 			<ng-template #elseblock>
-				<p>Nincsenek üzenetek.</p>
+				<p>{{ 'messagesNone' | translate }}</p>
 			</ng-template>
 			<div class="panel-group">
 				<div *ngFor="let message of getUserService().returnMessages();index as i" class="panel panel-default">
@@ -25,17 +25,17 @@
 						<div class="d-flex justify-content-between">
 							<span>
 								<span *ngIf="!message.read" class="badge badge-pill badge-info">
-									ÚJ
+									{{ 'new' | translate }}
 								</span>
 								{{ message.title }}
 								<span *ngIf="message.type==='deal'"class="badge badge-pill badge-info">
-									Akció
+									{{ 'deal' | translate }}
 								</span>
 								<span *ngIf="message.type==='feature'"class="badge badge-pill badge-success">
-									Funkció
+									{{ 'function' | translate }}
 								</span>
 								<span *ngIf="message.type==='information'"class="badge badge-pill" style="background-color: red">
-									Tájékoztatás
+									{{ 'news' | translate }}
 								</span>
 							</span>
 							<span>{{ message.date | date:'short'}}</span>

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Filter } from './filter';
 import { CurrencyService } from '../currency/currency.service';
 import { StoreService } from '../store/store.service';
+import { UserService } from '../user/user.service';
  
 @Injectable({
   providedIn: 'root'
@@ -20,8 +21,8 @@ export class FilterService {
 		gamesPerRequest: 10,
 		gameRequestOffset: 0,
 		selectedStores: [],
-		direction: 1,
-		sortBy: 'name',
+		direction: -1,
+		sortBy: 'metascore',
 		currency: 'EUR',
 		currencyPrevious: 'EUR',
 		symbol: '€',
@@ -32,6 +33,7 @@ export class FilterService {
 	private allStores: {name: String,isSelected: Boolean}[] = [];
 
 	constructor(
+		private userService: UserService,
 		private currencyService: CurrencyService,
 		private storeService: StoreService
 	) {
@@ -59,7 +61,6 @@ export class FilterService {
 				isSelected : true
 			});
 		})
-		console.log(this.allStores);
 	}
 
 	onCurrencyChange(value){
@@ -103,7 +104,6 @@ export class FilterService {
 				this.filter.selectedStores.push(store.name);
 			}
 		})
-		console.log(this.filter.selectedStores);
 	}
 
 	increaseOffset(){
@@ -111,7 +111,6 @@ export class FilterService {
 	}
 
 	resetFilter(){
-
 		this.filter = {
 			name: null,
 			minSpecialPrice: null,
@@ -125,13 +124,15 @@ export class FilterService {
 			selectedStores: [],
 			gamesPerRequest: 10,
 			gameRequestOffset: 0,
-			direction: 1,
-			sortBy: 'name',
+			direction: -1,
+			sortBy: 'metascore',
 			currency: this.filter.currency,
 			currencyPrevious: this.filter.currencyPrevious,
 			symbol: this.filter.symbol,
 			decimalPlaces: this.filter.decimalPlaces
 		}
+
+		this.setLocalCurrency();
 	}
 
 	selectAllStores(){
@@ -146,7 +147,6 @@ export class FilterService {
 		}
 
 		this.isAllSelected=!this.isAllSelected;
-		console.log(this.allStores);
 	}
 
 	selectStore(storeName){
@@ -156,7 +156,6 @@ export class FilterService {
 				store.isSelected = !store.isSelected;
 			}
 		})
-		console.log(this.allStores);
 	}
 
 	getAllStores(){
@@ -169,5 +168,31 @@ export class FilterService {
 
 	getIsAllSelected(){
 		return this.isAllSelected;
+	}
+
+	setLocalCurrency(){
+		this.userService.getIPAddress().subscribe(
+			(res: any)=>{
+				this.getGeoLocation(res.ip);
+			},
+			(err)=>{
+				console.log(err);
+			});
+	}
+
+	getGeoLocation(ip: string){
+		this.userService.getGeoLocation(ip).subscribe(
+			(res: any)=>{
+				this.currencyService.getCurrencies().forEach(currency=>{
+					if (currency.name==res.currency.code){
+						this.filter.currency = res.currency.code;
+						this.filter.symbol = currency.symbol;
+						this.filter.decimalPlaces = currency.decimalPlaces;
+					}
+				})	
+			},
+			(err)=>{
+				console.log(err);
+			});
 	}
 }

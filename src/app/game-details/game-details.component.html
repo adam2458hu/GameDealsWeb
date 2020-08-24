@@ -12,8 +12,8 @@
 				</div>
 				<div id="gameDetails" class="col-8">
 					<h4 class="text-center">{{ selectedGame.name }}</h4>
-					<div class="text-center">Műfaj: {{ selectedGame.genres }}</div>
-					<div *ngIf="selectedGame.releaseDate" class="text-center">Megjelenés: {{ selectedGame.releaseDate | date : 'longDate' }}</div>
+					<div class="text-center">{{ 'genre' | translate}}: {{ selectedGame.genres }}</div>
+					<div *ngIf="selectedGame.releaseDate" class="text-center">{{ 'releaseDate' | translate }}: {{ selectedGame.releaseDate | date : 'longDate' }}</div>
 					<div class="text-center">Metascore: 
 						<span class="metascore rated" *ngIf="selectedGame.metascore;else elseBlock">
 							{{ selectedGame.metascore }}
@@ -27,9 +27,9 @@
 			<div *ngIf="selectedGame.description" class="row mt-3">
 				<div class="col">
 					<button class="btn-block mb-2" (click)="descriptionOpened=!descriptionOpened">
-						<span *ngIf="!descriptionOpened;else showLess">Bővebben</span>
+						<span *ngIf="!descriptionOpened;else showLess">{{ 'showMore' | translate }}</span>
 						<ng-template #showLess>
-							<span>Kevesebb</span>
+							<span>{{ 'showLess' | translate }}</span>
 						</ng-template>
 					</button>
 					<p *ngIf="descriptionOpened" class="description">{{ selectedGame.description }}</p>
@@ -40,10 +40,10 @@
 			<table class="table table-hover table-dark mb-3">
 				<thead>
 					<tr>
-						<td class="text-center">Áruház</td>
-						<td class="text-center">Akciós ár</td>
-						<td class="text-center">Erdeti ár</td>
-						<td class="text-center">Kedvezmény</td>
+						<td class="text-center">{{ 'store' | translate }}</td>
+						<td class="text-center">{{ 'discountPrice' | translate }}</td>
+						<td class="text-center">{{ 'originalPrice' | translate }}</td>
+						<td class="text-center">{{ 'discount' | translate }}</td>
 					</tr>
 				</thead>
 				<tbody>

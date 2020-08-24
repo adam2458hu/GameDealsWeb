@@ -25,13 +25,13 @@ export class DealsComponent implements OnInit {
 		private storeService: StoreService,
 		private filterService: FilterService,
 		private currencyService: CurrencyService
-	) { }
+	) {}
 
 	ngOnInit() {
-		if (this.userService.isAuthenticated()){
-			this.userService.getMessages();
-		} 
-		
+		/*if (!this.userService.isAuthenticated()){
+			this.router.navigate(['/login']);
+		}*/
+
 		this.loadingScreenService.setAnimation(true);
 		this.gameService.resetGamesData();
 		this.filterService.resetFilter();
@@ -42,7 +42,11 @@ export class DealsComponent implements OnInit {
 		if (startLoadingAnimation) this.loadingScreenService.setAnimation(true);
 		this.gameService.getGameList(filter).subscribe(
 			(res: any)=>{
-				this.userService.resetSession(res.accessToken);
+				if (this.userService.isAuthenticated()){
+					this.userService.resetSession(res.accessToken);	
+					this.userService.getMessages();
+				}
+
 				this.gameService.setTotalGamesCount(res.totalGamesCount);
 				this.gameService.setFilteredGamesCount(res.filteredGamesCount);
 				for (let i=0;i<res.discountedGames.length;i++){
@@ -109,6 +113,14 @@ export class DealsComponent implements OnInit {
 
 	getGamesData(){
 		return this.gameService.getGamesData();
+	}
+
+	getGamesPerRequest(){
+		if (this.numberOfGamesLeft()>=this.getFilterService().filter.gamesPerRequest){
+			return this.getFilterService().filter.gamesPerRequest;
+		} else {
+			return this.numberOfGamesLeft();
+		}
 	}
 
 	getCheapestStore(game){

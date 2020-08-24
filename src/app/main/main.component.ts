@@ -16,6 +16,10 @@ export class MainComponent implements OnInit {
 		
 	}
 
+	onActivate(event) {
+    	window.scroll(0,0);
+	}
+
 	isLoading(){
 		return this.loadingScreenService.isLoading();
 	}

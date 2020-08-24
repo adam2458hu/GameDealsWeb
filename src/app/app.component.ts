@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { environment } from '../environments/environment';
 import { SwPush } from '@angular/service-worker';
 import { UserService } from './shared/user/user.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +10,14 @@ import { UserService } from './shared/user/user.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-	constructor(swPush: SwPush,private userService: UserService) {
+	constructor(
+		swPush: SwPush,
+		private userService: UserService,
+		private translateService: TranslateService
+	) {
+		this.translateService.setDefaultLang('en');
+		this.translateService.use(localStorage.getItem('lang') || 'en');
+
 		if (swPush.isEnabled) {
 		  swPush
 		    .requestSubscription({

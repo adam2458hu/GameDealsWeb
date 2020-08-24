@@ -1,25 +1,25 @@
 <div *ngIf="!getLoadingScreenService().isLoading() && areCurrenciesReceived() && areStoresReceived()" class="container-custom deals">
-	<h3 class="text-center">Összesen {{ getTotalGamesCount() }} akció</h3>
-	<h4 class="text-center">Keresési találat: {{ getFilteredGamesCount() }}</h4>
+	<h3 class="text-center">{{ 'totalDeals' | translate }}: {{ getTotalGamesCount() }}</h3>
+	<h4 class="text-center">{{ 'searchResults' | translate }}: {{ getFilteredGamesCount() }}</h4>
 	<div class="table-responsive">
 		<form #filterForm="ngForm" (ngSubmit)="sortTable()">
-			<table class="table table-hover table-dark">
+			<table class="table table-hover">
 				<thead>
-					<tr>
+					<tr><!--
 						<th>
 							<button type="button" (click)="getFilterService().toggleFilter()">Szűrők</button>
-						</th>
-						<th title="Rendezés név szerint" (click)="sortTable('name')">Játék neve
+						</th>-->
+						<th title="Rendezés név szerint" (click)="sortTable('name')">{{ 'name' | translate }}
 							<span>{{ checkSorting('name') }}</span>
 						</th>
-						<th title="Rendezés akciós ár szerint" (click)="sortTable('specialPrice')" class="text-center">Akciós ár
+						<th title="Rendezés akciós ár szerint" (click)="sortTable('specialPrice')" class="text-center">{{ 'discountPrice'| translate }}
 							<span>{{ checkSorting('specialPrice') }}</span>
 						</th>
 						<th title="Rendezés eredeti ár szerint" (click)="sortTable('originalPrice')" class="text-center">
-							Eredeti ár
+							{{ 'originalPrice' | translate }}
 							<span>{{ checkSorting('originalPrice') }}</span>
 						</th>
-						<th title="Rendezés kedvezmény szerint" (click)="sortTable('discountPercent')" class="text-center">Kedvezmény
+						<th title="Rendezés kedvezmény szerint" (click)="sortTable('discountPercent')" class="text-center">{{ 'discount' | translate }}
 							<span>{{ checkSorting('discountPercent') }}</span>
 						</th>
 						<th title="Rendezés metascore szerint" (click)="sortTable('metascore')" class="text-center">Metascore
@@ -27,18 +27,19 @@
 						</th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody><!--
 					<tr *ngIf="isFilterOpened()" app-filter
-					(filtered)="sortTable($event)"></tr> 
+					(filtered)="sortTable($event)"></tr>-->
 					<tr *ngFor="let game of getGamesData()" (click)="showAllStores(game)">
-						<td id="productImage">
+						<!--<td id="productImage">
 							<img *ngIf="game.stores[0].image;else noimageBlock" src="{{ game.stores[0].image }}" alt="{{ game.name }}">
 							<ng-template #noimageBlock>
 								<span class="noimage"><fa name="photo"></fa></span>
 							</ng-template>
-						</td>
+						</td>-->
 						<td id="productName">
-							{{ game.name }}
+							<div>{{ game.name }}</div>
+							<div id="genres">{{ game.genres }}</div>
 						</td>
 						<td id="specialPrice" class="text-center">
 							{{ currencyConverter(getCheapestStore(game).specialPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}
@@ -63,11 +64,7 @@
 		</form>
 	</div>
 	<button type="button" *ngIf="numberOfGamesLeft()>0" class="btn-block" (click)="showMore()">
-		Következő
-		<span *ngIf="numberOfGamesLeft()>=getFilterService().filter.gamesPerRequest; then thenBlock else elseBlock"></span>
-		<ng-template #thenBlock>{{ getFilterService().filter.gamesPerRequest }}</ng-template>
-		<ng-template #elseBlock>{{ numberOfGamesLeft() }}</ng-template>
-		találat mutatása.
+		{{ 'showNextResults' | translate: {gamesPerRequest:getGamesPerRequest()} }}
 	</button>
 </div>
 <app-game-details [selectedGame]="selectedGame" (close)="onClose()"></app-game-details>

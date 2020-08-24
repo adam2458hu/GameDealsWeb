@@ -2,5 +2,5 @@
 	<div *ngIf="isLoading()" class="modal-container animated">
 		<div class="loading-icon"></div>
 	</div>
-	<router-outlet></router-outlet>
+	<router-outlet (activate)="onActivate($event)"></router-outlet>
 </main>

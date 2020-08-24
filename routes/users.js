@@ -435,10 +435,10 @@ router.post('/sendPersonalInformations',m.isAuthenticated,async(req,res)=>{
 router.post('/saveLoginDetails',m.isAuthenticated,async(req,res)=>{
 	try {
 		const user = await User.findById(req._id);
-		console.log(user.lastLoginDetails.ip!=null);
+		/*console.log(user.lastLoginDetails.ip!=null);
 		console.log(req.body.loginDetails.ip!==user.lastLoginDetails.ip);
 		console.log(user.lastLoginDetails);
-		console.log(req.body.loginDetails);
+		console.log(req.body.loginDetails);*/
 		if (user.lastLoginDetails.ip!=null && req.body.loginDetails.ip!==user.lastLoginDetails.ip){
 			const securityAlertToken = user.generateSecurityAlertToken();
 			const newPasswordToken = user.generateNewPasswordToken();
@@ -665,12 +665,6 @@ router.get('/messages',m.isAuthenticated,async(req,res)=>{
 		const user = await User.findById(req._id);
 		let messagesUnread=0;
 		user.messages.forEach(message=>{
-			/*console.log(message.date);
-			console.log(user.messagesWereReadAt.getTime());
-			console.log(message.date.getTime()>user.messagesWereReadAt.getTime());
-			if (message.date.getTime()>user.messagesWereReadAt.getTime()){
-				++messagesUnread;
-			}*/
 			if (message.read==false){
 				++messagesUnread;
 			}

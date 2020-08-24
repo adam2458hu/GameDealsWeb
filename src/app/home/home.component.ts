@@ -1,7 +1,8 @@
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit, ElementRef, AfterViewInit, ViewChild} from '@angular/core';
 import { Game } from '../game/game';
 import { UserService } from '../shared/user/user.service';
 import { GameService } from '../game/game.service';
+import { CurrencyService } from '../shared/currency/currency.service';
 import { FilterService } from '../shared/filter/filter.service';
 import { LoadingScreenService } from '../shared/loading-screen/loading-screen.service';
 
@@ -10,12 +11,13 @@ import { LoadingScreenService } from '../shared/loading-screen/loading-screen.se
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements AfterViewInit {
 	index=0;
 	numberOfWatchedGames=0;
 	showViewedGenres=false;
 	images: String[]=['pubg','aco','ets2'];
-	titles: String[]=['PLAYERUNKNOWNS BATTLEGROUNDS leárazás','Assassins Creed: Odyssey leárazás','Euro Truck Simulator 2 akció'];
+	loadingImages = true;
+	titles: String[]=['PLAYERUNKNOWNS BATTLEGROUNDS','Assassins Creed: Odyssey','Euro Truck Simulator 2'];
 	discounts: String[]=['-50%','-67%','-75%'];
 	endOfOffer: Date[]=[new Date(2020, 7, 29, 0, 0, 0, 0),new Date(2020, 7, 27, 0, 0, 0, 0),new Date(2020, 7, 27, 0, 0, 0, 0)];
 	links: String[]=['https://store.steampowered.com/app/578080/PLAYERUNKNOWNS_BATTLEGROUNDS/',
@@ -31,11 +33,12 @@ export class HomeComponent implements OnInit {
 	constructor(
 		private userService: UserService,
 		private gameService: GameService,
+		private currencyService: CurrencyService,
 		private filterService: FilterService,
 		private loadingScreenService: LoadingScreenService
 	) { }
 
-	ngOnInit() {
+	ngAfterViewInit() {
 		this.fadeIn = true;
 		this.resetAnimation();
 		this.startAnimation();
@@ -122,6 +125,10 @@ export class HomeComponent implements OnInit {
 		return this.userService;
 	}
 
+	getFilterService(){
+		return this.filterService;
+	}
+
 	getRecommendedGamesByHistory(){
 		this.userService.getGameHistory().subscribe(
 			(res: any)=>{
@@ -175,6 +182,10 @@ export class HomeComponent implements OnInit {
 		return game.stores.reduce((accumulator, currentValue)=>{
 			return (accumulator.specialPrice<currentValue.specialPrice)?accumulator:currentValue;
 		})
+	}
+
+	currencyConverter(amount: number,from: String,to: String){
+		return this.currencyService.currencyConverter(amount,from,to);
 	}
 
 	deleteGameHistory(){

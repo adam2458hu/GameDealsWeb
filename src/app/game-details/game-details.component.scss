@@ -66,12 +66,17 @@
 		}
 
 		.metascore {
-			padding: 2px 4px;
+			display: inline-block;
+			padding: 5px 10px;
+			line-height: 10px;
 		}
 
 		#discountPercent span{
-			font-size: 18px;
-			padding: 8px;
+			display: inline-block;
+			background-color: $color-secondary;
+			line-height: 10px;
+			font-size: 16px;
+			padding: 5px 10px;
 		}
 
 		#gameDetails {
