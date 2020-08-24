@@ -73,9 +73,45 @@ router.post('/getWatchedGames',async(req,res)=>{
 	}
 })
 
+router.get('/',async(req,res)=>{
+	let filter=getFilter(req);
+	let sortObject=getSortObject(req);
+
+	try {
+		const totalGamesCount = await Game.countDocuments({'stores.expired':false});
+		const filteredGamesCount = await Game.countDocuments(filter);
+		const discountedGames = await Game.find(filter).sort(sortObject).limit(10).skip(parseInt(req.query.gameRequestOffset));
+		res.status(200).json({
+			totalGamesCount: totalGamesCount,
+			filteredGamesCount: filteredGamesCount,
+			discountedGames: discountedGames
+		});
+	} catch(err){
+		res.status(500).json({message: err.message});
+	}
+});
+
 router.post('/',[m.isAuthenticated,m.refreshToken()],async(req,res)=>{
-	let filter={};
-	let value;
+	let filter=getFilter(req);
+	let sortObject=getSortObject(req);
+
+	try {
+		const totalGamesCount = await Game.countDocuments({'stores.expired':false});
+		const filteredGamesCount = await Game.countDocuments(filter);
+		const discountedGames = await Game.find(filter).sort(sortObject).limit(10).skip(parseInt(req.query.gameRequestOffset));
+		res.status(200).json({
+			accessToken: req.accessToken,
+			totalGamesCount: totalGamesCount,
+			filteredGamesCount: filteredGamesCount,
+			discountedGames: discountedGames
+		});
+	} catch(err){
+		res.status(500).json({message: err.message});
+	}
+});
+
+function getFilter(req){
+	let filter={'stores.expired':false};
 	let expressions=[];
 
 	if (req.query.name!=null && req.query.name!=''){
@@ -173,28 +209,21 @@ router.post('/',[m.isAuthenticated,m.refreshToken()],async(req,res)=>{
 		}
 	}
 
-	try {
-		var sortObject = {};
-		if (req.query.sortBy==='specialPrice' || req.query.sortBy==='originalPrice' || 
-		 req.query.sortBy==='discountPercent') {
-			sortObject['stores.'+req.query.sortBy] = req.query.direction;
-		} else {
-			sortObject[req.query.sortBy] = req.query.direction;
-		}
+	return filter;
+}
 
-		const totalGamesCount = await Game.countDocuments();
-		const filteredGamesCount = await Game.countDocuments(filter);
-		const discountedGames = await Game.find(filter).sort(sortObject).limit(10).skip(parseInt(req.query.gameRequestOffset));
-		res.status(200).json({
-			accessToken: req.accessToken,
-			totalGamesCount: totalGamesCount,
-			filteredGamesCount: filteredGamesCount,
-			discountedGames: discountedGames
-		});
-	} catch(err){
-		res.status(500).json({message: err.message});
+function getSortObject(req){
+	let sortObject = {};
+
+	if (req.query.sortBy==='specialPrice' || req.query.sortBy==='originalPrice' || 
+	 req.query.sortBy==='discountPercent') {
+		sortObject['stores.'+req.query.sortBy] = req.query.direction;
+	} else {
+		sortObject[req.query.sortBy] = req.query.direction;
 	}
-});
+
+	return sortObject;
+}
 
 async function getCurrency(name){
 	let currency;
@@ -213,7 +242,7 @@ function checkCurrency(currency,amount){
 async function resetStillOnSaleFields(storeName){
 	let games = await Game.find({'stores.name':storeName});
 	games.forEach(game=>{
-		for(let i=0;i<game.stores.length;i++){
+		for(var i=0;i<game.stores.length;i++){
 			if (game.stores[i].name==storeName && !game.stores[i].expired){
 				game.stores[i].stillOnSale = false;
 				break;
@@ -226,7 +255,7 @@ async function resetStillOnSaleFields(storeName){
 async function markExpiredDeals(storeName){
 	let games = await Game.find({'stores.name':storeName});
 	games.forEach(game=>{
-		for(let i=0;i<game.stores.length;i++){
+		for(var i=0;i<game.stores.length;i++){
 			if (game.stores[i].name==storeName && !game.stores[i].expired && !game.stores[i].stillOnSale){
 				game.stores[i].expired = true;
 				break;
@@ -251,7 +280,7 @@ function saveScrapedGames(scrapedGames,storeName,resolve){
 		try {
 			let gameFoundInDatabase = await Game.findOne({name: game.title});
 
-			if (!gameFoundInDatabase) {
+			if (!gameFoundInDatabase && game.originalPrice>0.5) {
 				var options = {
 					method: 'GET',
 					url: encodeURI(`https://chicken-coop.p.rapidapi.com/games/${game.title}`),
@@ -290,7 +319,7 @@ function saveScrapedGames(scrapedGames,storeName,resolve){
 
 					saveToDatabase(newGame);
 				});
-			} else {
+			} else if (gameFoundInDatabase){
 				/*if (gameFoundInDatabase.stores.length>1){
 									console.log(gameFoundInDatabase);
 								}*/
@@ -387,12 +416,7 @@ function refreshBlizzardGames(){
 					}
 				})
 
-				if (!scrapedGames) {
-					if (i==scrapedPage.gameUrlList.length-1) {
-						resolve('Blizzard játékok frissítve');
-					}
-					continue;
-				} else {
+				if (scrapedGames) {
 					let gameObjects = [];
 
 					for(var j=0;j<scrapedGames.titles.length;j++){
@@ -406,9 +430,10 @@ function refreshBlizzardGames(){
 
 					gameObjects.forEach(async game=>{
 						try {
+							let currentGameIndex = i;
 							let gameFoundInDatabase = await Game.findOne({name: game.title});
 
-							if (!gameFoundInDatabase) {
+							if (!gameFoundInDatabase && game.originalPrice>0.5) {
 								var options = {
 									method: 'GET',
 									url: encodeURI(`https://chicken-coop.p.rapidapi.com/games/${game.title}`),
@@ -449,11 +474,7 @@ function refreshBlizzardGames(){
 
 									saveToDatabase(newGame);
 								});
-							} else {
-
-								/*if (gameFoundInDatabase.stores.length>1){
-									console.log(gameFoundInDatabase);
-								}*/
+							} else if (gameFoundInDatabase){
 
 								if (gameFoundInDatabase.stores.filter(function(store){
 									return store.name==storeName; }).length > 0) {
@@ -507,7 +528,7 @@ function refreshBlizzardGames(){
 								}
 							}
 
-							if ((i==scrapedPage.gameUrlList.length-1) && (game==gameObjects[gameObjects.length-1])){
+							if ((currentGameIndex==scrapedPage.gameUrlList.length-1) && (game==gameObjects[gameObjects.length-1])){
 								markExpiredDeals(storeName);
 								resolve(`Blizzard játékok frissítve`);
 							}
@@ -515,6 +536,12 @@ function refreshBlizzardGames(){
 							console.log(err);
 						}
 					})
+				} else {
+					if (i==scrapedPage.gameUrlList.length-1) {
+						markExpiredDeals(storeName);
+						resolve('Blizzard játékok frissítve');
+					}
+					continue;
 				}
 			}
 
@@ -600,7 +627,7 @@ function refreshEpicGames(){
 					try {
 						let gameFoundInDatabase = await Game.findOne({name: game.title});
 
-						if (!gameFoundInDatabase) {
+						if (!gameFoundInDatabase && game.originalPrice>0.5) {
 							var options = {
 								method: 'GET',
 								url: encodeURI(`https://chicken-coop.p.rapidapi.com/games/${game.title}`),
@@ -641,11 +668,7 @@ function refreshEpicGames(){
 
 								saveToDatabase(newGame);
 							});
-						} else {
-
-							/*if (gameFoundInDatabase.stores.length>1){
-									console.log(gameFoundInDatabase);
-								}*/
+						} else if (gameFoundInDatabase){
 
 							if (gameFoundInDatabase.stores.filter(function(store){
 								return store.name==storeName; }).length > 0) {
@@ -707,6 +730,9 @@ function refreshEpicGames(){
 						console.log(err);
 					}
 				})
+			} else {
+				markExpiredDeals(storeName);
+				resolve(`${storeName} játékok frissítve`);
 			}
 
 			debugger;
@@ -740,7 +766,7 @@ function refreshHumbleBundleGames(){
 						try {
 							let gameFoundInDatabase = await Game.findOne({name: game.human_name});
 
-							if (!gameFoundInDatabase) {
+							if (!gameFoundInDatabase && game.full_price.amount>0.5) {
 								var options = {
 									method: 'GET',
 									url: encodeURI(`https://chicken-coop.p.rapidapi.com/games/${game.human_name}`),
@@ -786,14 +812,11 @@ function refreshHumbleBundleGames(){
 									saveToDatabase(humbleBundleGame);
 
 									if (game==humbleBundleGamesList[humbleBundleGamesList.length-1]){
+										markExpiredDeals(storeName);
 										resolve(`${storeName} játékok frissítve`);
 									}
 								});
-							} else {
-
-								/*if (gameFoundInDatabase.stores.length>1){
-									console.log(gameFoundInDatabase);
-								}*/
+							} else if (gameFoundInDatabase){
 
 								if (gameFoundInDatabase.stores.filter(function(store){
 								return store.name==storeName; }).length > 0) {
@@ -887,7 +910,7 @@ function refreshGoGGames(){
 						try {
 							let gameFoundInDatabase = await Game.findOne({name: game.title});
 
-							if (!gameFoundInDatabase) {
+							if (!gameFoundInDatabase && game.price.baseAmount>0.5) {
 								var options = {
 									method: 'GET',
 									url: encodeURI(`https://chicken-coop.p.rapidapi.com/games/${game.title}`),
@@ -930,10 +953,11 @@ function refreshGoGGames(){
 									saveToDatabase(gogGame);
 
 									if (game==gogDiscountedGamesList[gogDiscountedGamesList.length-1]){
+										markExpiredDeals(storeName);
 										resolve(`${storeName} játékok frissítve`);
 									}
 								});
-							} else {
+							} else if (gameFoundInDatabase){
 
 								/*if (gameFoundInDatabase.stores.length>1){
 									console.log(gameFoundInDatabase);
