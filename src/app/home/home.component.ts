@@ -44,8 +44,11 @@ export class HomeComponent implements AfterViewInit {
 		this.startAnimation();
 		this.gameService.resetGamesData();
 		this.filterService.resetFilter();
-		this.getRecommendedGamesByHistory();
-		this.getGameHistory();
+
+		if (this.userService.isAuthenticated()){
+			this.getRecommendedGamesByHistory();
+			this.getGameHistory();
+		}
 	}
 
 	resetAnimation(){
