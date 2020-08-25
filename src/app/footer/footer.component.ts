@@ -17,7 +17,6 @@ export class FooterComponent implements OnInit {
   changeLang(lang){
     localStorage.setItem('lang',lang);
     window.location.reload();
-    console.log(lang);
   }
 
 }
