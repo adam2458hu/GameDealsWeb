@@ -3,6 +3,7 @@ import { environment } from '../environments/environment';
 import { SwPush } from '@angular/service-worker';
 import { UserService } from './shared/user/user.service';
 import { TranslateService } from '@ngx-translate/core';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',
@@ -13,10 +14,16 @@ export class AppComponent {
 	constructor(
 		swPush: SwPush,
 		private userService: UserService,
-		private translateService: TranslateService
+		private translateService: TranslateService,
+		private titleService: Title
 	) {
 		this.translateService.setDefaultLang('en');
 		this.translateService.use(localStorage.getItem('lang') || 'en');
+		this.translateService.onLangChange.subscribe((res: string) => {
+	      this.translateService.get('pageTitle').subscribe((res: string) => {
+	        this.titleService.setTitle(res);
+	      });
+	    });
 
 		if (swPush.isEnabled) {
 		  swPush
