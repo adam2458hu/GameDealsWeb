@@ -1,11 +1,11 @@
-<div *ngIf="selectedGame" id="gameDetails">
+<div *ngIf="selectedGame" id="gameDetails" [class.loadingImages]="loadingImages">
 	<div class="blurred-background" (click)="onClose()"></div>
 	<div class="card">
 		<span class="close" (click)="onClose()">&times;</span>
 		<div class="card-header">
 			<div class="row">
 				<div class="col-4">
-					<img *ngIf="selectedGame.stores[0].image;else noimageBlock" src="{{ selectedGame.stores[0].image }}" alt="{{ selectedGame.name }}">
+					<img *ngIf="selectedGame.stores[0].image;else noimageBlock" src="{{ selectedGame.stores[0].image }}" alt="{{ selectedGame.name }}" (loaded)="loadingImages=false">
 					<ng-template #noimageBlock>
 						<span class="noimage"><fa name="photo"></fa></span>
 					</ng-template>

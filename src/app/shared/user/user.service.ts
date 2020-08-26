@@ -78,6 +78,11 @@ export class UserService {
 		return this.http.post(environment.apiUsersURL+'/login',user);
 	}
 
+	loginRememberedUser(){
+		var headers = new HttpHeaders({'authorization':'Bearer '+this.getRememberMeToken()});
+		return this.http.get(environment.apiUsersURL+'/loginRememberedUser',{headers: headers});
+	}
+
 	getIPAddress(){
 		return this.http.get('https://api.ipify.org/?format=json');
 	}
@@ -230,7 +235,6 @@ export class UserService {
 
 	sendTwoFactorEmail(){
 		var headers = new HttpHeaders({'authorization':'Bearer '+this.getTempToken()});
-		console.log("elküldve");
 		return this.http.get(environment.apiUsersURL+'/sendTwoFactorEmail',{headers: headers});
 	}
 
@@ -255,6 +259,10 @@ export class UserService {
 		localStorage.setItem('refreshToken',token);
 	}
 
+	setRememberMeToken(token: string){
+		localStorage.setItem('rememberMeToken',token);
+	}
+
 	getAccessToken(){
 		return localStorage.getItem('accessToken');
 	}
@@ -265,6 +273,10 @@ export class UserService {
 
 	getRefreshToken(){
 		return localStorage.getItem('refreshToken');
+	}
+
+	getRememberMeToken(){
+		return localStorage.getItem('rememberMeToken');
 	}
 
 	removeAccessToken(){
@@ -280,6 +292,10 @@ export class UserService {
 		/*var headers = new HttpHeaders({'authorization':'Bearer '+this.getAccessToken()});
 		return this.http.delete(environment.apiUsersURL+'/logout',{token: this.getRefreshToken()},{headers:headers});
 	*/}
+
+	removeRememberMeToken(){
+		localStorage.removeItem('rememberMeToken');
+	}
 
 	startSessionCountdown(){	
 	    this.refreshTimeLeft();
@@ -302,12 +318,9 @@ export class UserService {
 	}
 
 	logoutUser(msg: String){
-		if (localStorage.getItem('rememberMe')){
-			localStorage.removeItem('email');
-			localStorage.removeItem('password');
-			localStorage.removeItem('rememberMe');
+		if (localStorage.getItem('rememberMeToken')){
+			this.removeRememberMeToken();
 		}
-		
 		this.removeAccessToken();
 		this.removeRefreshToken();
 		this.stopSessionCountdown();

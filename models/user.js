@@ -160,6 +160,10 @@ userSchema.methods.generateTempAccessToken = function(){
 	return jwt.sign({_id: this._id},process.env.TEMP_ACCESS_TOKEN_SECRET,{expiresIn: "5m"});
 }
 
+userSchema.methods.generateRememberMeToken = function(){
+	return jwt.sign({_id: this._id},process.env.REMEMBER_ME_SECRET,{expiresIn: "7d"});
+}
+
 userSchema.methods.generateRefreshToken = function(){
 	return jwt.sign({_id: this._id},process.env.REFRESH_TOKEN_SECRET);
 }

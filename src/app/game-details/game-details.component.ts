@@ -12,6 +12,7 @@ export class GameDetailsComponent implements OnInit {
 	@Input() selectedGame: Game;
 	@Output() close = new EventEmitter();
 	descriptionOpened: boolean;
+	loadingImages=true;
 
 	constructor(
 		private userService: UserService

@@ -149,47 +149,39 @@ router.post('/login',function(req,res,next){
 					twoFactorGoogleEnabled: user.twoFactorGoogleEnabled
 				});
 			} else if (user.twoFactorEmailEnabled) {
-				/*var token = speakeasy.totp({
-					secret: user.twoFactorEmailSecret,
-					encoding: 'base32'
-				});
-
-				transporter.sendMail({
-					from: process.env.SITE_EMAIL_SENDER,
-					to: user.email,
-					subject: 'Email hitelesítés',
-					context: {
-						firstName : user.first_name,
-						lastName : user.last_name,
-						token : token
-					},
-					attachments : [{
-						filename: 'logo.png',
-						path: './public/images/logo.png',
-						cid: 'logo'
-					}],
-					template: 'email_authentication',
-				},(err,info)=>{
-					if (err) console.log(err);
-					else {
-						res.status(201).json({
-							_id: user._id,
-							tempAccessToken: user.generateTempAccessToken(),
-							twoFactorEmailEnabled: user.twoFactorEmailEnabled,
-							message: 'Az email címére elküdtük a hitelesítő kódot.'
-						});
-					}
-				});*/
 				sendTwoFactorEmail(res,user);
 			} else {
-				return res.status(200).json({
-					accessToken: user.generateAccessToken(),
-					refreshToken: user.generateRefreshToken()
-				});
+				if (req.body.rememberMe){
+					return res.status(200).json({
+						accessToken: user.generateAccessToken(),
+						refreshToken: user.generateRefreshToken(),
+						rememberMeToken: user.generateRememberMeToken()
+					})
+				} else {
+					return res.status(200).json({
+						accessToken: user.generateAccessToken(),
+						refreshToken: user.generateRefreshToken()
+					});
+				}
 			}
 		}
 	})(req,res,next);
 })
+
+router.get('/loginRememberedUser',m.isUserRemembered,async(req,res)=>{
+	try {
+		const user = await User.findById(req._id);
+		console.log(user);
+		if (user) {
+			return res.status(200).json({
+				accessToken: user.generateAccessToken(),
+				refreshToken: user.generateRefreshToken()
+			});
+		}
+	} catch(err){
+		res.status(500).json({message: err.message});
+	}
+});
 
 router.get('/sendTwoFactorEmail',m.isTempAuthenticated,async(req,res)=>{
 	try {

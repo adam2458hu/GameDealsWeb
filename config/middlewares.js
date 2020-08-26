@@ -27,6 +27,19 @@ function isAuthenticated(req,res,next){
 	})
 }
 
+function isUserRemembered(req,res,next){
+	const authHeader = req.headers['authorization'];
+	const rememberMeToken = authHeader.split(' ')[1];
+	if (!rememberMeToken) return res.status(403).send('No token provided');
+	jwt.verify(rememberMeToken,process.env.REMEMBER_ME_SECRET,(err,user)=>{
+		if (err) return res.sendStatus(403);
+		else {
+			req._id = user._id;
+			next();
+		}
+	})
+} 
+
 function refreshToken(){
 	return async function(req,res,next){
 		try {
@@ -47,3 +60,4 @@ function refreshToken(){
 module.exports.isTempAuthenticated = isTempAuthenticated;
 module.exports.isAuthenticated = isAuthenticated;
 module.exports.refreshToken = refreshToken;
+module.exports.isUserRemembered = isUserRemembered;

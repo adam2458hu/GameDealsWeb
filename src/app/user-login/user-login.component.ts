@@ -39,15 +39,8 @@ export class UserLoginComponent implements OnInit {
 	ngOnInit() {
 	  	if (this.userService.isAuthenticated()){
 	  		this.router.navigate(['/deals']);
-	  	} else if (localStorage.getItem('rememberMe')){
-			this.user.email = localStorage.getItem('email');
-			this.user.password = localStorage.getItem('password');
-			this.user.rememberMe = true;
-
-			setTimeout(()=>{
-				this.loginFormElement.setValue(this.user);
-				this.loginFormElement.ngSubmit.emit();
-			})
+	  	} else if (localStorage.getItem('rememberMeToken')){
+			this.loginRememberedUser();
 		}
 	}
 
@@ -65,19 +58,27 @@ export class UserLoginComponent implements OnInit {
 			});
 	}
 
+	loginRememberedUser(){
+		this.loadingScreenService.setAnimation(true);
+		this.userService.loginRememberedUser().subscribe(
+			(res: any)=>{
+				if (res.accessToken){
+					this.userService.setAccessToken(res.accessToken);
+					this.userService.setRefreshToken(res.refreshToken);
+					this.userService.startSessionCountdown();
+					this.getIPAddress();
+					this.getUserProfile();
+				}
+				this.loadingScreenService.setAnimation(false);
+			},
+			(err)=>{
+				this.userService.setErrorMessage(err.error.message);
+				this.loadingScreenService.setAnimation(false);
+			});
+	}
+
 	onSubmit(form: NgForm){
 		this.loadingScreenService.setAnimation(true);
-
-		if (form.value.rememberMe){
-			localStorage.setItem('email',form.value.email);
-			localStorage.setItem('password',form.value.password);
-			localStorage.setItem('rememberMe',form.value.rememberMe);
-		} else {
-			localStorage.removeItem('email');
-			localStorage.removeItem('password');
-			localStorage.removeItem('rememberMe');
-		}
-
 		this.userService.loginUser(form.value).subscribe(
 			(res: any)=>{
 				if (res.multipleTwoFactorEnabled) {
@@ -90,15 +91,14 @@ export class UserLoginComponent implements OnInit {
 					this.userService.setTempToken(res.tempAccessToken);
 					this.setPopup(true,'emailTwoFactor');
 				} else if (res.accessToken){
-					//this.userService.setUser(form.value);
 					this.userService.setAccessToken(res.accessToken);
 					this.userService.setRefreshToken(res.refreshToken);
+					if (res.rememberMeToken){
+						this.userService.setRememberMeToken(res.rememberMeToken);
+					}
 					this.userService.startSessionCountdown();
 					this.getIPAddress();
 					this.getUserProfile();
-					/*this.router.navigate(['/deals']).then(()=>{
-						this.userService.setSuccessMessage('Sikeres bejelentkezés');
-					});*/
 				} else if (res.emailVerified!=null && !res.emailVerified){
 					this.setPopup(true,'verificationRequired');
 				} else {
@@ -159,14 +159,10 @@ export class UserLoginComponent implements OnInit {
 		this.userService.verifyTwoFactorCode(form.value).subscribe(
 			(res: any)=>{
 				this.loadingScreenService.setAnimation(false);
-				//this.userService.setUser(form.value);
 				this.userService.setAccessToken(res.accessToken);
 				this.userService.setRefreshToken(res.refreshToken);
 				this.userService.startSessionCountdown();
 				this.getUserProfile();
-				/*this.router.navigate(['/deals']).then(()=>{
-					this.userService.setSuccessMessage('Sikeres bejelentkezés');
-				});*/
 			},
 			(err)=>{
 				this.loadingScreenService.setAnimation(false);
