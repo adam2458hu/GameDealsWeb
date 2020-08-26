@@ -1,3 +1,4 @@
+<app-back-to-top></app-back-to-top>
 <div *ngIf="!getLoadingScreenService().isLoading() && areCurrenciesReceived() && areStoresReceived()" class="container-custom deals">
 	<h3 class="text-center">{{ 'totalDeals' | translate }}: {{ getTotalGamesCount() }}</h3>
 	<h4 class="text-center">{{ 'searchResults' | translate }}: {{ getFilteredGamesCount() }}</h4>

@@ -14,6 +14,7 @@ import { UserProfileComponent } from './user-profile/user-profile.component';
 import { UserLoginComponent } from './user-login/user-login.component';
 import { UserRegisterComponent } from './user-register/user-register.component';
 import { NavbarComponent } from './navbar/navbar.component';
+import { BackToTopComponent } from './back-to-top/back-to-top.component';
 import { DealsComponent } from './deals/deals.component';
 import { FooterComponent } from './footer/footer.component';
 import { FilterComponent } from './filter/filter.component';
@@ -52,6 +53,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     UserLoginComponent,
     UserRegisterComponent,
     NavbarComponent,
+    BackToTopComponent,
     DealsComponent,
     FooterComponent,
     FilterComponent,
