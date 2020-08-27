@@ -42,7 +42,7 @@
 								<tr>
 									<th></th>
 									<th>{{ 'name' | translate }}</th>
-									<th class="text-center">{{ 'discountPrice' | translate }}</th>
+									<th class="text-center">{{ 'currentPrice' | translate }}</th>
 									<th class="text-center">{{ 'originalPrice' | translate }}</th>
 									<th class="text-center">{{ 'discount' | translate }}</th>
 									<th class="text-center">Metascore</th>
@@ -98,7 +98,7 @@
 							<thead>
 								<th></th>
 								<th>{{ 'name' | translate }}</th>
-								<th class="text-center">{{ 'discountPrice' | translate }}</th>
+								<th class="text-center">{{ 'currentPrice' | translate }}</th>
 								<th class="text-center">{{ 'originalPrice' | translate }}</th>
 								<th class="text-center">{{ 'discount' | translate }}</th>
 								<th class="text-center">Metascore</th>
@@ -134,6 +134,6 @@
 				</div>
 			</div>
 		</div>
-		<app-game-details [selectedGame]="selectedGame" (close)="onClose()"></app-game-details>
+		<app-game-details *ngIf="selectedGame" [selectedGame]="selectedGame" (close)="onClose()"></app-game-details>
 	</ng-template>
 </div>
