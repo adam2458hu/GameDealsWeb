@@ -3,8 +3,8 @@
 	right: 25px;
 	bottom: 50px;
 	border-radius: 50%;
-	width: 50px;
-	height: 50px;
+	width: 40px;
+	height: 40px;
 	z-index: 98;
 
 	&:after{
@@ -15,8 +15,8 @@
 		top: 45%;
 		left: 50%;
 		transform: translate(-50%,-50%);
-		border-left: 10px solid transparent;
-		border-right: 10px solid transparent;
-		border-bottom: 10px solid white;
+		border-left: 8px solid transparent;
+		border-right: 8px solid transparent;
+		border-bottom: 8px solid white;
 	}
 }
