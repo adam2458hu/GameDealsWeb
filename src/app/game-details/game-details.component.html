@@ -5,7 +5,8 @@
 		<div class="card-header">
 			<div class="row">
 				<div class="col-4">
-					<img *ngIf="selectedGame.stores[0].image;else noimageBlock" src="{{ selectedGame.stores[0].image }}" alt="{{ selectedGame.name }}" (loaded)="loadingImages=false">
+					<!--<img *ngIf="selectedGame.stores[0].image;else noimageBlock" src="{{ selectedGame.stores[0].image }}" alt="{{ selectedGame.name }}" (loaded)="loadingImages=false">-->
+					<img *ngIf="selectedGame.stores.image;else noimageBlock" src="{{ selectedGame.stores.image }}" alt="{{ selectedGame.name }}" (loaded)="loadingImages=false">
 					<ng-template #noimageBlock>
 						<span class="noimage"><fa name="photo"></fa></span>
 					</ng-template>
@@ -41,13 +42,14 @@
 				<thead>
 					<tr>
 						<td class="text-center">{{ 'store' | translate }}</td>
-						<td class="text-center">{{ 'discountPrice' | translate }}</td>
+						<td class="text-center">{{ 'currentPrice' | translate }}</td>
 						<td class="text-center">{{ 'originalPrice' | translate }}</td>
 						<td class="text-center">{{ 'discount' | translate }}</td>
 					</tr>
 				</thead>
 				<tbody>
-					<tr *ngFor="let store of orderStoresByDiscountedPrice(selectedGame)">
+					<!--<tr *ngFor="let store of orderStoresByDiscountedPrice(selectedGame)">-->
+					<tr *ngFor="let store of orderedStores">
 						<td class="text-center">
 							<a href="{{ store.linkToGame }}" target="_blank" (click)="addToGameHistory(selectedGame._id)">{{ store.name }}</a>
 						</td>
