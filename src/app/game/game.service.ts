@@ -13,6 +13,7 @@ export class GameService {
 	private totalGamesCount: number;
 	private filteredGamesCount: number;
 	private gamesData: Game[]=[];
+	private unwindedGamesList: Game[]=[];
 	private recommendedGames: Game[]=[];
 
 	constructor(
@@ -21,6 +22,10 @@ export class GameService {
 		private filterService: FilterService,
 		private currencyService: CurrencyService
 	) { }
+
+	getGame(_id){
+		return this.http.get(environment.apiGamesURL+'/getGame/'+_id);
+	}
 
 	getGameList(filter){
 		let queries=[];
@@ -62,12 +67,20 @@ export class GameService {
 		return this.gamesData;
 	}
 
+	getUnwindedGamesList(){
+		return this.unwindedGamesList;
+	}
+
 	getTotalGamesCount(){
 		return this.totalGamesCount;
 	}
 
 	getFilteredGamesCount(){
 		return this.filteredGamesCount;
+	}
+
+	resetUnwindedGamesList(){
+		this.unwindedGamesList = [];
 	}
 
 	resetGamesData(){
@@ -80,6 +93,10 @@ export class GameService {
 
 	pushGamesData(data){
 		this.gamesData.push(data);
+	}
+
+	pushUnwindedGamesList(data){
+		this.unwindedGamesList.push(data);
 	}
 
 	pushRecommendedGames(game){
