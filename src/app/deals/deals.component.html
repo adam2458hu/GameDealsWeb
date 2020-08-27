@@ -13,7 +13,7 @@
 						<th title="Rendezés név szerint" (click)="sortTable('name')">{{ 'name' | translate }}
 							<span>{{ checkSorting('name') }}</span>
 						</th>
-						<th title="Rendezés akciós ár szerint" (click)="sortTable('specialPrice')" class="text-center">{{ 'discountPrice'| translate }}
+						<th title="Rendezés akciós ár szerint" (click)="sortTable('specialPrice')" class="text-center">{{ 'currentPrice'| translate }}
 							<span>{{ checkSorting('specialPrice') }}</span>
 						</th>
 						<th title="Rendezés eredeti ár szerint" (click)="sortTable('originalPrice')" class="text-center">
@@ -31,17 +31,18 @@
 				<tbody><!--
 					<tr *ngIf="isFilterOpened()" app-filter
 					(filtered)="sortTable($event)"></tr>-->
-					<tr *ngFor="let game of getGamesData()" (click)="showAllStores(game)">
+					<!--<tr *ngFor="let game of getGamesData()" (click)="showAllStores(game)">-->
 						<!--<td id="productImage">
 							<img *ngIf="game.stores[0].image;else noimageBlock" src="{{ game.stores[0].image }}" alt="{{ game.name }}">
 							<ng-template #noimageBlock>
 								<span class="noimage"><fa name="photo"></fa></span>
 							</ng-template>
 						</td>-->
+					<tr *ngFor="let game of getUniqueGames(getUnwindedGamesList())" (click)="showAllStores(game)">
 						<td id="productName">
 							<div>{{ game.name }}</div>
 							<div id="genres">{{ game.genres }}</div>
-						</td>
+						</td><!--
 						<td id="specialPrice" class="text-center">
 							{{ currencyConverter(getCheapestStore(game).specialPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}
 						</td>
@@ -50,6 +51,15 @@
 						</td>
 						<td id="discountPercent" class="text-center">
 							<span>-{{ getCheapestStore(game).discountPercent }} %</span>
+						</td>-->
+						<td id="specialPrice" class="text-center">
+							{{ currencyConverter(game.stores.specialPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}
+						</td>
+						<td id="originalPrice" class="text-center">
+							{{ currencyConverter(game.stores.originalPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}
+						</td>
+						<td id="discountPercent" class="text-center">
+							<span>-{{ game.stores.discountPercent }} %</span>
 						</td>
 						<td id="metascore" class="text-center">
 							<span class="metascore rated" *ngIf="game.metascore;else elseBlock">
@@ -68,4 +78,4 @@
 		{{ 'showNextResults' | translate: {gamesPerRequest:getGamesPerRequest()} }}
 	</button>
 </div>
-<app-game-details [selectedGame]="selectedGame" (close)="onClose()"></app-game-details>
+<app-game-details *ngIf="selectedGame" [selectedGame]="selectedGame" (close)="onClose()"></app-game-details>

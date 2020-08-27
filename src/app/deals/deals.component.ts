@@ -34,6 +34,7 @@ export class DealsComponent implements OnInit {
 
 		this.loadingScreenService.setAnimation(true);
 		this.gameService.resetGamesData();
+		this.gameService.resetUnwindedGamesList();
 		this.filterService.resetFilter();
 		this.getGameList(this.filterService.filter,true);
 	}
@@ -46,11 +47,14 @@ export class DealsComponent implements OnInit {
 					this.userService.resetSession(res.accessToken);	
 					this.userService.getMessages();
 				}
-
+				console.log(res.unwindedDiscountedGames);
 				this.gameService.setTotalGamesCount(res.totalGamesCount);
 				this.gameService.setFilteredGamesCount(res.filteredGamesCount);
 				for (let i=0;i<res.discountedGames.length;i++){
 					this.gameService.pushGamesData(res.discountedGames[i]);
+				}
+				for (let i=0;i<res.unwindedDiscountedGames.length;i++){
+					this.gameService.pushUnwindedGamesList(res.unwindedDiscountedGames[i]);
 				}
 				if (startLoadingAnimation) this.loadingScreenService.setAnimation(false);
 			},
@@ -81,6 +85,7 @@ export class DealsComponent implements OnInit {
 		}
 
 		this.gameService.resetGamesData();
+		this.gameService.resetUnwindedGamesList();
 		this.filterService.applyFilter();
 		this.getGameList(this.filterService.filter,true);
 	}
@@ -115,6 +120,10 @@ export class DealsComponent implements OnInit {
 		return this.gameService.getGamesData();
 	}
 
+	getUnwindedGamesList(){
+		return this.gameService.getUnwindedGamesList();
+	}
+
 	getGamesPerRequest(){
 		if (this.numberOfGamesLeft()>=this.getFilterService().filter.gamesPerRequest){
 			return this.getFilterService().filter.gamesPerRequest;
@@ -122,11 +131,28 @@ export class DealsComponent implements OnInit {
 			return this.numberOfGamesLeft();
 		}
 	}
-
+	/*
 	getCheapestStore(game){
 		return game.stores.reduce((accumulator, currentValue)=>{
 			return (accumulator.specialPrice<currentValue.specialPrice)?accumulator:currentValue;
 		})
+	}*/
+
+	getCheapestStoreByGameId(gameId){
+		this.gameService.getGame(gameId).subscribe(
+			(res:any)=>{
+				return res.game.stores.reduce((accumulator, currentValue)=>{
+					return (accumulator.specialPrice<currentValue.specialPrice)?accumulator:currentValue;
+				})
+			},
+			(err)=>{
+				console.log(err);
+			})
+	}
+
+	getUniqueGames(gamesList){
+		return gamesList.filter((currentElement,currentIndex,compareArray)=>
+			compareArray.findIndex(element=>(element._id === currentElement._id))===currentIndex);
 	}
 
 	showAllStores(game){
