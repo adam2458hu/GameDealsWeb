@@ -277,9 +277,9 @@ async function resetStillOnSaleFields(storeName){
 				break;
 			}
 		}
-		if (game.name=="XCOM 2: War of the Chosen - Tactical Legacy Pack"){
+		/*if (game.name=="XCOM 2: War of the Chosen - Tactical Legacy Pack"){
 			console.log(game);
-		}
+		}*/
 		saveToDatabase(game);
 	})
 }
@@ -293,9 +293,9 @@ async function markExpiredDeals(storeName){
 				break;
 			}
 		}
-		if (game.name=="XCOM 2: War of the Chosen - Tactical Legacy Pack"){
+		/*if (game.name=="XCOM 2: War of the Chosen - Tactical Legacy Pack"){
 			console.log(game);
-		}
+		}*/
 		saveToDatabase(game);
 	})
 }
