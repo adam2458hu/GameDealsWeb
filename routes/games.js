@@ -73,6 +73,15 @@ router.post('/getWatchedGames',async(req,res)=>{
 	}
 })
 
+router.get('/getGame/:_id',async(req,res)=>{
+	try {
+		const game = await Game.findOne({_id: ObjectId(req.params._id)});
+		res.status(200).json({game: game});
+	} catch(err){
+		res.status(500).json({message: err.message});
+	}
+})
+
 router.get('/',async(req,res)=>{
 	let filter=getFilter(req);
 	let sortObject=getSortObject(req);
@@ -81,11 +90,31 @@ router.get('/',async(req,res)=>{
 		const totalGamesCount = await Game.countDocuments({'stores.expired':false});
 		const filteredGamesCount = await Game.countDocuments(filter);
 		const discountedGames = await Game.find(filter).sort(sortObject).limit(10).skip(parseInt(req.query.gameRequestOffset));
+		const unwindedDiscountedGames = await Game.aggregate([
+			{$match: filter},
+			{$unwind:"$stores"},
+			{$match: {'stores.expired':false}},
+			{$sort: sortObject},
+			{$skip: parseInt(req.query.gameRequestOffset)},
+			{$limit:10}
+			]).exec(function (err, result){
+				if(err){
+				    return console.log(err);
+				} else {
+				    return res.status(200).json({
+						totalGamesCount: totalGamesCount,
+						filteredGamesCount: filteredGamesCount,
+						discountedGames: discountedGames,
+						unwindedDiscountedGames: result
+					});
+				}
+		});/*
+		const discountedGames = await Game.find(filter).sort(sortObject).limit(10).skip(parseInt(req.query.gameRequestOffset));
 		res.status(200).json({
 			totalGamesCount: totalGamesCount,
 			filteredGamesCount: filteredGamesCount,
 			discountedGames: discountedGames
-		});
+		});*/
 	} catch(err){
 		res.status(500).json({message: err.message});
 	}
@@ -217,9 +246,9 @@ function getSortObject(req){
 
 	if (req.query.sortBy==='specialPrice' || req.query.sortBy==='originalPrice' || 
 	 req.query.sortBy==='discountPercent') {
-		sortObject['stores.'+req.query.sortBy] = req.query.direction;
+		sortObject['stores.'+req.query.sortBy] = parseInt(req.query.direction);
 	} else {
-		sortObject[req.query.sortBy] = req.query.direction;
+		sortObject[req.query.sortBy] = parseInt(req.query.direction);
 	}
 
 	return sortObject;
@@ -248,6 +277,9 @@ async function resetStillOnSaleFields(storeName){
 				break;
 			}
 		}
+		if (game.name=="XCOM 2: War of the Chosen - Tactical Legacy Pack"){
+			console.log(game);
+		}
 		saveToDatabase(game);
 	})
 }
@@ -260,6 +292,9 @@ async function markExpiredDeals(storeName){
 				game.stores[i].expired = true;
 				break;
 			}
+		}
+		if (game.name=="XCOM 2: War of the Chosen - Tactical Legacy Pack"){
+			console.log(game);
 		}
 		saveToDatabase(game);
 	})
