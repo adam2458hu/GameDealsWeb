@@ -10,7 +10,7 @@ import { GameService } from '../game/game.service';
   styleUrls: ['./game-details.component.scss']
 })
 export class GameDetailsComponent implements OnInit {
-	@Input() selectedGame: Game;
+	@Input() selectedGame;
 	@Output() close = new EventEmitter();
 	descriptionOpened: boolean;
 	loadingImages=true;
@@ -22,6 +22,7 @@ export class GameDetailsComponent implements OnInit {
 	) { }
 
 	ngOnInit() {
+		console.log(this.selectedGame);
 		this.descriptionOpened=false;
 		this.orderStoresByDiscountedPrice(this.selectedGame);
 	}
