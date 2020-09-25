@@ -19,7 +19,7 @@ export class UserService {
 	private authorizedToPasswordReset: boolean;
 	private messages;
 	private messagesUnread;
-	private user: User={
+	private user: User;/*{
 		role: '',
 		first_name: '',
 		last_name: '',
@@ -60,7 +60,7 @@ export class UserService {
 			country : '',
 			trustedDate : new Date()
 		}]
-	};
+	};*/
 
 	constructor(private http: HttpClient,private router: Router) { }
 
