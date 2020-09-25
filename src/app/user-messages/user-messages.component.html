@@ -4,7 +4,7 @@
 			<h3>{{ 'messages' | translate }}</h3>
 		</div>
 		<div class="card-body">
-			<div *ngIf="getUserService().returnMessages().length>0;else elseblock">
+			<div *ngIf="getUserService().returnMessages() && getUserService().returnMessages().length>0;else elseblock">
 				<div class="d-flex justify-content-between mb-2">
 					<label>
 						<input type="checkbox"(change)="selectAllMessages()" [checked]="isAllSelected" style="margin: 0 10px">{{ 'selectAll' | translate }}

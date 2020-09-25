@@ -39,30 +39,30 @@
 			<button type="button" *ngIf="getUserService().getUser().twoFactorEmailEnabled" class="btn-block" (click)="toggleTwoFactor('Email')">{{ 'twoFactorEmailDisable' | translate }}</button>
 			<hr>
 			<h3>{{ 'trustedDevices' | translate }}</h3>
-			<div *ngIf="getUserService().getUser().trustedDevices.length==0;else elseBlock" class="text-center">{{ 'trustedDevicesNone' | translate }}</div>
-			<ng-template #elseBlock>
-				<div id="trustedDevices">
-					<div class="row mb-2">
-						<div class="col-3">{{ 'deviceIP' | translate }}</div>
-						<div class="col-4">{{ 'country' | translate }}</div>
-						<div class="col-3">{{ 'trustedDate' | translate }}</div>
-						<div class="col-2"></div>
+			<div *ngIf="getUserService().getUser().trustedDevices && getUserService().getUser().trustedDevices.length>0;else elseBlock" id="trustedDevices">
+				<div class="row mb-2">
+					<div class="col-3">{{ 'deviceIP' | translate }}</div>
+					<div class="col-4">{{ 'country' | translate }}</div>
+					<div class="col-3">{{ 'trustedDate' | translate }}</div>
+					<div class="col-2"></div>
+				</div>
+				<div *ngFor="let device of getUserService().getUser().trustedDevices" class="row mb-2">
+					<div class="col-3">
+						{{ device.ip }}
 					</div>
-					<div *ngFor="let device of getUserService().getUser().trustedDevices" class="row mb-2">
-						<div class="col-3">
-							{{ device.ip }}
-						</div>
-						<div class="col-4">
-							{{ device.country }}
-						</div>
-						<div class="col-3">
-							{{ device.trustedDate | date:'short'}}
-						</div>
-						<div class="col-2 text-right">
-							<button class="btn-sm" (click)="untrustDevice(device)">{{ 'delete' | translate }}</button>
-						</div>
+					<div class="col-4">
+						{{ device.country }}
+					</div>
+					<div class="col-3">
+						{{ device.trustedDate | date:'short'}}
+					</div>
+					<div class="col-2 text-right">
+						<button class="btn-sm" (click)="untrustDevice(device)">{{ 'delete' | translate }}</button>
 					</div>
 				</div>
+			</div>
+			<ng-template #elseBlock>
+				<div class="text-center">{{ 'trustedDevicesNone' | translate }}</div>
 			</ng-template>
 		</div>
 	</div>
