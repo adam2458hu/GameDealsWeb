@@ -73,6 +73,10 @@ export class GameDetailsComponent implements AfterViewInit {
 			})
 	}
 
+	getUserService(){
+	  	return this.userService;
+	  }
+
 	getStoreWithImage(){
 		return this.gameDetails.stores.find(element=>element.image!=null);
 	}

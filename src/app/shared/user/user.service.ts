@@ -54,6 +54,11 @@ export class UserService {
 			title: '',
 			text: '',
 			read : false
+		},
+		trustedDevices: {
+			ip : '',
+			country : '',
+			trustedDate : new Date()
 		}
 	};
 

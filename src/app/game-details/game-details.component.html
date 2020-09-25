@@ -37,7 +37,7 @@
 			</div>
 		</div>
 		<div class="card-body">
-			<button *ngIf="userService.isAuthenticated()" class="btn-block btn-success rounded-0" (click)="openWaitlist()">
+			<button *ngIf="getUserService().isAuthenticated()" class="btn-block btn-success rounded-0" (click)="openWaitlist()">
 				<fa name="clock-o"></fa>
 				<span *ngIf="!gameIsOnWaitlist;else editWaitlist">{{ 'addToWaitlist' | translate }}</span>
 				<ng-template #editWaitlist>

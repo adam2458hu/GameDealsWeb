@@ -35,4 +35,9 @@ export class User {
 		text : String;
 		read : Boolean;
 	};
+	trustedDevices : {
+		ip : String;
+		country : String;
+		trustedDate : Date;
+	};
 }
