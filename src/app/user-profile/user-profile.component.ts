@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { UserService } from '../shared/user/user.service';
 
 @Component({
   selector: 'user-profile',
@@ -7,9 +8,25 @@ import { Component, OnInit } from '@angular/core';
 })
 export class UserProfileComponent implements OnInit {
 
-	constructor() { }
+	constructor(
+		private userService: UserService
+	) { }
 
 	ngOnInit() {
+
+	}
+
+	onActivate(event) {
+		window.scroll(0,0);
+    	if (this.userService.isAuthenticated()){
+    		this.userService.refreshAccessToken().subscribe(
+    			(res: any)=>{
+    				this.userService.resetSession(res.accessToken);
+    			},
+    			(err)=>{
+    				console.log(err);
+    			})
+    	}
 	}
 
 }

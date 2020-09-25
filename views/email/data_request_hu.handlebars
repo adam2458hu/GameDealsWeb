@@ -1,7 +1,7 @@
 <div class="main">
 	<div class="container">
 		<h1 style="text-align:center">Tisztelt {{lastName}} {{firstName}}!</h1>
-		<p>Azért kapta ezt az üzenetet, mert a <a href="{{siteUrl}}">Digital Deals</a> oldalon igényelte az Önről tárolt adatok {{format}} formátumban történő lekérdezését. Az adatainak letöltéséhez kattintson az alábbi gombra:</p>
+		<p>Azért kapta ezt az üzenetet, mert igényelte az Önről tárolt adatok lekérdezését. Az adatainak {{format}} formátumban történő letöltéséhez kattintson az alábbi gombra:</p>
 		<div class="button-container">
 			<a href="{{downloadUrl}}">Letöltés</a>
 		</div>
@@ -10,6 +10,6 @@
 			<br>
 			<a href="{{downloadUrl}}">{{downloadUrl}}</a>
 		</p>
-		<p><b>Üdvözlettel,<br>Digital Deals</b></p>
+		<p><b>Üdvözlettel,<br>{{ siteName }}</b></p>
 	</div>
 </div>

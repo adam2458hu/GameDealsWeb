@@ -1,23 +1,22 @@
-<div *ngIf="selectedGame" id="gameDetails" [class.loadingImages]="loadingImages">
+<div *ngIf="gameDetailsReceived" id="gameDetails" [class.loadingImages]="getStoreWithImage() && loadingImages">
 	<div class="blurred-background" (click)="onClose()"></div>
-	<div class="card">
+	<div class="card" #gameDetailsDiv>
 		<span class="close" (click)="onClose()">&times;</span>
 		<div class="card-header">
 			<div class="row">
-				<div class="col-4">
-					<!--<img *ngIf="selectedGame.stores[0].image;else noimageBlock" src="{{ selectedGame.stores[0].image }}" alt="{{ selectedGame.name }}" (loaded)="loadingImages=false">-->
-					<img *ngIf="selectedGame.stores.image;else noimageBlock" src="{{ selectedGame.stores.image }}" alt="{{ selectedGame.name }}" (loaded)="loadingImages=false">
+				<div class="col-12 col-sm-4 mb-2 mb-sm-0">
+					<img *ngIf="getStoreWithImage();else noimageBlock" src="{{ getStoreWithImage().image }}" alt="{{ gameDetails.name }}" (loaded)="loadingImages=false">
 					<ng-template #noimageBlock>
 						<span class="noimage"><fa name="photo"></fa></span>
 					</ng-template>
 				</div>
-				<div id="gameDetails" class="col-8">
-					<h4 class="text-center">{{ selectedGame.name }}</h4>
-					<div class="text-center">{{ 'genre' | translate}}: {{ selectedGame.genres }}</div>
-					<div *ngIf="selectedGame.releaseDate" class="text-center">{{ 'releaseDate' | translate }}: {{ selectedGame.releaseDate | date : 'longDate' }}</div>
+				<div id="gameDetails" class="col-12 col-sm-8">
+					<h4 class="text-center">{{ gameDetails.name }}</h4>
+					<div class="text-center">{{ 'genre' | translate}}: {{ gameDetails.genres }}</div>
+					<div *ngIf="gameDetails.releaseDate" class="text-center">{{ 'releaseDate' | translate }}: {{ gameDetails.releaseDate | date : 'longDate' }}</div>
 					<div class="text-center">Metascore: 
-						<span class="metascore rated" *ngIf="selectedGame.metascore;else elseBlock">
-							{{ selectedGame.metascore }}
+						<span class="metascore rated" *ngIf="gameDetails.metascore;else elseBlock">
+							{{ gameDetails.metascore }}
 						</span>
 						<ng-template #elseBlock>
 							<span class="metascore tba" title="besorolás alatt">TBA</span>
@@ -25,45 +24,56 @@
 					</div>
 				</div>
 			</div>
-			<div *ngIf="selectedGame.description" class="row mt-3">
+			<div *ngIf="gameDetails.description" class="row mt-3">
 				<div class="col">
 					<button class="btn-block mb-2" (click)="descriptionOpened=!descriptionOpened">
-						<span *ngIf="!descriptionOpened;else showLess">{{ 'showMore' | translate }}</span>
-						<ng-template #showLess>
-							<span>{{ 'showLess' | translate }}</span>
+						<span *ngIf="!descriptionOpened;else hideDescription">{{ 'descriptionShow' | translate }}</span>
+						<ng-template #hideDescription>
+							<span>{{ 'descriptionHide' | translate }}</span>
 						</ng-template>
 					</button>
-					<p *ngIf="descriptionOpened" class="description">{{ selectedGame.description }}</p>
+					<p *ngIf="descriptionOpened" class="description">{{ gameDetails.description }}</p>
 				</div>
 			</div>
 		</div>
 		<div class="card-body">
-			<table class="table table-hover table-dark mb-3">
-				<thead>
-					<tr>
-						<td class="text-center">{{ 'store' | translate }}</td>
-						<td class="text-center">{{ 'currentPrice' | translate }}</td>
-						<td class="text-center">{{ 'originalPrice' | translate }}</td>
-						<td class="text-center">{{ 'discount' | translate }}</td>
-					</tr>
-				</thead>
-				<tbody>
-					<!--<tr *ngFor="let store of orderStoresByDiscountedPrice(selectedGame)">-->
-					<tr *ngFor="let store of orderedStores">
-						<td class="text-center">
-							<a href="{{ store.linkToGame }}" target="_blank" (click)="addToGameHistory(selectedGame._id)">{{ store.name }}</a>
-						</td>
-						<td class="text-center">{{ store.specialPrice }} €</td>
-						<td class="text-center" style="text-decoration: line-through;">{{ store.originalPrice }} €</td>
-						<td id="discountPercent" class="text-center">
-							<span>-{{ store.discountPercent }} %</span>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+			<button *ngIf="userService.isAuthenticated()" class="btn-block btn-success rounded-0" (click)="openWaitlist()">
+				<fa name="clock-o"></fa>
+				<span *ngIf="!gameIsOnWaitlist;else editWaitlist">{{ 'addToWaitlist' | translate }}</span>
+				<ng-template #editWaitlist>
+					<span>{{ 'editWaitlist' | translate }}</span>
+				</ng-template>
+			</button>
+			<div class="table-responsive">
+				<table class="table table-hover table-dark mb-3">
+					<thead>
+						<tr>
+							<th class="text-center">{{ 'store' | translate }}</th>
+							<th class="text-center">{{ 'currentPrice' | translate }}</th>
+							<th class="text-center">{{ 'originalPrice' | translate }}</th>
+							<th class="text-center">{{ 'historicalLow' | translate }}</th>
+							<th class="text-center">{{ 'discount' | translate }}</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let store of orderedStores">
+							<td class="text-center">
+								<a href="{{ store.linkToGame }}" target="_blank" (click)="addToGameHistory(gameDetails._id)">{{ store.name }}</a>
+							</td>
+							<td class="text-center">{{ store.specialPrice }} €</td>
+							<td class="text-center" [ngStyle]="{'text-decoration':store.specialPrice<store.originalPrice?'line-through':'none'}">{{ store.originalPrice }} €</td>
+							<td class="text-center">{{ store.historicalLowPrice }} €</td>
+							<td id="discountPercent" class="text-center">
+								<span>-{{ store.discountPercent }} %</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 			<div id="bottomPaddingReplacer">
 				<!--a .card osztályban alkalmazott overflow-y:auto eltünteti a alsó belső margót, ezért ez pótolja azt-->
 			</div>
+			<app-waitlist *ngIf="waitlistOpened" [selectedGame]="selectedGame" [gameIsOnWaitlist]="gameIsOnWaitlist" (add)="isGameOnWaitlist(selectedGame._id)" (edit)="isGameOnWaitlist(selectedGame._id)" (delete)="gameIsOnWaitlist=false" (close)="waitlistOpened=false"></app-waitlist>
 		</div>
 	</div>
 </div>

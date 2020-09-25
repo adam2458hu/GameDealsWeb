@@ -1,0 +1,19 @@
+{
+	"emailAuthentication":"Email authentication",
+	"emailVerification":"Please verify your email",
+	"emailAlreadyVerified":"This email address is already verified",
+	"emailSuccesfullyVerified":"Email successfully verified",
+	"dataRequest":"Data request",
+	"deviceAlreadyTrustworthy":"You already marked this device as trustworthy",
+	"deviceMarkedTrustworthy":"Your device has been marked as trustworthy",
+	"deviceUntrusted":"Your device has been marked as untrusted",
+	"forgottenPassword":"Forgotten password",
+	"newsletterDeals":"Newsletter - Recommended deals",
+	"newsletterOther":"Newsletter - ",
+	"securityAlert":"Security alert",
+	"successfulLogin":"Successful login",
+	"successfulLogout":"Successful logout",
+	"unverifiedEmail":"Unverified email",
+	"verificationCodeSent":"We've sent the verification code to your email",
+	"waitlist":"The games on your waitlist are on sale"
+}

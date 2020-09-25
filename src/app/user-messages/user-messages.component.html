@@ -7,11 +7,11 @@
 			<div *ngIf="getUserService().returnMessages().length>0;else elseblock">
 				<div class="d-flex justify-content-between mb-2">
 					<label>
-						<input type="checkbox"(change)="selectAllMessages()" [checked]="isAllSelected" style="margin: 0 10px">Mindet kijelöl
+						<input type="checkbox"(change)="selectAllMessages()" [checked]="isAllSelected" style="margin: 0 10px">{{ 'selectAll' | translate }}
 					</label>
 					<div>
-						<button class="btn btn-sm mr-2 btn-info" (click)="deleteSelectedMessages()">Törlés</button>
-						<button class="btn btn-sm btn-info" (click)="markSelectedMessagesAsRead()">Olvasottnak jelölés</button>
+						<button class="btn btn-sm mr-2 btn-info" (click)="deleteSelectedMessages()">{{ 'delete' | translate }}</button>
+						<button class="btn btn-sm btn-info" (click)="markSelectedMessagesAsRead()">{{ 'markAsRead' | translate }}</button>
 					</div>
 				</div>
 			</div>

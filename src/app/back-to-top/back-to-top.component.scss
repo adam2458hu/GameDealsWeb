@@ -1,11 +1,11 @@
 .backToTop {
 	position: fixed;
 	right: 25px;
-	bottom: 50px;
+	bottom: 25px;
 	border-radius: 50%;
 	width: 40px;
 	height: 40px;
-	z-index: 98;
+	z-index: 100;
 
 	&:after{
 		content: '';
@@ -18,5 +18,18 @@
 		border-left: 8px solid transparent;
 		border-right: 8px solid transparent;
 		border-bottom: 8px solid white;
+	}
+}
+
+@media screen and (max-width: 768px) {
+	.backToTop {
+		right: 40px;
+	}
+}
+
+@media screen and (max-width: 578px) {
+	.backToTop {
+		bottom: 14px;
+		right: 14px;
 	}
 }

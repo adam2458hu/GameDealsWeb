@@ -1,64 +1,98 @@
-<div *ngIf="!isConsented()" id="cookie-consent">
-	<!--<div class="container">
+<div *ngIf="!consented || popupOpened" id="cookieConsent" class="centered">
+	<h1>{{ 'cookieSettings' | translate }}</h1>
+	<div class="container">
 		<div class="row">
-			<div class="col-9">
-				Az oldalon sütiket használunk az oldal funkcióinak teljeskörű működése, illetve a felhasználói élmény növelése érdekében. A sütikről szóló részletes tájékoztatóhoz kattintson <button [routerLink]="['/cookie-policy']">ide</button>, az elfogadásukhoz és a testreszabásához pedig kérjük kattintson a gombra.
+			<div class="col-12 mb-3">
+				{{ 'cookieConsentInfoStart' | translate }}
+				<a [routerLink]="['/cookie-policy']">{{ 'cookieConsentInfoLink' | translate }}</a>
+				{{ 'cookieConsentInfoEnd' | translate }}
 			</div>
-			<div class="col-3 text-right">
-				<button type="button">Sütik testreszabása</button>
+			<div class="col-12">
+				<button type="button" class="btn-block mb-2" (click)="consentToAllCookies()"><b>{{'acceptAll' | translate }}</b></button>
 			</div>
 		</div>
-	</div>-->
-	<p>Az oldalon sütiket használunk az oldal funkcióinak teljeskörű működése, illetve a felhasználói élmény növelése érdekében.</p>
-	<button class="btn-block" [routerLink]="['/cookie-policy']">Süti tájékoztató</button>
-	<button class="btn-block" type="button" (click)="customizeCookies()">Sütik testreszabása</button>
+		<div class="row">
+			<div class="col-12 col-md-6 pr-md-2 mb-2 mb-md-0">
+				<button class="btn-block btn-outline-custom" type="button" (click)="consentToNecessaryCookies()">
+					<b>{{ 'acceptOnlyNecessary' | translate }}</b>
+				</button>
+			</div>
+			<div class="col-12 col-md-6 pl-md-2 ">
+				<button class="btn-block btn-outline-custom" type="button" (click)="toggleSettingsPanel()"><b>{{ 'customSettings' | translate }}</b></button>
+			</div>
+		</div>
+	</div>
 </div>
-<button id="privacy" (click)="customizeCookies()"><fa name="cog"></fa>Adatvédelem</button>
-<div *ngIf="customize" id="customize-cookies">
-	<form ngForm="#customizeForm" (ngSubmit)="saveSettings()">
-		<h3>Adatvédelmi beállítások</h3>
-		<p>A Digital Deals oldalon a regisztrációkor megadott személyes és a belépéshez szükséges adatokat, valamint a használt eszköz jellemzőiről információkat gyűjtünk. Ezek egy része elengedhetetlen az oldal megfelelő működése érdekében, de a lentebb található lehetőségeket személyre szabhatja, amelyek kizárólag erre az oldalra fognak vonatkozni. Amennyiben nem kíván hozzájárulni ezen adatok felhasználásához, akkor kikapcsolhatja az egyes opciókat.</p>
+<!--
+<div *ngIf="!consented || popupOpened" id="cookieConsent" class="bottom">
+	<div class="container">
 		<div class="row">
-			<div class="col-10">
-				Az Ön pontos geolokációs adatainak felhasználása
+			<div class="col-12 col-lg-8 text-center text-sm-center text-lg-left mb-2 mb-lg-0">
+				{{ 'cookieConsentInfoStart' | translate }}
+				<a [routerLink]="['/cookie-policy']">{{ 'cookieConsentInfoLink' | translate }}</a>
+				{{ 'cookieConsentInfoEnd' | translate }}
 			</div>
-			<div class="col-2">
+			<div class="col-12 col-lg-4 text-center text-sm-center text-lg-right">
+				<button type="button" class="btn-block mb-2" (click)="consentToAllCookies()"><b>{{'acceptAll' | translate }}</b></button>
+				<button class="btn-block btn-outline-custom" type="button" (click)="toggleSettingsPanel()"><b>{{ 'customSettings' | translate }}</b></button>
+			</div>
+		</div>
+	</div>
+</div>-->
+
+<div *ngIf="settingsPanelOpened" id="settingsPanel" class="container">
+	<span class="close" (click)="toggleSettingsPanel()">&times;</span>
+	<form #consentForm="ngForm" id="consentForm" (ngSubmit)="consentToCustomCookies(consentForm);toggleSettingsPanel()">
+		<h1>{{ 'customSettings' | translate }}</h1>
+		<div class="row options mt-3">
+			<div class="col-9 col-sm-10">
+				<b>{{ 'necessaryCookies' | translate }}</b>
+				<p>{{ 'necessaryCookiesInfo' | translate }}</p>
+			</div>
+			<div class="col-3 col-sm-2 text-right">
 				<label>
-					<input type="checkbox" name="geolocation" [(ngModel)]="geolocation">
+					<input type="hidden" name=necessary [(ngModel)]="consent.necessary">
+					<input type="checkbox" checked disabled>
 					<span class="custom-checkbox"></span>
 				</label>
 			</div>
-			<div class="col-10">
-				Személyre szabott ajánlatok
+			<div class="col-9 col-sm-10">
+				<b>{{ 'functionalCookies' | translate }}</b>
+				<p>{{ 'functionalCookiesInfo' | translate }}</p>
 			</div>
-			<div class="col-2">
+			<div class="col-3 col-sm-2 text-right">
 				<label>
-					<input type="checkbox" name="recommendations" [(ngModel)]="recommendations">
+					<input type="checkbox" name="functional" [(ngModel)]="consent.functional">
 					<span class="custom-checkbox"></span>
 				</label>
 			</div>
-			<div class="col-10">
-				Push értesítések fogadása
+			<div class="col-9 col-sm-10">
+				<b>{{ 'analyticalCookies' | translate }}</b>
+				<p>{{ 'analyticalCookiesInfo' | translate }}</p>
 			</div>
-			<div class="col-2">
+			<div class="col-3 col-sm-2 text-right">
 				<label>
-					<input type="checkbox" name="pushNotifications" [(ngModel)]="pushNotifications">
+					<input type="checkbox" name="analytical" [(ngModel)]="consent.analytical">
 					<span class="custom-checkbox"></span>
 				</label>
 			</div>
-			<div class="col-10">
-				Az Ön által használt eszköz jellemzőinek automatikus elküldése belépéskor.
+			<div class="col-9 col-sm-10">
+				<b>{{ 'advertisingCookies' | translate }}</b>
+				<p>{{ 'advertisingCookiesInfo' | translate }}</p>
 			</div>
-			<div class="col-2">
+			<div class="col-3 col-sm-2 text-right">
 				<label>
-					<input type="checkbox" name="device" [(ngModel)]="device">
+					<input type="checkbox" name="advertising" [(ngModel)]="consent.advertising">
 					<span class="custom-checkbox"></span>
 				</label>
 			</div>
 		</div>
-		<div class="d-flex justify-content-between mt-3">
-			<button type="submit">Mentés</button>
-			<button (click)="customizeCookies()">Bezárás</button>
-		</div>
+		<button class="btn-block" type="submit">
+			{{ 'saveSettings' | translate }}
+		</button>
 	</form>
 </div>
+
+<button id="settingsButton" *ngIf="consented && !popupOpened" (click)="togglePopup()">
+	<fa name="cog" size="lg"></fa>
+</button>

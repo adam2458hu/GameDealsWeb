@@ -1,0 +1,35 @@
+<form *ngIf="gameDetailsReceived" #waitlistForm="ngForm" (ngSubmit)="addToWaitlist(waitlistForm)">
+	<span class="close" (click)="onClose()">&times;</span>
+	<h4 *ngIf="!gameIsOnWaitlist;else editWaitlistTitle" class="text-center">{{ 'addToWaitlist' | translate}}: {{ waitlist.name }}</h4>
+	<ng-template #editWaitlistTitle>
+		<h4 class="text-center">{{ 'editWaitlist' | translate}}: {{ waitlist.name }}</h4>
+	</ng-template>
+	<div class="row mt-3">
+		<div class="col-12 col-lg-3 mb-2 mb-lg-0">
+			{{ 'priceMax' | translate }}
+			<input type="number" class="form-control" name="maxPrice" [(ngModel)]="waitlist.maxPrice">
+		</div>
+		<div class="col-12 col-lg-3 mb-2 mb-lg-0">
+			{{ 'discountMin' | translate }}
+			<input type="number" class="form-control" name="minDiscount" [(ngModel)]="waitlist.minDiscount">
+		</div>
+		<div class="col-12 col-lg-6">
+			{{ 'stores' | translate }}:
+			<div class="form-check" *ngFor="let store of stores;index as i">
+				<label class="form-check-label">
+					<input type="checkbox" class="form-check-input" [(ngModel)]="store.isSelected" [ngModelOptions]="{standalone: true}">
+					{{store.name}}
+				</label>
+			</div>
+		</div>
+		<input type="hidden" name="gameID" [(ngModel)]="waitlist.gameID">
+		<input type="hidden" name="name" [(ngModel)]="waitlist.name">
+	</div>
+	<input *ngIf="!gameIsOnWaitlist;else editWaitlist" type="submit" class="btn-block" value="{{ 'add' | translate }}">
+	<ng-template #editWaitlist>
+		<div id="editWaitlist" class="d-flex justify-content-between">
+			<button type="button" (click)="editWaitlistItem(waitlist._id,waitlistForm)">{{ 'edit' | translate }}</button>
+			<button type="button" (click)="deleteWaitlistItem(waitlist._id)">{{ 'delete' | translate }}</button>
+		</div>
+	</ng-template>
+</form>

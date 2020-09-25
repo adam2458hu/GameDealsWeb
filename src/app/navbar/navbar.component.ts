@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild,ElementRef } from '@angular/core';
 import { UserService } from '../shared/user/user.service';
 
 @Component({
@@ -10,7 +10,8 @@ import { UserService } from '../shared/user/user.service';
 export class NavbarComponent implements OnInit {
   private mobile: boolean;
   private resizeTimeout: any;
-
+  @ViewChild('navbarToggler',{static:false}) navbarToggler: ElementRef;
+  @ViewChild('responsiveNavbar',{static:false}) responsiveNavbar: ElementRef;
   @HostListener('window:resize')
   
   onWindowResize() {
@@ -28,6 +29,13 @@ export class NavbarComponent implements OnInit {
         }
       }).bind(this), 500);
   };
+
+  @HostListener('window:click',['$event'])
+  onClick(event) {
+    if (this.responsiveNavbar.nativeElement.classList.contains('show') && !event.target.classList.contains('navbar-toggler-icon')) {
+      this.navbarToggler.nativeElement.click();
+    }
+  }
 
   constructor(
     private userService: UserService

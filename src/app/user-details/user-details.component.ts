@@ -50,7 +50,8 @@ export class UserDetailsComponent implements OnInit {
 			first_name: form.value.first_name,
 			last_name: form.value.last_name,
 			email: form.value.email,
-			consentToNewsletter: form.value.consentToNewsletter
+			consentToNewsletter: form.value.consentToNewsletter,
+			language: form.value.language
 		}
 
 		this.loadingScreenService.setAnimation(true);
@@ -138,7 +139,7 @@ export class UserDetailsComponent implements OnInit {
 		this.userService.getUserProfile().subscribe(
 			(res: any)=>{
 				this.userService.setUser(res.user);
-				this.userService.resetSession(res.accessToken);
+				//this.userService.resetSession(res.accessToken);
 			},
 			(err)=>{
 				this.userService.setErrorMessage(err.error.message);

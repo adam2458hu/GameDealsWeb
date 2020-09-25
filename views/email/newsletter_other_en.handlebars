@@ -1,0 +1,16 @@
+<div class="main">
+	<div class="container">	
+		<h1 style="text-align: center">Dear {{firstName}} {{lastName}}!</h1>
+		<p>{{ text }}</p>
+		<p>You received this message, because you subscribed to our newsletters. If you dont want to receive newsletters in the future, you can unsubscribe at anytime by going to <a href="{{siteUrl}}">profile/details</a> or by clicking on the following button:</p>
+		<div class="button-container">
+			<a href="{{unsubscribeURL}}">Leiratkozás</a>
+		</div>
+		<p>
+			If the button doesn't work, please copy and paste the following link into your browser's address bar and press enter:
+			<br>
+			<a href="{{unsubscribeURL}}">{{unsubscribeURL}}</a>
+		</p>
+		<p><b>Sincerely,<br>{{ siteName }}</b></p>
+	</div>
+</div>

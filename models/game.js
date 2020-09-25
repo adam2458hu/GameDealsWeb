@@ -29,6 +29,10 @@ const gameSchema = new mongoose.Schema({
 			type : Number,
 			required : true
 		},
+		historicalLowPrice : {
+			type : Number,
+			required : true
+		},
 		discountPercent : {
 			type : Number,
 			required : true

@@ -15,12 +15,12 @@ export class HomeComponent implements AfterViewInit {
 	index=0;
 	numberOfWatchedGames=0;
 	showViewedGenres=false;
-	images: String[]=['pubg','aco','ets2'];
+	images: String[]=['nms','aco','ets2'];
 	loadingImages = true;
-	titles: String[]=['PLAYERUNKNOWNS BATTLEGROUNDS','Assassins Creed: Odyssey','Euro Truck Simulator 2'];
+	titles: String[]=["No Man's Sky",'Assassins Creed: Odyssey','Euro Truck Simulator 2'];
 	discounts: String[]=['-50%','-67%','-75%'];
-	endOfOffer: Date[]=[new Date(2020, 7, 29, 0, 0, 0, 0),new Date(2020, 7, 27, 0, 0, 0, 0),new Date(2020, 7, 27, 0, 0, 0, 0)];
-	links: String[]=['https://store.steampowered.com/app/578080/PLAYERUNKNOWNS_BATTLEGROUNDS/',
+	endOfOffer: Date[]=[new Date(2020, 10, 5, 0, 0, 0, 0),new Date(2020, 7, 27, 0, 0, 0, 0),new Date(2020, 7, 27, 0, 0, 0, 0)];
+	links: String[]=['https://store.steampowered.com/app/275850/No_Mans_Sky/',
 	'https://store.steampowered.com/app/812140/Assassins_Creed_Odyssey/','https://store.steampowered.com/app/227300/Euro_Truck_Simulator_2/'];
 	t;
 	genreStatistics=[];

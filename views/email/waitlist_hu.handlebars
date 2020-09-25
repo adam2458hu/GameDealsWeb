@@ -1,0 +1,29 @@
+<div class="main">
+	<div class="container">
+		<h1 style="text-align: center">Tisztelt {{lastName}} {{firstName}}!</h1>
+		<p>
+			Szeretnénk értesíteni, hogy a <a href="{{ siteUrl }}">Game Deals List</a> oldalon várólistára felvett játékok közül a következőek vannak jelenleg akcióban:
+		</p>
+		<p>
+			<table class="games">
+				<thead>
+					<tr>
+						<th>Játék neve</th>
+						<th>Áruház</th>
+						<th>Akciós ár</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{#each games}}
+					<tr>
+						<td>{{this.name}}</td>
+						<td><a href="{{this.store.linkToGame}}">{{this.store.name}}</a></td>
+						<td>{{this.store.specialPrice}}€</td>
+					</tr>
+					{{/each}}
+				</tbody>
+			</table>
+		</p>
+		<p><b>Üdvözlettel,<br>{{ siteName }}</b></p>
+	</div>
+</div>

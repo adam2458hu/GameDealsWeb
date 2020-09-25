@@ -18,7 +18,8 @@ export class UserRegisterComponent implements OnInit {
 		password:'',
 		confirmPassword:'',
 		consentToGDPR: false,
-		consentToNewsletter: false
+		consentToNewsletter: false,
+		language: localStorage.getItem('lang') || 'en'
 	}
 
 	emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -36,7 +37,6 @@ export class UserRegisterComponent implements OnInit {
 	}
 
 	onSubmit(form: NgForm){
-		console.log(form.value);
 		this.loadingScreenService.setAnimation(true);
 		this.userService.registerUser(form.value).subscribe(
 			(res: any)=>{

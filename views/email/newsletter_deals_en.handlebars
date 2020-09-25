@@ -1,0 +1,34 @@
+<div class="main">
+	<div class="container">	
+		<h1 style="text-align: center">Dear {{firstName}} {{lastName}}!</h1>
+		<p>Based on your watch history, we would like to recommend you the following deals:</p>
+		<table class="games">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Store</th>
+					<th>Discounted price</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{#each recommendedGames}}
+				<tr>
+					<td>{{this.name}}</td>
+					<td><a href="{{this.stores.linkToGame}}">{{this.stores.name}}</a></td>
+					<td>{{this.stores.specialPrice}}€</td>
+				</tr>
+				{{/each}}
+			</tbody>
+		</table>
+		<p>You received this message, because you subscribed to our newsletters. If you dont want to receive newsletters in the future, you can unsubscribe at anytime by going to <a href="{{siteUrl}}/profile/details">profile/details</a> or by clicking on the following button:</p>
+		<div class="button-container">
+			<a href="{{unsubscribeURL}}">Unsubscribe</a>
+		</div>
+		<p>
+			If the button doesn't work, please copy and paste the following link into your browser's address bar and press enter:
+			<br>
+			<a href="{{unsubscribeURL}}">{{unsubscribeURL}}</a>
+		</p>
+		<p><b>Sincerely,<br>{{ siteName }}</b></p>
+	</div>
+</div>

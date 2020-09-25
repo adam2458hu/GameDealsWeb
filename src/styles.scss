@@ -8,8 +8,12 @@
 
 html {
 	position: relative;
-	min-height: 100%;
+	height: 100%;
 }
+
+/*html,body {
+	height: 100%;
+}*/
 
 header {
 	position: fixed;
@@ -23,18 +27,35 @@ body{
 	background: linear-gradient(90deg,#0C1D21,#2F383A,#0C1D21);
 	color: white;
 	font-family: Arial,sans-serif;
+	height: 100%;
 	margin: 0;
 	padding: 0;
+
+}
+
+app-root {
+	min-height: 100%;
+	display: flex;
+	flex-direction: column;
+
+	app-footer{
+		margin-top: auto;
+	}
 }
 
 main {
 	position: relative;
 	//background: linear-gradient(90deg,#073642,#1B2540,#073642);
-	font-family: 'Concert One';
-	padding: 50px;
-	min-height: calc(100vh - 134px);
+	//font-family: 'Concert One';
+	font-family: 'Ubuntu', sans-serif;
+	//padding: 50px;
+	//100% eszköz kijelző magasság - footer magassága
+	//min-height: calc(100vh - 134px);
+	//min-height: calc(100vh - 160px);
+	min-height: 100%;
 	//min-height: 100vh;
-	margin: 70px 0 0;
+	//margin: 70px 0 0;
+	padding: 120px 50px 50px;
 }
 
 h2,label {
@@ -63,18 +84,6 @@ th,td {
 	white-space: nowrap;
 }
 
-td {
-	color: white;
-
-	&:hover {
-		color: white;
-	}
-}
-/*
-tbody tr:not(first-child) td {
-	padding: 0px 12px !important;
-}*/
-
 img {
 	vertical-align: middle;
 }
@@ -85,6 +94,53 @@ fa {
 
 .loadingImages{
 	display: none;
+}
+
+.table-responsive {
+	box-shadow: 0 0 5px 2px darken($color-primary,8%);
+	//margin-top: 50px;
+}
+
+table {
+	margin: 0 !important;
+
+	button,input[type="submit"] {
+		font-size: 18px;
+		width: 100%;
+		height: 100%;
+		padding: 2px;
+		margin-top: 5px;
+	}
+
+	th,td {
+		border-bottom: 1px solid #999;
+		vertical-align: top;
+	}
+
+	th {
+		background-color: $color-secondary;
+		border-top: none;
+		color: white;
+		font-size: 18px;
+	}
+
+	td {
+		background-color: #0D1315;
+		color: white;
+
+		&:hover {
+			color: white;
+		}
+
+		#storeSelection {
+			line-height: 20px;
+		}
+
+		a {
+			color: $color-link;
+			text-weight: bold;
+		}
+	}
 }
 
 .modal-container{
@@ -130,7 +186,8 @@ fa {
 	position: relative;
 }
 
-input {
+input,select {
+	//font-family: Arial,sans-serif;
 	line-height: 1.4em;
 }
 
@@ -149,9 +206,13 @@ input {
 
 		tr {
 			cursor: pointer;
+
+			td {
+				vertical-align: middle;
+			}
 		}
 	}
-
+	/*
 	.table-responsive {
 		box-shadow: 0 0 5px 2px darken($color-primary,8%);
 		margin-top: 50px;
@@ -198,7 +259,7 @@ input {
 				}
 			}
 		}
-	}
+	}*/
 
 	.card {
 		//box-shadow: 0 0px 10px 5px $color-secondary;
@@ -248,19 +309,22 @@ input {
 
 input[type="submit"],button {
 	background-color: $color-secondary;
-	box-shadow: 0 0 5px 2px darken($color-secondary,5%);
+	//box-shadow: 0 0 5px 2px darken($color-secondary,5%);
 	border: 1px solid $color-secondary;
-	border-radius: 5px;
+	//border-radius: 5px;
+	border-radius: 20px;
 	color: white;
 	cursor: pointer;
+	font-family: Arial,sans-serif;
 	outline: none !important;
 	padding: 5px 20px;
 	transition: 0.2s;
 
 	&:hover {
-		background-color: #0978A5;
+		//background-color: #0978A5;
+		background-color: darken($color-secondary,5%);
 		//box-shadow: 0 0 5px 2px $color-primary;
-		box-shadow: 0 0 5px 1px #0978A5;
+		//box-shadow: 0 0 5px 1px #0978A5;
 	}
 
 	&:active {
@@ -328,7 +392,7 @@ input[type="submit"],button {
 /* Handle */
 ::-webkit-scrollbar-thumb {
 	background: $color-link;
-	border-radius: 10px;
+	//border-radius: 10px;
 }
 
 /* Handle on hover */
@@ -377,4 +441,26 @@ input[type="submit"],button {
 @keyframes rotate {
 	from {transform: translate(-50%,-50%) rotate(0deg)}
 	to {transform: translate(-50%,-50%) rotate(360deg)}
+}
+
+@media screen and (max-width: 768px){
+	* {
+		font-size: 14px;
+	}
+
+	h2 {
+		font-size: 24px;
+	}
+
+	h3 {
+		font-size: 22px;
+	}
+
+	h4 {
+		font-size: 20px;
+	}
+
+	h5 {
+		font-size: 18px;
+	}
 }

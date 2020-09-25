@@ -1,52 +1,106 @@
 @import '../../variables';
 @import '../../mixins';
 
-#cookie-consent {
+h1 {
+	color: black;
+	font-size: 24px;
+	text-align: center;	
+}
+
+#cookieConsent {
 	position: fixed;
-	background-color: $color-secondary;
-	border-radius: 5px;
-	border: 1px solid black;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%,-50%);
-	max-width: 300px;
-	padding: 20px;
-	z-index: 99;
+	background-color: white;
+	box-shadow: 2px 0 20px black;
+	color: black;
+	font-size: 14px;
+	z-index: 9999;
+
+	&.centered {
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%,-50%);
+		border-radius: 8px;
+		width: 95%;
+		max-width: 600px;
+		padding: 20px 10px;
+	}
+
+	&.bottom {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		border-top: 1px solid black;
+		max-height: calc(100% - 61px);
+		width: 100%;
+		padding: 10px 0;
+		overflow: auto;
+	}
 
 	button {
 		background-color: $color-primary;
+		border: 2px solid $color-primary;
+		border-radius: 8px;
+		box-shadow: none;
+		font-size: 14px;
+		text-transform: uppercase;
+		padding: 10px;
+
+		&.btn-outline-custom {
+			background-color: white;
+			font-size: 11px;
+			color: $color-primary;
+		}
+	}
+
+	a {
+		color: $color-secondary;
+
+		&:hover{
+			color: $color-secondary !important;
+			text-decoration: underline;
+		}
 	}
 }
 
-#privacy{
+#settingsPanel {
 	position: fixed;
-	bottom: 0;
-	right: 0;
-	background-color: white;
-	color: black;
-	z-index: 99;
-}
-
-#customize-cookies {
-	position: fixed;
-	background-color: white;
-	border-radius: 5px;
-	border: 1px solid black;
-	color: black;
 	top: 50%;
 	left: 50%;
-	width: 800px;
-	max-width: 80%;
 	transform: translate(-50%,-50%);
-	padding: 30px;
-	z-index: 99;
+	background-color: white;
+	border-radius: 8px;
+	box-shadow: 2px 0 20px black;
+	color: black;
+	width: 95%;
+	max-width: 700px;
+	padding: 20px;
+	z-index: 9999;
+
+	.options {
+		max-height: 400px;
+		overflow: auto;
+		margin-bottom: 10px
+	}
+
+	.close {
+		position: absolute;
+		top: 10px;
+		right: 10px;
+		color: #777;
+		font-size: 40px;
+		cursor: pointer;
+	}
+
+	p {
+		font-size: 14px;
+	}
 
 	.col-2 {
 		text-align: right;
 	}
 
-	.row {
-		border-bottom: 1px solid #333;
+	hr {
+		border-width: 4px;
 	}
 
 	.custom-checkbox{
@@ -63,36 +117,104 @@
 	input {
 		display: none;
 
-		+.custom-checkbox:after{
-			position: absolute;
-			content: "X";
-			color: black;
-			text-align: center;
-			top: 0;
-			left: 0;
-			height: 100%;
-			width: 50%;
-			background-color: white;
-			border-radius: 50%;
-			transition: 0.4s;
+		+.custom-checkbox {
+			&:before{
+				position: absolute;
+				content: "";
+				top: 0;
+				left: 0;
+				height: 100%;
+				width: 50%;
+				background-color: white;
+				border-radius: 50%;
+				transition: 0.4s;
+			}
+
+			&:after {
+				position: absolute;
+				content: "X";
+				color: black;
+				top: 50%;
+				left: 25%;
+				transform: translate(-50%,-50%);
+				transition: 0.4s;
+			}
 		}
 
 		&:checked+.custom-checkbox {
 			background-color: $color-primary;
 		}
 
-		&:checked+.custom-checkbox:after{
-			position: absolute;
-			content: "\2713";
-			text-align: center;
-			color: white;
-			top: 0;
-			left: 50%;
-			height: 100%;
-			width: 50%;
-			background-color: $color-secondary;
-			border-radius: 50%;
-			transition: 0.4s;
+		&:checked+.custom-checkbox {
+			&:before {
+				position: absolute;
+				top: 0;
+				left: 50%;
+				height: 100%;
+				width: 50%;
+				background-color: $color-secondary;
+				border-radius: 50%;
+				transition: 0.4s;
+			}
+
+			&:after{
+				position: absolute;
+				content: "\2713";
+				text-align: center;
+				color: white;
+				top: 50%;
+				left: 75%;
+				transform: translate(-50%,-50%);
+				transition: 0.4s;
+			}
 		}
 	}
 }
+
+#settingsButton {
+	position: fixed;
+	left: 25px;
+	bottom: 25px;
+	border-radius: 50%;
+	width: 40px;
+	height: 40px;
+	z-index: 100;
+
+	fa {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%,-50%);
+		font-size: 20px;
+	}
+}
+
+
+@media screen and (max-width: 768px) {
+	#settingsButton {
+		left: 40px;
+	}
+}
+
+@media screen and (max-width: 578px) {
+	* {
+		font-size: 12px;
+	}
+
+	#cookieConsent {
+		button {
+			font-size: 12px;
+		}
+	}
+
+	#settingsPanel {
+		p {
+			font-size: 12px;
+		}
+	}
+
+	#settingsButton {
+		bottom: 14px;
+		left: 14px;
+	}
+}	

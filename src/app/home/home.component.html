@@ -2,7 +2,7 @@
 	<div class="news-slideshow">
 		<div class="news-main">
 			<div class="row">
-				<div class="col-4">
+				<div class="col-lg-4 d-none d-lg-block big-screen-title">
 					<div class="news-container">
 						<div class="news-description text-center" [ngClass]="{'fadeIn':fadeIn}">
 							<h3>{{titles[index]}} {{ 'sale' | translate }}</h3>
@@ -10,17 +10,32 @@
 							<button (click)="goToExternalUrl(links[index])">{{ 'letssee' | translate}}</button>
 						</div>
 					</div>
-					<span class="custom-badge">
+					<span class="custom-badge d-none d-lg-block">
 						<span class="custom-badge-text" [ngClass]="{'fadeIn':fadeIn}">{{discounts[index]}}</span>
 					</span>
 				</div>
-				<div class="col-8">
-					<div class="news-image">
+				<div class="col-12 col-lg-8">
+					<div class="small-screen-title d-block d-lg-none">
+						<div>
+							<a href="{{links[index]}}" target="_blank">
+								<h3>{{titles[index]}}</h3>
+							</a>
+						</div>
+						<div>
+							<a href="{{links[index]}}" target="_blank">
+								<p>{{ 'endOfDeal' | translate }}: {{months[endOfOffer[index].getMonth()]}} {{endOfOffer[index].getDate()}}.</p>
+							</a>
+						</div>
+					</div>
+					<div class="news-image" (swipeleft)="deleteClass();next()" (swiperight)="deleteClass();previous()">
 						<img [ngClass]="{'fadeIn':fadeIn}" [src]='"/assets/"+images[index]+".jpg"' alt="{{titles[index]}}" (loaded)="loadingImages=false" width="100%">
 					</div>
+					<span class="custom-badge d-inline-block d-lg-none">
+						<span class="custom-badge-text" [ngClass]="{'fadeIn':fadeIn}">{{discounts[index]}}</span>
+					</span>
 				</div>
-				<span class="pager pager-left" (click)="deleteClass();previous()">&lt;</span>
-				<span class="pager pager-right" (click)="deleteClass();next()">&gt;</span>
+				<span class="pager pager-left d-none d-md-inline-block" (click)="deleteClass();previous()"></span>
+				<span class="pager pager-right d-none d-md-inline-block" (click)="deleteClass();next()"></span>
 			</div>
 		</div>
 		<div class="nav-buttons text-center">
@@ -40,7 +55,7 @@
 						<table class="table table-hover table-dark">
 							<thead>
 								<tr>
-									<th></th>
+									<!--<th></th>-->
 									<th>{{ 'name' | translate }}</th>
 									<th class="text-center">{{ 'currentPrice' | translate }}</th>
 									<th class="text-center">{{ 'originalPrice' | translate }}</th>
@@ -49,20 +64,26 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr *ngFor="let game of getRecommendedGames()" (click)="showAllStores(game)">
+								<tr *ngFor="let game of getRecommendedGames()" (click)="showAllStores(game)"><!--
 									<td id="productImage">
 										<img *ngIf="game.stores[0].image;else noimageBlock" src="{{ game.stores[0].image }}" alt="{{ game.name }}">
 										<ng-template #noimageBlock>
 											<span class="noimage"><fa name="photo"></fa></span>
 										</ng-template>
-									</td>
+									</td>-->
 									<td id="productName">
-										{{ game.name }}
+										<div>{{ game.name }}</div>
+										<div id="genres">{{ game.genres }}</div>
 									</td>
-									<td id="specialPrice" class="text-center">{{ currencyConverter(getCheapestStore(game).specialPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}</td>
+									<!--<td id="specialPrice" class="text-center">{{ currencyConverter(getCheapestStore(game).specialPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}</td>
 									<td id="originalPrice" class="text-center">{{ currencyConverter(getCheapestStore(game).originalPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}</td>
 									<td id="discountPercent" class="text-center">
 										<span>-{{ getCheapestStore(game).discountPercent }} %</span>
+									</td>-->
+									<td id="specialPrice" class="text-center">{{ currencyConverter(game.stores.specialPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}</td>
+									<td id="originalPrice" class="text-center">{{ currencyConverter(game.stores.originalPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}</td>
+									<td id="discountPercent" class="text-center">
+										<span>-{{ game.stores.discountPercent }} %</span>
 									</td>
 									<td id="metascore" class="text-center">
 										<span class="rated" *ngIf="game.metascore;else elseBlock">
@@ -79,9 +100,9 @@
 				</div>
 			</div>
 			<div id="watchedGames">
-				<div class="d-flex justify-content-between mt-3">
+				<div class="d-md-flex justify-content-between mt-3">
 					<h2>{{ 'watchHistory' | translate }}</h2>
-					<div class="d-inline-block">
+					<div class="d-flex justify-content-between d-md-inline-block mb-2 mb-md-0">
 						<button (click)="showViewedGenres=!showViewedGenres" class="mr-2">
 							<span *ngIf="!showViewedGenres;else elseBlock">{{ 'watchedGenresShow' | translate }}</span>
 							<ng-template #elseBlock>{{ 'watchedGenresHide' | translate }}</ng-template>
@@ -96,7 +117,7 @@
 					<div class="table-responsive">
 						<table class="table table-hover table-dark">
 							<thead>
-								<th></th>
+								<!--<th></th>-->
 								<th>{{ 'name' | translate }}</th>
 								<th class="text-center">{{ 'currentPrice' | translate }}</th>
 								<th class="text-center">{{ 'originalPrice' | translate }}</th>
@@ -105,14 +126,15 @@
 							</thead>
 							<tbody>
 								<tr *ngFor="let game of getGamesData()" (click)="showAllStores(game)">
-									<td id="productImage">
+									<!--<td id="productImage">
 										<img *ngIf="game.stores[0].image;else noimageBlock" src="{{ game.stores[0].image }}" alt="{{ game.name }}">
 										<ng-template #noimageBlock>
 											<span class="noimage"><fa name="photo"></fa></span>
 										</ng-template>
-									</td>
+									</td>-->
 									<td id="productName">
-										<a href="{{ getCheapestStore(game).linkToGame }}" target="_blank">{{ game.name }}</a>
+										<div>{{ game.name }}</div>
+										<div id="genres">{{ game.genres }}</div>
 									</td>
 									<td id="specialPrice" class="text-center">{{ currencyConverter(getCheapestStore(game).specialPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}</td>
 									<td id="originalPrice" class="text-center">{{ currencyConverter(getCheapestStore(game).originalPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}</td>

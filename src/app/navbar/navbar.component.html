@@ -1,15 +1,15 @@
 <header>
-	<nav class="navbar navbar-expand-md bg-dark navbar-dark" (window:resize)="onWindowResize()">
+	<nav class="navbar navbar-expand-lg bg-dark navbar-dark" (window:resize)="onWindowResize()">
 		<div class="container">
-			<a class="navbar-brand" [routerLink]="['/deals']">
+			<a class="navbar-brand" [routerLink]="['/home']">
 				<!--<img class="mirrored" src="../assets/angel8a.png" alt="" height="30px">-->
-				Game Deals List
+				Game Deals Web
 				<!--<img src="../assets/angel8a.png" alt="" height="30px">-->
 			</a>
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#responsiveNavbar">
+			<button  #navbarToggler class="navbar-toggler" type="button" data-toggle="collapse" data-target="#responsiveNavbar">
 				<span class="navbar-toggler-icon"></span>
 			</button>
-			<div class="collapse navbar-collapse" id="responsiveNavbar">
+			<div #responsiveNavbar class="collapse navbar-collapse" id="responsiveNavbar">
 				<ul class="navbar-nav ml-auto">
 					<li class="nav-item" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">
 						<a class="nav-link" [routerLink]="['/home']" routerLinkActive="active">
@@ -38,7 +38,8 @@
 				        <div class="dropdown-menu">
 				          <a class="dropdown-item" [routerLink]="['/profile/details']" routerLinkActive="active" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">{{ 'details' | translate }}</a>
 				          <a class="dropdown-item" [routerLink]="['/profile/security']" routerLinkActive="active" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">{{ 'security' | translate }}</a>
-				          <a *ngIf="isAdmin()" class="dropdown-item" [routerLink]="['/profile/admin']" routerLinkActive="active" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">Admin felület</a>
+				          <a class="dropdown-item" [routerLink]="['/profile/waitlist']" routerLinkActive="active" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">{{ 'waitlist' | translate }}</a>
+				          <a *ngIf="isAdmin()" class="dropdown-item" [routerLink]="['/profile/admin']" routerLinkActive="active" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">{{ 'adminPage' | translate }}</a>
 				        </div>
 					</li>
 					<li *ngIf="getUserService().isAuthenticated()" class="nav-item" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">
@@ -48,7 +49,7 @@
 						</a>
 					</li>
 					<li *ngIf="getUserService().isAuthenticated()" class="nav-item" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">
-						<a class="nav-link" [routerLink]="['/logout']" routerLinkActive="active" (click)="getUserService().logoutUser('Sikeres kijelentkezés')">
+						<a class="nav-link" [routerLink]="['/logout']" routerLinkActive="active" (click)="getUserService().logoutUser('successfulLogout')">
 							<fa name="sign-out"></fa>{{ 'logout' | translate }}
 						</a>
 					</li>
@@ -59,16 +60,16 @@
 	</nav>
 	<div class="box-shadow-container"></div>
 	<div *ngIf="getUserService().isAuthenticated() && getTimeLeftAsString()!=null" id="time-left">
-		<span>Hátralévő idő: </span>
+		<span>{{ 'timeLeft' | translate }}: </span>
 		<span [innerHTML]="getTimeLeftAsString()"></span>
 	</div>
 	<div *ngIf="getUserService().getErrorMessage() || getUserService().getSuccessMessage()" id="info-box" class="animated text-center">
 		<div class="container">
 			<strong *ngIf="getUserService().getErrorMessage()">
-				{{ getUserService().getErrorMessage() }}
+				{{ getUserService().getErrorMessage() | translate }}
 			</strong>
 			<strong *ngIf="getUserService().getSuccessMessage()">
-				{{ getUserService().getSuccessMessage() }}
+				{{ getUserService().getSuccessMessage() | translate }}
 			</strong>
 		</div>
 	</div>

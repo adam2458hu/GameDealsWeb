@@ -1,0 +1,32 @@
+@import '../../variables';
+
+form {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	padding: 20px;
+
+	input[type="submit"],#editWaitlist {
+		position: absolute;
+		left: 20px;
+		bottom: 20px;
+		width: calc(100% - 40px);
+	}
+
+	.close {
+		position: absolute;
+		top: 5px;
+		right: 15px;
+		font-size: 40px;
+		font-weight: lighter;
+		color: lighten($color-secondary,20%);
+		cursor: pointer;
+		z-index: 99;
+
+		&:hover {
+			color: lighten($color-secondary,40%);
+		}
+	}
+}

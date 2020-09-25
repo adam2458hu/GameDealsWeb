@@ -7,9 +7,10 @@ const router = express.Router();
 const request = require('request');
 const Currency = require('../models/currency');
 
-start();
+//start();
 
-function updateCurrencies(){
+function updateExchangeRates(){
+	console.log("Árfolyamok frissítése folyamatban");
 	request(process.env.EXCHANGE_RATE_API,function (error, response, body) {
 		if (error) {
 			console.log(error);
@@ -26,17 +27,17 @@ function updateCurrencies(){
 
 			let updateResponse = await updateCurrencyInDatabase(currency);
 			if (updateResponse==='OK' && arrayOfExchangeRates[arrayOfExchangeRates.length-1]===currencyName) {
-				console.log("Pénznemek frissítve");
+				console.log("Árfolyamok frissítve");
 			}
 		})
 	});
 }
-
+/*
 function start(){
 	var threeHours = 1000*60*60*3;
 	updateCurrencies();
 	setInterval(updateCurrencies,threeHours);
-}
+}*/
 
 router.get('/',async(req,res)=>{
 	try {
@@ -48,6 +49,7 @@ router.get('/',async(req,res)=>{
 })
 
 router.get('/update',async(req,res)=>{
+	console.log("Árfolyamok frissítése folyamatban");
 	try {
 		request(process.env.EXCHANGE_RATE_API,function (error, response, body) {
 			if (error) {
@@ -65,7 +67,7 @@ router.get('/update',async(req,res)=>{
 				
 				let updateResponse = await updateCurrencyInDatabase(currency);
 				if (updateResponse==='OK' && arrayOfExchangeRates[arrayOfExchangeRates.length-1]===currencyName) {
-					console.log("Pénznemek frissítve");
+					console.log("Árfolyamok frissítve");
 				}
 			})
 			res.json(JSON.parse(body));
@@ -93,3 +95,4 @@ async function updateCurrencyInDatabase(currency){
 }
 
 module.exports = router;
+module.exports.updateExchangeRates = updateExchangeRates;

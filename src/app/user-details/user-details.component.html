@@ -13,6 +13,14 @@
 				</div>
 				<div class="row">
 					<div class="col-4 text-right">
+						<label for="email">Email:</label>
+					</div>
+					<div class="col-8">
+						<input type="text" id="email" name="email" [(ngModel)]="getUserService().getUser().email" class="form-control">
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-4 text-right">
 						<label for="first_name">{{ 'firstName' | translate }}:</label>
 					</div>
 					<div class="col-8">
@@ -29,10 +37,13 @@
 				</div>
 				<div class="row">
 					<div class="col-4 text-right">
-						<label for="email">Email:</label>
+						<label for="language">{{ 'language' | translate }}:</label>
 					</div>
 					<div class="col-8">
-						<input type="text" id="email" name="email" [(ngModel)]="getUserService().getUser().email" class="form-control">
+						<select name="language" id="language" class="form-control" [(ngModel)]="getUserService().getUser().language">
+							<option value="en">English</option>
+							<option value="hu">Magyar</option>
+						</select>
 					</div>
 				</div>
 				<div class="row mb-3">
@@ -88,7 +99,7 @@
 		</div>
 		<div class="card-footer">
 			<button type="button" class="mr-3 mb-3 mb-sm-0" (click)="setPopup(false)">{{ 'cancel' | translate }}</button>
-			<button type="button" (click)="deleteProfile()">{{ 'yes' | translate }}</button>
+			<button type="button" (click)="deleteProfile()">{{ 'delete' | translate }}</button>
 		</div>
 	</div>
 </div>

@@ -1,0 +1,35 @@
+.tooltip-container {
+	display: inline-block;
+	cursor: pointer;
+	position: relative;
+
+	.tooltip-text {
+		display: none;
+		position: absolute;
+		top: 0;
+		left: 50%;
+		transform: translate(-50%,-105%);
+		background-color: black;
+		border-radius: 4px;
+		padding: 4px 8px;
+		text-align: center;
+		font-size: 14px;
+		width: 200px;
+		opacity: 0.95;
+
+		&:after{
+			position: absolute;
+			left: 50%;
+			bottom: -17px;
+			transform: translateX(-50%);
+			content: '';
+			border: 10px solid black;
+			border-color: black transparent transparent transparent;
+			opacity: 0.95;
+		}
+	}
+
+	&:hover > .tooltip-text{
+		display: block;
+	}
+}

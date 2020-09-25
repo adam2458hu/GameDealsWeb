@@ -40,6 +40,19 @@ function isUserRemembered(req,res,next){
 	})
 } 
 
+async function isAdmin(req,res,next){
+	try {
+		const user = await User.findById(req._id);
+		if (user.role==='admin'){
+			next();
+		} else {
+			return res.status(403).json({message: 'Nincs admin jogosultsága'});
+		}
+	} catch(err){
+		res.status(500).json({message: err.message});
+	}
+}
+
 function refreshToken(){
 	return async function(req,res,next){
 		try {
@@ -61,3 +74,4 @@ module.exports.isTempAuthenticated = isTempAuthenticated;
 module.exports.isAuthenticated = isAuthenticated;
 module.exports.refreshToken = refreshToken;
 module.exports.isUserRemembered = isUserRemembered;
+module.exports.isAdmin = isAdmin;

@@ -32,6 +32,10 @@ const userSchema = new mongoose.Schema({
 	secretSalt : {
 		type : String
 	},
+	language : {
+		type : String,
+		required : true
+	},
 	consentToGDPR : {
 		type : Boolean,
 		default : false
@@ -65,6 +69,9 @@ const userSchema = new mongoose.Schema({
 		ip : {
 			type: String
 		},
+		location : {
+			type: String
+		},
 		date : {
 			type : Date
 		},
@@ -94,6 +101,20 @@ const userSchema = new mongoose.Schema({
 		}
 
 	},
+	trustedDevices : [{
+		ip : {
+			type : String,
+			required : true
+		},
+		country : {
+			type: String,
+			required: true
+		},
+		trustedDate : {
+			type : Date,
+			default : Date.now
+		}
+	}],
 	gameHistory : [{
 		gameId : {
 			type : String
@@ -102,6 +123,28 @@ const userSchema = new mongoose.Schema({
 			type : Date,
 			default : Date.now
 		}
+	}],
+	waitlist : [{
+		gameID : {
+			type : String,
+			required : true
+		},
+		name : {
+			type : String,
+			required : true
+		},
+		maxPrice : {
+			type : Number,
+			required : true	
+		},
+		minDiscount : {
+			type : Number,
+			required : true	
+		},
+		selectedStores : [{
+			type : String,
+			required : true	
+		}]
 	}],
 	messages : [{
 		date : {
@@ -185,11 +228,15 @@ userSchema.methods.generateForgottenToken = function(){
 }
 
 userSchema.methods.generateNewPasswordToken = function(){
-	return jwt.sign({_id: this._id},process.env.NEW_PASSWORD_SECRET,{expiresIn: "5m"});
+	return jwt.sign({_id: this._id},process.env.NEW_PASSWORD_SECRET,{expiresIn: "7d"});
 }
 
-userSchema.methods.generateSecurityAlertToken = function(){
-	return jwt.sign({_id: this._id},process.env.SECURITY_ALERT_SECRET,{expiresIn: "5m"});
+userSchema.methods.generateTrustDeviceToken = function(loginDetails){
+	return jwt.sign({_id: this._id,ip: loginDetails.ip,country: loginDetails.country},process.env.TRUST_DEVICE_SECRET,{expiresIn: "7d"});
+}
+
+userSchema.methods.generateUnsubscribeToken = function(){
+	return jwt.sign({_id: this._id},process.env.UNSUBSCRIBE_SECRET,{expiresIn: "5m"});
 }
 
 userSchema.methods.verifyToken = function(token){

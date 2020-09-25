@@ -1,0 +1,19 @@
+{
+	"emailAuthentication":"Email hitelesítés",
+	"emailVerification":"Kérjük erősítse meg email címét",
+	"emailAlreadyVerified":"Ez az email cím már meg van erősítve",
+	"emailSuccesfullyVerified":"Az email cím sikeresen megerősítve",
+	"dataRequest":"Adatigénylés",
+	"deviceAlreadyTrustworthy":"Ezt az eszközt már megbízhatónak minősítette",
+	"deviceMarkedTrustworthy":"Az eszköze megbízhatónak minősítve",
+	"deviceUntrusted":"Az eszköze megbízhatatlannak minősítve",
+	"forgottenPassword":"Elfelejtett jelszó",
+	"newsletterDeals":"Hírlevél - Akciós ajánlatok",
+	"newsletterOther":"Hírlevél - ",
+	"securityAlert":"Biztonsági értesítés",
+	"successfulLogin":"Sikeres bejelentkezés",
+	"successfulLogout":"Sikeres kijelentkezés",
+	"unverifiedEmail":"Megerősítetlen e-mail cím",
+	"verificationCodeSent":"Az email címére elküdtük a hitelesítő kódot.",
+	"waitlist":"Akcióban a várólistára felvett játéka(i)"
+}

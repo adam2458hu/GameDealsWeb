@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { LoadingScreenService } from '../shared/loading-screen/loading-screen.service';
+import { UserService } from '../shared/user/user.service';
 
 @Component({
   selector: 'app-main',
@@ -9,7 +10,8 @@ import { LoadingScreenService } from '../shared/loading-screen/loading-screen.se
 export class MainComponent implements OnInit {
 
 	constructor(
-		private loadingScreenService: LoadingScreenService
+		private loadingScreenService: LoadingScreenService,
+		private userService: UserService
 	) { }
 
 	ngOnInit() {
@@ -18,6 +20,15 @@ export class MainComponent implements OnInit {
 
 	onActivate(event) {
     	window.scroll(0,0);
+    	if (this.userService.isAuthenticated()){
+    		this.userService.refreshAccessToken().subscribe(
+    			(res: any)=>{
+    				this.userService.resetSession(res.accessToken);
+    			},
+    			(err)=>{
+    				console.log(err);
+    			})
+    	}
 	}
 
 	isLoading(){

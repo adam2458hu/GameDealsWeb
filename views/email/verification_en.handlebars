@@ -1,0 +1,22 @@
+<div class="main">
+	<div class="container">
+		<h1 style="text-align: center">Dear {{firstName}} {{lastName}}!</h1>
+		<p>
+			You received this message, because a user account was created with the {{email}} email address on <a href="{{ siteUrl }}">{{ siteName }}</a>. If you were the one who registered, please click on the following button to complete your registration:
+		</p>
+		<div class="button-container">
+			<a href="{{verificationUrl}}">Verify registration</a>
+		</div>
+		<p>
+			After you verify your registration, you will be able to edit your profile, add games to your waitlist or subscribe to our newsletters/push notifications so you wont miss out on the latest gaming deals.
+			<br>
+			<p>
+				If the button doesn't work, please copy and paste the following link into your browser's address bar and press enter:
+				<br>
+				<a href="{{verificationUrl}}">{{verificationUrl}}</a>
+			</p>
+			This verification link is valid for 24 hours. When it expires, you can resend it after logging into your profile. If you dont verify your account within one week, it will be automatically deleted. In case you didn't register on our site, please delete this message.
+		</p>
+		<p><b>Sincerely,<br>{{ siteName }}</b></p>
+	</div>
+</div>

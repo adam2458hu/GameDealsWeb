@@ -1,0 +1,41 @@
+<div class="main">
+	<div class="container">
+		<h1 style="text-align: center">Dear {{firstName}} {{lastName}}!</h1>
+		<p>You received this message, because someone has successfully logged in with your account from an unknown device:</p>
+		<table>
+			<tbody>
+				<tr>
+					<td>IP address:</td>
+					<td>{{loginDetails.ip}}</td>
+				</tr>
+				<tr>
+					<td>Country:</td>
+					<td>{{loginDetails.country}}</td>
+				</tr>
+				<tr>
+					<td>Device:</td>
+					<td>{{loginDetails.device}}</td>
+				</tr>
+				</tr>
+					<td>OS:</td>
+					<td>{{loginDetails.os_version}}</td>
+				</tr>
+				<tr>
+					<td>Browser:</td>
+					<td>{{loginDetails.browser}}</td>
+				<tr>
+					<td>Date:</td>
+					<td>{{localeDate}}</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>If this person was you, and you dont want to receive security alerts when logging in from this device in the future, please click on the following button:</p>
+		<div class="button-container">
+			<a href="{{trustDeviceUrl}}">Yes, it was me.</a>
+		</div>
+		<p>If it wasn't you, please create a new password by clicking on this button:</p><div class="button-container">
+			<a href="{{newPasswordUrl}}">Create new password.</a>
+		</div>
+		<p><b>Sincerely,<br>{{ siteName }}</b></p>
+	</div>
+</div>

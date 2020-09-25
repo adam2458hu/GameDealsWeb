@@ -46,19 +46,31 @@
 				<h3 *ngIf="popupType=='emailTwoFactor'">{{ 'twoFactorEmail' | translate }}</h3>
 			</div>
 			<div class="card-body">
-				<p *ngIf="popupType=='appTwoFactor'">Kérjük írja be a hitelesítő alkalmázásában megjelenő 6 számjegyű kódot.</p>
-				<p *ngIf="popupType=='emailTwoFactor'">Kérjük írja be az email címére küldött üzenetben található 6 számjegyű kódot.</p>
-				<div class="input-group">
+				<p *ngIf="popupType=='appTwoFactor'">{{ 'twoFactorAppInputInfo' | translate }}</p>
+				<p *ngIf="popupType=='emailTwoFactor'">{{ 'twoFactorEmailInputInfo' | translate }}</p>
+				<div class="input-group mb-2">
 					<div class="input-group-prepend">
 						<span class="input-group-text text-white">{{ 'securityCode' | translate }}:</span>
 					</div>
 					<input type="text" class="form-control" id="code" name="code" [(ngModel)]="code" placeholder="******">
 				</div>
+				<div class="text-left">
+					<label>
+						<input type="checkbox" name="rememberDevice" [(ngModel)]="user.rememberDevice"> {{ 'rememberDevice' | translate }}
+					</label>
+					<div class="tooltip-container">
+						<fa name="question-circle ml-1">
+						</fa>
+						<div class="tooltip-text">
+							{{ 'rememberDeviceInfo' | translate }}
+						</div>
+					</div>
+				</div>
 				<input type="hidden" id="type" name="type" [(ngModel)]="popupType">
 			</div>
 			<div class="card-footer">
 				<button type="button" class="mr-3" (click)="setPopup(false)">{{ 'cancel' | translate }}</button>
-				<input type="submit" value="Küldés">
+				<input type="submit" value="{{ 'send' | translate }}">
 			</div>
 		</form>
 	</div>

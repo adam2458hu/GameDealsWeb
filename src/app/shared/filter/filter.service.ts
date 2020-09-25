@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Filter } from './filter';
 import { CurrencyService } from '../currency/currency.service';
 import { StoreService } from '../store/store.service';
+import { CookieService } from '../cookie/cookie.service';
 import { UserService } from '../user/user.service';
  
 @Injectable({
@@ -34,6 +35,7 @@ export class FilterService {
 
 	constructor(
 		private userService: UserService,
+		private cookieService: CookieService,
 		private currencyService: CurrencyService,
 		private storeService: StoreService
 	) {
@@ -132,7 +134,9 @@ export class FilterService {
 			decimalPlaces: this.filter.decimalPlaces
 		}
 
-		this.setLocalCurrency();
+		if (this.cookieService.getConsent().functional) {
+			this.setLocalCurrency();
+		}
 	}
 
 	selectAllStores(){
@@ -171,13 +175,20 @@ export class FilterService {
 	}
 
 	setLocalCurrency(){
-		this.userService.getIPAddress().subscribe(
-			(res: any)=>{
-				this.getGeoLocation(res.ip);
-			},
-			(err)=>{
-				console.log(err);
-			});
+		let localCurrency=localStorage.getItem('currency');
+		if (localCurrency){
+			this.filter.currency = JSON.parse(localCurrency).code;
+			this.filter.symbol = JSON.parse(localCurrency).symbol;
+			this.filter.decimalPlaces = JSON.parse(localCurrency).decimalPlaces;
+		} else {
+			this.userService.getIPAddress().subscribe(
+				(res: any)=>{
+					this.getGeoLocation(res.ip);
+				},
+				(err)=>{
+					console.log(err);
+				});
+		}
 	}
 
 	getGeoLocation(ip: string){
@@ -188,6 +199,11 @@ export class FilterService {
 						this.filter.currency = res.currency.code;
 						this.filter.symbol = currency.symbol;
 						this.filter.decimalPlaces = currency.decimalPlaces;
+						localStorage.setItem('currency',JSON.stringify({
+							code: res.currency.code,
+							symbol: currency.symbol,
+							decimalPlaces: currency.decimalPlaces
+						}))
 					}
 				})	
 			},

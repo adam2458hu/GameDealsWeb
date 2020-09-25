@@ -5,6 +5,7 @@ export class User {
 	last_name: String;
 	email: String;
 	password: String;
+	language: String;
 	rememberMe: Boolean;
 	twoFactorGoogleEnabled: Boolean;
 	twoFactorEmailEnabled: Boolean;

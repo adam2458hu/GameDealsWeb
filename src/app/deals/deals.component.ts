@@ -43,16 +43,15 @@ export class DealsComponent implements OnInit {
 		if (startLoadingAnimation) this.loadingScreenService.setAnimation(true);
 		this.gameService.getGameList(filter).subscribe(
 			(res: any)=>{
-				if (this.userService.isAuthenticated()){
+				/*if (this.userService.isAuthenticated()){
 					this.userService.resetSession(res.accessToken);	
 					this.userService.getMessages();
-				}
-				console.log(res.unwindedDiscountedGames);
+				}*/
 				this.gameService.setTotalGamesCount(res.totalGamesCount);
 				this.gameService.setFilteredGamesCount(res.filteredGamesCount);
-				for (let i=0;i<res.discountedGames.length;i++){
+				/*for (let i=0;i<res.discountedGames.length;i++){
 					this.gameService.pushGamesData(res.discountedGames[i]);
-				}
+				}*/
 				for (let i=0;i<res.unwindedDiscountedGames.length;i++){
 					this.gameService.pushUnwindedGamesList(res.unwindedDiscountedGames[i]);
 				}

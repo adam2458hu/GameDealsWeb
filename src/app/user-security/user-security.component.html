@@ -15,7 +15,7 @@
 					</div>
 				</div>
 				<div class="form-group mb-3">
-					<label for="confirmPassword">{{ 'passwordNewAgain' | translate }}</label>
+					<label for="confirmPassword">{{ 'passwordNewConfirm' | translate }}</label>
 					<input type="password" id="confirmPassword" class="form-control" name="confirmPassword" [(ngModel)]="user.confirmPassword" appEqualPasswordValidator="password" #confirmPassword="ngModel" minlength="8" placeholder="********" required>
 					<div *ngIf="!confirmPassword.valid && confirmPassword.dirty">
 						<div *ngIf="confirmPassword.errors.required">{{ 'fieldRequired' | translate }}</div>
@@ -30,16 +30,40 @@
 			<div class="alert alert-info">
 				{{ 'twoFactorAuthenticationInfo' | translate }}
 			</div>
-			<p>{{ 'twoFactorAppInfo' | translate }}
-				A Google Hitelesítő használatához először töltse le az alkalmazást az <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2">Android</a> vagy <a href="https://apps.apple.com/us/app/google-authenticator/id388497605">IOS</a> eszközére.
-			}
-			}
+			<p>{{ 'twoFactorAppInfoStart' | translate }}<a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank">Android</a>{{ 'twoFactorAppInfoMiddle' | translate }}<a href="https://apps.apple.com/us/app/google-authenticator/id388497605" target="_blank">IOS</a> {{ 'twoFactorAppInfoEnd' | translate }}
 			</p>
 			<button type="button" *ngIf="!getUserService().getUser().twoFactorGoogleEnabled" class="btn-block mb-3" (click)="toggleTwoFactor('App')">{{ 'twoFactorAppEnable' | translate }}</button>
 			<button type="button" *ngIf="getUserService().getUser().twoFactorGoogleEnabled" class="btn-block mb-3" (click)="toggleTwoFactor('App')">{{ 'twoFactorAppDisable' | translate }}</button>
 			<p>{{ 'twoFactorEmailInfo' | translate }}</p>
 			<button type="button" *ngIf="!getUserService().getUser().twoFactorEmailEnabled" class="btn-block" (click)="toggleTwoFactor('Email')">{{ 'twoFactorEmailEnable' | translate }}</button>
 			<button type="button" *ngIf="getUserService().getUser().twoFactorEmailEnabled" class="btn-block" (click)="toggleTwoFactor('Email')">{{ 'twoFactorEmailDisable' | translate }}</button>
+			<hr>
+			<h3>{{ 'trustedDevices' | translate }}</h3>
+			<div *ngIf="getUserService().getUser().trustedDevices.length==0;else elseBlock" class="text-center">{{ 'trustedDevicesNone' | translate }}</div>
+			<ng-template #elseBlock>
+				<div id="trustedDevices">
+					<div class="row mb-2">
+						<div class="col-3">{{ 'deviceIP' | translate }}</div>
+						<div class="col-4">{{ 'country' | translate }}</div>
+						<div class="col-3">{{ 'trustedDate' | translate }}</div>
+						<div class="col-2"></div>
+					</div>
+					<div *ngFor="let device of getUserService().getUser().trustedDevices" class="row mb-2">
+						<div class="col-3">
+							{{ device.ip }}
+						</div>
+						<div class="col-4">
+							{{ device.country }}
+						</div>
+						<div class="col-3">
+							{{ device.trustedDate | date:'short'}}
+						</div>
+						<div class="col-2 text-right">
+							<button class="btn-sm" (click)="untrustDevice(device)">{{ 'delete' | translate }}</button>
+						</div>
+					</div>
+				</div>
+			</ng-template>
 		</div>
 	</div>
 </div>

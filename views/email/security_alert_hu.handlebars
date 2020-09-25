@@ -9,6 +9,10 @@
 					<td>{{loginDetails.ip}}</td>
 				</tr>
 				<tr>
+					<td>Ország:</td>
+					<td>{{loginDetails.country}}</td>
+				</tr>
+				<tr>
 					<td>Eszköz:</td>
 					<td>{{loginDetails.device}}</td>
 				</tr>
@@ -27,11 +31,11 @@
 		</table>
 		<p>Azért kapta ezt az üzenetet, mert valaki sikeresen bejelentkezett az Ön profiljába egy számunkra ismeretlen eszközről. Amennyiben Ön volt aki bejelentkezett, és nem szeretne több biztonsági értesítő üzenetet kapni, amikor erről az eszközről lép be a profiljába, akkor kattintson a következő gombra:</p>
 		<div class="button-container">
-			<a href="{{securityAlertUrl}}">Igen, én voltam.</a>
+			<a href="{{trustDeviceUrl}}">Igen, én voltam.</a>
 		</div>
 		<p>Ha nem Ön volt, aki belépett, akkor kérjük, hogy készítsen új jelszót az alábbi gombra kattintva:</p><div class="button-container">
 			<a href="{{newPasswordUrl}}">Új jelszó létrehozása.</a>
 		</div>
-		<p><b>Üdvözlettel,<br>Digital Deals</b></p>
+		<p><b>Üdvözlettel,<br>{{ siteName }}</b></p>
 	</div>
 </div>

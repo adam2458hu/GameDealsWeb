@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 import { LoadingScreenService } from '../shared/loading-screen/loading-screen.service';
 import { UserService } from '../shared/user/user.service';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-user-security',
@@ -138,6 +139,20 @@ export class UserSecurityComponent implements OnInit {
 			(err)=>{
 				this.userService.setErrorMessage(err.error.message);
 			});
+	}
+
+	untrustDevice(device){
+		this.loadingScreenService.setAnimation(false);
+		this.userService.untrustDevice(device).subscribe(
+			(res:any)=>{
+				this.loadingScreenService.setAnimation(false);
+				this.getUserProfile();
+				this.userService.setSuccessMessage(res.message);
+			},
+			(err)=>{
+				this.loadingScreenService.setAnimation(false);
+				this.userService.setErrorMessage(err.error.message);
+			})
 	}
 
 	setPopup(value: boolean,type?: string){

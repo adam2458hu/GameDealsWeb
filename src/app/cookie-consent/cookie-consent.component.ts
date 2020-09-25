@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { CookieService } from '../shared/cookie/cookie.service';
 
 @Component({
@@ -7,47 +8,69 @@ import { CookieService } from '../shared/cookie/cookie.service';
   styleUrls: ['./cookie-consent.component.scss']
 })
 export class CookieConsentComponent implements OnInit {
-	customize: boolean=false;
-	device: boolean=false;
-	geolocation: boolean=false;
-	pushNotifications: boolean=false;
-	recommendations: boolean= false;
+	consented: boolean;
+	popupOpened: boolean;
+	settingsPanelOpened: boolean;
+	consent: {
+		necessary: boolean,
+		functional: boolean,
+		analytical: boolean,
+		advertising: boolean
+	} = {
+		necessary : true,
+		functional : true,
+		analytical : true,
+		advertising : true
+	}
 
 	constructor(private cookieService: CookieService) { }
 
 	ngOnInit() {
+		if (this.cookieService.getConsent()) {
+			this.consented = true;
+			this.consent = this.cookieService.getConsent();
+			this.popupOpened = false;
+		} else {
+			this.consented = false;
+			this.consent.necessary = true;
+			this.consent.functional = false;
+			this.consent.analytical = false;
+			this.consent.advertising = false;
+			this.popupOpened = true;
+		}
+		this.settingsPanelOpened = false;
 	}
 
-	isConsented(){
-		return this.cookieService.isConsented();
+	consentToNecessaryCookies(){
+		this.consent.necessary = true;
+		this.consent.functional = false;
+		this.consent.analytical = false;
+		this.consent.advertising = false;
+		this.cookieService.consentToCookies(this.consent);
+		this.consented = true;
+		this.popupOpened = false;
 	}
 
-	customizeCookies(){
-		this.customize = !this.customize;
+	consentToCustomCookies(form: NgForm){
+		this.cookieService.consentToCookies(form.value);
+		this.consented = true;
+		this.popupOpened = false;
 	}
 
-	toggleRecommendations(){
-		this.recommendations = !this.recommendations;
+	consentToAllCookies(){
+		this.consent.functional = true;
+		this.consent.analytical = true;
+		this.consent.advertising = true;
+		this.cookieService.consentToCookies(this.consent);
+		this.consented = true;
+		this.popupOpened = false;
 	}
 
-	saveSettings(){
-		this.customizeCookies();
+	togglePopup(){
+		this.popupOpened = !this.popupOpened;
 	}
 
-	isGeolocationEnabled(){
-		return this.geolocation;
+	toggleSettingsPanel(){
+		this.settingsPanelOpened = !this.settingsPanelOpened;
 	}
-
-	areRecommendationsEnabled(){
-		return this.recommendations;
-	}
-
-	arePushNotificationsEnabled(){
-		return this.pushNotifications;
-	}
-
-	isDeviceEnabled(){
-		return this.device;
-	}
-
 }

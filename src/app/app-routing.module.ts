@@ -8,12 +8,15 @@ import { UserLoginComponent } from './user-login/user-login.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { UserEmailVerificationComponent } from './user-email-verification/user-email-verification.component';
 import { UserForgottenPasswordComponent } from './user-forgotten-password/user-forgotten-password.component';
+import { UserNewsletterUnsubscribeComponent } from './user-newsletter-unsubscribe/user-newsletter-unsubscribe.component';
 import { UserNewPasswordComponent } from './user-new-password/user-new-password.component';
 import { UserSecurityComponent } from './user-security/user-security.component';
 import { UserAdminComponent } from './user-admin/user-admin.component';
 import { UserDetailsComponent } from './user-details/user-details.component';
+import { UserWaitlistComponent } from './user-waitlist/user-waitlist.component';
 import { UserDataRequestComponent } from './user-data-request/user-data-request.component';
 import { UserMessagesComponent } from './user-messages/user-messages.component';
+import { UserTrustDeviceComponent } from './user-trust-device/user-trust-device.component';
 import { DealsComponent } from './deals/deals.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 
@@ -42,6 +45,9 @@ const routes: Routes = [
 				path: 'security',component: UserSecurityComponent
 			},
 			{
+				path: 'waitlist',component: UserWaitlistComponent
+			},
+			{
 				path: 'admin',component: UserAdminComponent
 			},
 		]
@@ -60,6 +66,12 @@ const routes: Routes = [
 	},
 	{
 		path: 'forgot-password',component: UserForgottenPasswordComponent
+	},
+	{
+		path: 'newsletter-unsubscribe/:token',component: UserNewsletterUnsubscribeComponent
+	},
+	{
+		path: 'trust-device/:token',component: UserTrustDeviceComponent
 	},
 	{
 		path: 'new-password/:token',component: UserNewPasswordComponent

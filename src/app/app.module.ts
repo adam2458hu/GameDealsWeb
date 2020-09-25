@@ -8,6 +8,7 @@ import { DeviceDetectorModule } from 'ngx-device-detector';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
 import {TranslateModule, TranslateLoader} from '@ngx-translate/core';
 import {TranslateHttpLoader} from '@ngx-translate/http-loader';
+import 'hammerjs';
 
 import { AppComponent } from './app.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
@@ -41,6 +42,10 @@ import { ChartComponent } from './chart/chart.component';
 import { GameDetailsComponent } from './game-details/game-details.component';
 
 import { LoadedDirective } from './loaded.directive';
+import { WaitlistComponent } from './waitlist/waitlist.component';
+import { UserNewsletterUnsubscribeComponent } from './user-newsletter-unsubscribe/user-newsletter-unsubscribe.component';
+import { UserTrustDeviceComponent } from './user-trust-device/user-trust-device.component';
+import { UserWaitlistComponent } from './user-waitlist/user-waitlist.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
     return new TranslateHttpLoader(http);
@@ -76,7 +81,11 @@ export function HttpLoaderFactory(http: HttpClient) {
     HomeComponent,
     ChartComponent,
     GameDetailsComponent,
-    LoadedDirective
+    LoadedDirective,
+    WaitlistComponent,
+    UserNewsletterUnsubscribeComponent,
+    UserTrustDeviceComponent,
+    UserWaitlistComponent
   ], 
   imports: [
     BrowserModule,

@@ -2,11 +2,6 @@
 @import "../../mixins";
 
 footer{
-	//position: absolute;
-	position: relative;
-	left: 0;
-	bottom: 0;
-	//box-shadow: inset 0 -20px 40px 2px darken($color-primary,10%),0 10px 40px 2px darken($color-secondary,10%);
 	box-shadow: 0 10px 40px 2px darken($color-secondary,10%);
 	width: 100%;
 	border-top: 2px solid darken($color-secondary,10%);
@@ -24,5 +19,19 @@ footer{
 	.copyright {
 		font-size: 14px;
 		font-style: italic;
+	}
+}
+
+@media screen and (max-width: 992px){
+	footer {
+		font-size: 14px;
+
+		h5 {
+			font-size: 18px;
+		}
+
+		.copyright {
+			font-size: 12px;
+		}
 	}
 }

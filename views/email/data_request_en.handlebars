@@ -1,0 +1,15 @@
+<div class="main">
+	<div class="container">
+		<h1 style="text-align:center">Dear {{firstName}} {{lastName}}!</h1>
+		<p>You received this message, because you have requested to download the informations we store about you. To download your informations in {{format}} format, please click on the following button:</p>
+		<div class="button-container">
+			<a href="{{downloadUrl}}">Download</a>
+		</div>
+		<p>
+			If the button doesn't work, please copy and paste the following link into your browser's address bar and press enter:
+			<br>
+			<a href="{{downloadUrl}}">{{downloadUrl}}</a>
+		</p>
+		<p><b>Sincerely,<br>{{ siteName }}</b></p>
+	</div>
+</div>

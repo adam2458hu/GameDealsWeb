@@ -25,6 +25,7 @@ export class UserService {
 		last_name: '',
 		email: '',
 		password: '',
+		language: 'en',
 		rememberMe: false,
 		twoFactorGoogleEnabled: false,
 		twoFactorEmailEnabled: false,
@@ -64,6 +65,15 @@ export class UserService {
 
 	verifyEmail(token: string){
 		return this.http.get(environment.apiUsersURL+'/verifyEmail/'+token);
+	}
+
+	trustDevice(token: string){
+		return this.http.get(environment.apiUsersURL+'/trustDevice/'+token);
+	}
+
+	untrustDevice(device: any){
+		var headers = new HttpHeaders({'authorization':'Bearer '+this.getAccessToken()});
+		return this.http.post(environment.apiUsersURL+'/untrustDevice',{device: device},{headers:headers});
 	}
 
 	verifyDataRequest(token: string){
@@ -152,11 +162,17 @@ export class UserService {
 	}
 
 	sendPushNotifications(notification: any){
-		return this.http.post(environment.apiUsersURL+'/sendPushNotifications',notification);
+		var headers = new HttpHeaders({'authorization':'Bearer '+this.getAccessToken()});
+		return this.http.post(environment.apiUsersURL+'/sendPushNotifications',notification,{headers: headers});
+	}
+
+	newsletterUnsubscribe(token: string){
+		return this.http.get(environment.apiUsersURL+'/newsletterUnsubscribe/'+token);
 	}
 
 	sendNewsletters(newsletter: any){
-		return this.http.post(environment.apiUsersURL+'/sendNewsletters',newsletter);
+		var headers = new HttpHeaders({'authorization':'Bearer '+this.getAccessToken()});
+		return this.http.post(environment.apiUsersURL+'/sendNewsletters',newsletter,{headers: headers});
 	}
 
 	sendMessages(message: any){
@@ -263,6 +279,14 @@ export class UserService {
 		localStorage.setItem('rememberMeToken',token);
 	}
 
+	setLanguage(language: string){
+		localStorage.setItem('lang',language);
+	}
+
+	getLanguage(){
+		return localStorage.getItem('lang');
+	}
+
 	getAccessToken(){
 		return localStorage.getItem('accessToken');
 	}
@@ -301,7 +325,8 @@ export class UserService {
 	    this.refreshTimeLeft();
 	    this.sessionRefreshInterval = setInterval(()=>{
 	        if (this.refreshTimeLeft()<=0){
-	        	this.logoutUser('A munkamenet lejárt, jelentkezzen be újra');
+	        	console.log("idő: "+this.refreshTimeLeft());
+	        	this.logoutUser('sessionIsOver');
 	        }
 	      },1000);
 	}
@@ -317,7 +342,7 @@ export class UserService {
 		this.startSessionCountdown();
 	}
 
-	logoutUser(msg: String){
+	logoutUser(msg: string){
 		if (localStorage.getItem('rememberMeToken')){
 			this.removeRememberMeToken();
 		}
@@ -381,7 +406,7 @@ export class UserService {
 	}
 
 	isResetTokenValid(token: String){
-		return this.http.get(environment.apiUsersURL+'/forgotten/'+token);
+		return this.http.get(environment.apiUsersURL+'/isResetTokenValid/'+token);
 	}
 
 	setErrorMessage(msg: String){
@@ -455,6 +480,31 @@ export class UserService {
 	addToGameHistory(gameId: String){
 		var headers = new HttpHeaders({'authorization':'Bearer ' + this.getAccessToken()});
 		return this.http.post(environment.apiUsersURL+'/addToGameHistory',{gameId: gameId},{headers: headers})
+	}
+
+	getWaitlist(){
+		var headers = new HttpHeaders({'authorization':'Bearer ' + this.getAccessToken()});
+		return this.http.get(environment.apiUsersURL+'/getWaitlist',{headers: headers});
+	}
+
+	isGameOnWaitlist(gameID: String){
+		var headers = new HttpHeaders({'authorization':'Bearer ' + this.getAccessToken()});
+		return this.http.get(environment.apiUsersURL+'/isGameOnWaitlist/'+gameID,{headers:headers});
+	}
+
+	addToWaitlist(game: any){
+		var headers = new HttpHeaders({'authorization':'Bearer '+this.getAccessToken()});
+		return this.http.post(environment.apiUsersURL+'/addToWaitlist',game,{headers: headers});
+	}
+
+	editWaitlistItem(waitlistID: String,game: any){
+		var headers = new HttpHeaders({'authorization':'Bearer '+this.getAccessToken()});
+		return this.http.put(environment.apiUsersURL+'/editWaitlistItem/'+waitlistID,game,{headers: headers});
+	}
+
+	deleteWaitlistItem(waitlistID: String){
+		var headers = new HttpHeaders({'authorization':'Bearer '+this.getAccessToken()});
+		return this.http.delete(environment.apiUsersURL+'/deleteWaitlistItem/'+waitlistID,{headers: headers});
 	}
 
 	getGameHistory(){

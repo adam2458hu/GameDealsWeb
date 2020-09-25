@@ -1,0 +1,33 @@
+<div id="waitlist" class="mt-5">
+	<div class="container-custom fixed deals">
+		<h3>{{ 'waitlist' | translate }}</h3>
+		<div *ngIf="waitlist.length>0;else noGamesOnWaitlist" class="table-responsive">
+			<table class="table table-hover table-dark">
+				<thead>
+					<tr>
+						<th>{{ 'name' | translate }}</th>
+						<th class="text-center">{{ 'priceMax' | translate }}</th>
+						<th class="text-center">{{ 'discountMin' | translate }}</th>
+						<th class="text-center"></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let item of waitlist" (click)="showAllStores(item.gameID)">
+						<td id="productName">
+							<div>{{ item.name }}</div>
+						</td>
+						<td id="specialPrice" class="text-center">{{ item.maxPrice }} €</td>
+						<td id="originalPrice" class="text-center">{{ item.minDiscount }} %</td>
+						<td>
+							<button (click)="deleteWaitlistItem(item._id);$event.stopPropagation()">{{ 'delete' | translate }}</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<ng-template #noGamesOnWaitlist>
+			<div class="text-center">{{ 'noGamesOnWaitlist' | translate }}</div>
+		</ng-template>
+	</div>
+</div>
+<app-game-details *ngIf="selectedGame" [selectedGame]="selectedGame" (close)="selectedGame=null"></app-game-details>

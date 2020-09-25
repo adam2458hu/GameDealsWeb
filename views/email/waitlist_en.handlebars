@@ -1,0 +1,29 @@
+<div class="main">
+	<div class="container">
+		<h1 style="text-align: center">Dear {{firstName}} {{lastName}}!</h1>
+		<p>
+			We would like to inform you, that from the waitlist you have on <a href="{{ siteUrl }}">Game Deals List</a>, the following games are on a sale right now:
+		</p>
+		<p>
+			<table class="games">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Store</th>
+						<th>Discounted price</th>
+					</tr>
+				</thead>
+				<tbody>
+					{{#each games}}
+					<tr>
+						<td>{{this.name}}</td>
+						<td><a href="{{this.store.linkToGame}}">{{this.store.name}}</a></td>
+						<td>{{this.store.specialPrice}}€</td>
+					</tr>
+					{{/each}}
+				</tbody>
+			</table>
+		</p>
+		<p><b>Sincerely,<br>{{ siteName }}</b></p>
+	</div>
+</div>
