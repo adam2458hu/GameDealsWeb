@@ -48,18 +48,18 @@ export class UserService {
 		},
 		createdAt: '',
 		updatedAt: '',
-		messages: {
+		messages: [{
 			date: new Date('2020-05-31T12:30:36.658+00:00'),
 			type: '',
 			title: '',
 			text: '',
 			read : false
-		},
-		trustedDevices: {
+		}],
+		trustedDevices: [{
 			ip : '',
 			country : '',
 			trustedDate : new Date()
-		}
+		}]
 	};
 
 	constructor(private http: HttpClient,private router: Router) { }

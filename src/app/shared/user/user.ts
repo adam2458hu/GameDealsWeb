@@ -28,16 +28,16 @@ export class User {
 		windowWidth: String;
 		windowHeight: String;
 	};
-	messages : {
+	messages : [{
 		date : Date;
 		type : String;
 		title : String;
 		text : String;
 		read : Boolean;
-	};
-	trustedDevices : {
+	}];
+	trustedDevices : [{
 		ip : String;
 		country : String;
 		trustedDate : Date;
-	};
+	}];
 }
