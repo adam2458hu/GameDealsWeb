@@ -9,8 +9,8 @@ import { LoginDetails } from '../login-details/login-details';
   providedIn: 'root'
 })
 export class UserService {
-	private errorMessage: String;
-	private successMessage: String;
+	private errorMessage: string;
+	private successMessage: string;
 	private maxIdleInMilisecs: number=60000;
 	private timeLeftInMilisecs: number;
 	private timeLeftAsString: String;
@@ -414,7 +414,7 @@ export class UserService {
 		return this.http.get(environment.apiUsersURL+'/isResetTokenValid/'+token);
 	}
 
-	setErrorMessage(msg: String){
+	setErrorMessage(msg: string){
 		this.successMessage = null;
 		this.errorMessage = msg;
 		setTimeout(()=>{
@@ -422,7 +422,7 @@ export class UserService {
 		},3000);
 	}
 
-	setSuccessMessage(msg: String){
+	setSuccessMessage(msg: string){
 		this.errorMessage = null;
 		this.successMessage = msg;
 		setTimeout(()=>{
