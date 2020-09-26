@@ -18,7 +18,6 @@ import { UserDataRequestComponent } from './user-data-request/user-data-request.
 import { UserMessagesComponent } from './user-messages/user-messages.component';
 import { UserTrustDeviceComponent } from './user-trust-device/user-trust-device.component';
 import { DealsComponent } from './deals/deals.component';
-import { RenewCertificateComponent } from './renew-certificate/renew-certificate.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 
 const routes: Routes = [
@@ -82,9 +81,6 @@ const routes: Routes = [
 	},
 	{
 		path: 'cookie-policy',component: CookiePolicyComponent
-	},
-	{
-		path: '.well-known/pki-validation/:fileName', component: RenewCertificateComponent
 	},
 	{
 		path: '',redirectTo:'/home',pathMatch: 'full'
