@@ -20,9 +20,9 @@ app.use('/api/games',gamesRoutes);
 app.use('/api/currencies',currenciesRoutes);
 app.use('/api/stores',storesRoutes);
 app.use('/.well-known/pki-validation/4CFDDDDCD306CDC8E0F956EBF799D1C7.txt',express.static(path.join(__dirname,"/.well-known/pki-validation/4CFDDDDCD306CDC8E0F956EBF799D1C7.txt")))
-/*app.get('*', function (req, res){
+app.get('*', function (req, res){
     res.sendFile(path.join(__dirname+'/dist/index.html'));
-});*/
+});
 
 //https://github.com/i18next/i18next-express-middleware
 i18next
