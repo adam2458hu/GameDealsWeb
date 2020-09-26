@@ -13,7 +13,7 @@ const i18nextMiddleware = require('i18next-express-middleware');
 const FilesystemBackend = require('i18next-node-fs-backend');
 
 app.use(cors());
-app.use(express.static(__dirname+'/dist/'));
+app.use(express.static(__dirname+'/dist/', { dotfiles: 'allow' } ));
 app.use(bodyParser.json());
 app.use('/api/users',usersRoutes);
 app.use('/api/games',gamesRoutes);
