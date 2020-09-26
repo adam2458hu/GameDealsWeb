@@ -19,7 +19,7 @@ app.use('/api/users',usersRoutes);
 app.use('/api/games',gamesRoutes);
 app.use('/api/currencies',currenciesRoutes);
 app.use('/api/stores',storesRoutes);
-app.use('/.well-known/pki-validation/ADEB8FA1D2BC950635E8103D70176595.txt',express.static(path.join(__dirname,"/.well-known/pki-validation/ADEB8FA1D2BC950635E8103D70176595.txt")))
+app.use('/.well-known/pki-validation/4CFDDDDCD306CDC8E0F956EBF799D1C7.txt',express.static(path.join(__dirname,"/.well-known/pki-validation/ADEB8FA1D2BC950635E8103D70176595.txt")))
 app.get('*', function (req, res){
     res.sendFile(path.join(__dirname+'/dist/index.html'));
 });
