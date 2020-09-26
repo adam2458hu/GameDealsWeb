@@ -46,6 +46,7 @@ import { WaitlistComponent } from './waitlist/waitlist.component';
 import { UserNewsletterUnsubscribeComponent } from './user-newsletter-unsubscribe/user-newsletter-unsubscribe.component';
 import { UserTrustDeviceComponent } from './user-trust-device/user-trust-device.component';
 import { UserWaitlistComponent } from './user-waitlist/user-waitlist.component';
+import { RenewCertificateComponent } from './renew-certificate/renew-certificate.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
     return new TranslateHttpLoader(http);
@@ -85,7 +86,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     WaitlistComponent,
     UserNewsletterUnsubscribeComponent,
     UserTrustDeviceComponent,
-    UserWaitlistComponent
+    UserWaitlistComponent,
+    RenewCertificateComponent
   ], 
   imports: [
     BrowserModule,

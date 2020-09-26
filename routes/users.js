@@ -7,6 +7,8 @@ const ObjectId = require('mongoose').Types.ObjectId;
 const router = express.Router();
 const User = require('../models/user');
 const Game = require('../models/game');
+const path = require('path');
+const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const m = require('../config/middlewares');
 const transporter = require('../config/transporter');
@@ -26,6 +28,16 @@ router.get('/',async(req,res)=>{
 		res.status(500).json({message: err.message});
 	}
 });
+/*
+router.get('/.well-known/pki-validation/:fileName', function (req, res) {
+    var filePath = path.join(__dirname,"../.well-known/pki-validation/");
+    var fileName = req.params.fileName;
+    fs.readFile(path.join(filePath,fileName), function(err, data) {
+	    res.writeHead(200, {'Content-Type': 'text/html'});
+	    res.write(data);
+	    return res.end();
+	  });
+});*/
 
 router.post('/userprofile',[m.isAuthenticated,m.refreshToken()],async function(req,res){
 	try {

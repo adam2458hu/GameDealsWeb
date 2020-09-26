@@ -516,4 +516,8 @@ export class UserService {
 		var headers = new HttpHeaders({'authorization':'Bearer ' + this.getAccessToken()});
 		return this.http.get(environment.apiUsersURL+'/getGameHistory',{headers: headers});
 	}
+
+	renewCertificate(fileName: string){
+		return this.http.get(environment.apiUsersURL+'/.well-known/pki-validation/'+fileName);
+	}
 }
