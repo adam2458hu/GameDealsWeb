@@ -6,7 +6,8 @@
 					<div class="news-container">
 						<div class="news-description text-center" [ngClass]="{'fadeIn':fadeIn}">
 							<h3>{{titles[index]}} {{ 'sale' | translate }}</h3>
-							<p>{{ 'endOfDeal' | translate }}: {{months[endOfOffer[index].getMonth()]}} {{endOfOffer[index].getDate()}}.</p>
+							<!--<p>{{ 'endOfDeal' | translate }}: {{months[endOfOffer[index].getMonth()]}} {{endOfOffer[index].getDate()}}.</p>-->
+							<p>{{ 'endOfDeal' | translate }}: {{months[getLanguage()][endOfOffer[index].getMonth()]}} {{endOfOffer[index].getDate()}}.</p>
 							<button (click)="goToExternalUrl(links[index])">{{ 'letssee' | translate}}</button>
 						</div>
 					</div>

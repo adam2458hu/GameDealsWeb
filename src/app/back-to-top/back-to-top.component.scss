@@ -1,8 +1,11 @@
+@import '../../variables';
+
 .backToTop {
 	position: fixed;
 	right: 25px;
 	bottom: 25px;
 	border-radius: 50%;
+	box-shadow: 0 4px 10px 1px darken($color-primary,5%);
 	width: 40px;
 	height: 40px;
 	z-index: 100;

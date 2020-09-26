@@ -283,7 +283,8 @@ function sendTwoFactorEmail(res,user) {
 		context: {
 			firstName : user.first_name,
 			lastName : user.last_name,
-			token : token
+			token : token,
+			siteName : process.env.SITE_NAME
 		},
 		attachments : [{
 			filename: 'logo.png',
@@ -329,7 +330,8 @@ router.get('/generateEmailSecret',m.isAuthenticated,async(req,res)=>{
 							context: {
 								firstName : user.first_name,
 								lastName : user.last_name,
-								token : token
+								token : token,
+								siteName : process.env.SITE_NAME
 							},
 							attachments : [{
 								filename: 'logo.png',
@@ -700,7 +702,8 @@ router.post('/forgotten',async(req,res)=>{
 				context: {
 					firstName: user.first_name,
 					lastName: user.last_name,
-					newPasswordUrl: newPasswordUrl
+					newPasswordUrl: newPasswordUrl,
+					siteName: process.env.SITE_NAME
 				},
 				attachments: [{
 					name: 'logo.png',

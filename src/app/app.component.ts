@@ -3,6 +3,7 @@ import { environment } from '../environments/environment';
 import { SwPush } from '@angular/service-worker';
 import { CookieService } from './shared/cookie/cookie.service';
 import { UserService } from './shared/user/user.service';
+import { LanguageService } from './shared/language/language.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Title } from '@angular/platform-browser';
 
@@ -14,15 +15,18 @@ import { Title } from '@angular/platform-browser';
 export class AppComponent {
 	//languageCookieIsSet = false;
 	availableLanguages = ['en','hu'];
+	languageIsSet;
 
 	constructor(
 		swPush: SwPush,
 		private cookieService: CookieService,
 		private userService: UserService,
 		private translateService: TranslateService,
-		private titleService: Title
+		private titleService: Title,
+		private languageService: LanguageService
 	) {
 
+		this.languageIsSet=false;
 		this.translateService.setDefaultLang('en');
 		this.translateService.onLangChange.subscribe((res: string) => {
 	      this.translateService.get('pageTitle').subscribe((res: string) => {
@@ -30,12 +34,25 @@ export class AppComponent {
 	      });
 	    });
 
-	    if (this.cookieService.getConsent().functional){
-			if (!localStorage.getItem('lang')) this.setLanguageCookie();
-			else this.translateService.use(localStorage.getItem('lang'));
+		/*
+	    if (this.cookieService.getConsent() && this.cookieService.getConsent().functional){
+	    	console.log("beleegyezett");
+			if (!localStorage.getItem('lang')) this.requestLanguage();
+			else {
+				this.languageService.setLanguage(localStorage.getItem('lang'));
+				this.translateService.use(localStorage.getItem('lang'));
+			}
 	    } else {
+	    	console.log("nem egyezett bele");
+	    	this.languageService.setLanguage('en');
 	    	this.translateService.use('en');
-	    }
+	    }*/
+		if (!this.cookieService.getLanguageCookie()) this.requestLanguage();
+		else {
+			this.languageService.setLanguage(this.cookieService.getLanguageCookie());
+			this.translateService.use(this.cookieService.getLanguageCookie());
+			this.languageIsSet=true;
+		}
 
 		if (swPush.isEnabled) {
 		  swPush
@@ -55,19 +72,24 @@ export class AppComponent {
 		}
 	}
 
-	setLanguageCookie(){
+	requestLanguage(){
 		this.userService.getIPAddress().subscribe(
 			(res: any)=>{
 				this.userService.getGeoLocation(res.ip).subscribe(
 					(res: any)=>{
 						// ha a felhasználó elfogadta a sütiket csak akkor állítjuk be a nyelv sütit
 						if (this.availableLanguages.includes(res.country_code2.toLowerCase())){
-							localStorage.setItem('lang',res.country_code2.toLowerCase());
+							this.languageService.setLanguage(res.country_code2.toLowerCase());
+							//localStorage.setItem('lang',res.country_code2.toLowerCase());
+							this.cookieService.setLanguageCookie(res.country_code2.toLowerCase());
 							//window.location.reload();
+							this.translateService.use(res.country_code2.toLowerCase());
 						} else {
-							localStorage.setItem('lang','en');
+							this.languageService.setLanguage('en');
+							this.cookieService.setLanguageCookie('en');
+							//localStorage.setItem('lang','en');
 						}
-						this.translateService.use(res.country_code2.toLowerCase());
+						this.languageIsSet=true;
 						//this.languageCookieIsSet=true;
 					},
 					(err)=>{

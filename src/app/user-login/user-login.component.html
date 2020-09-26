@@ -17,7 +17,7 @@
 					<label>
 						<input type="checkbox" name="rememberMe" [(ngModel)]="user.rememberMe"> {{ 'rememberMe' | translate }}
 					</label>
-					<a [routerLink]="['/forgot-password']">{{ 'passwordForgotten' | translate}}?</a>
+					<a [routerLink]="['/forgot-password']">{{ 'forgotPassword' | translate}}</a>
 				</div>
 				<div class="text-center">
 					<input type="submit" class="btn-block" value="{{ 'signIn' | translate }}">

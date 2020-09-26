@@ -1,10 +1,12 @@
 import { Component, OnInit, ElementRef, AfterViewInit, ViewChild} from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { Game } from '../game/game';
 import { UserService } from '../shared/user/user.service';
 import { GameService } from '../game/game.service';
 import { CurrencyService } from '../shared/currency/currency.service';
 import { FilterService } from '../shared/filter/filter.service';
 import { LoadingScreenService } from '../shared/loading-screen/loading-screen.service';
+import { LanguageService } from '../shared/language/language.service';
 
 @Component({
   selector: 'app-home',
@@ -27,7 +29,10 @@ export class HomeComponent implements AfterViewInit {
 	uniqueWatchedGenres=[];
 	r;
 	fadeIn: Boolean;
-	months: String[]=['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december'];
+	months = {
+		'hu' : ['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december'],
+		'en' : ["January","February","March","April","May","June","July","August","September","October","November","December"]
+	};
 	selectedGame: Game;
 
 	constructor(
@@ -35,7 +40,8 @@ export class HomeComponent implements AfterViewInit {
 		private gameService: GameService,
 		private currencyService: CurrencyService,
 		private filterService: FilterService,
-		private loadingScreenService: LoadingScreenService
+		private loadingScreenService: LoadingScreenService,
+		private languageService: LanguageService
 	) { }
 
 	ngAfterViewInit() {
@@ -179,6 +185,10 @@ export class HomeComponent implements AfterViewInit {
 
 	getGamesData(){
 		return this.gameService.getGamesData();
+	}
+
+	getLanguage(){
+		return this.languageService.getLanguage();
 	}
 
 	getCheapestStore(game){

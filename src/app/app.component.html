@@ -1,5 +1,5 @@
-<app-modal></app-modal>
-<app-navbar></app-navbar>
-<app-main></app-main>
-<app-footer></app-footer>
-<app-cookie-consent></app-cookie-consent>
+<app-modal *ngIf="languageIsSet"></app-modal>
+<app-navbar *ngIf="languageIsSet"></app-navbar>
+<app-main *ngIf="languageIsSet"></app-main>
+<app-footer *ngIf="languageIsSet"></app-footer>
+<app-cookie-consent *ngIf="languageIsSet"></app-cookie-consent>

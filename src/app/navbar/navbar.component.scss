@@ -28,6 +28,7 @@ header {
 			text-transform: uppercase;
 			text-shadow: 0px 3px 0px #0880B2;
 			transition: 0.4s;
+			z-index: 10000;
 
 			&:before {
 				position: absolute;
@@ -90,6 +91,12 @@ header {
 	nav {
 		.nav-link {
 			font-size: 16px;
+		}
+
+		li:not(:last-child) {
+			.nav-link {
+				border-bottom: 2px solid $color-secondary;
+			}
 		}
 
 		.navbar-brand {

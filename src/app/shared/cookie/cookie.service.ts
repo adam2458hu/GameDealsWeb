@@ -60,8 +60,33 @@ export class CookieService {
 	}
 
 	getConsent(){
-		let consent = this.getCookie('cookieConsent');
+		/*let consent = this.getCookie('cookieConsent');
 		if (consent) return JSON.parse(consent);
-		else return false;
+		else return false;*/
+		let cookieConsent = this.getCookie('cookieConsent');
+		if (cookieConsent) {
+			this.consent = JSON.parse(cookieConsent);
+		}
+		return this.consent;
+	}
+
+	setLanguageCookie(lang){
+		if (this.getConsent().functional){
+			localStorage.setItem('lang',lang);
+		}
+	}
+
+	getLanguageCookie(){
+		return localStorage.getItem('lang');
+	}
+
+	setCurrencyCookie(currency){
+		if (this.getConsent().functional){
+			localStorage.setItem('currency',currency);
+		}
+	}
+
+	getCurrencyCookie(){
+		return localStorage.getItem('currency');
 	}
 }

@@ -26,7 +26,7 @@ export class CookieConsentComponent implements OnInit {
 	constructor(private cookieService: CookieService) { }
 
 	ngOnInit() {
-		if (this.cookieService.getConsent()) {
+		if (this.cookieService.getConsent().necessary) {
 			this.consented = true;
 			this.consent = this.cookieService.getConsent();
 			this.popupOpened = false;
