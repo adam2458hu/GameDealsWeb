@@ -93,8 +93,9 @@ main {
 					animation: fadeIn 0.5s;
 				}
 
-				button {
+				a.salelink {
 					background-color: $color-primary;
+					padding: 10px 20px;
 				}
 			}
 		}

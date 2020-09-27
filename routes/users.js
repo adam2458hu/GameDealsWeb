@@ -800,6 +800,8 @@ router.post('/sendPushNotifications',[m.isAuthenticated,m.isAdmin], (req, res) =
       icon: 'assets/deal.png',
     },
   }
+  console.log(fakeDatabase);
+  console.log(notificationPayload);
   
   const promises = []
   fakeDatabase.forEach(subscription => {

@@ -307,7 +307,7 @@ input,select {
 	}
 }
 
-input[type="submit"],button {
+input[type="submit"],button,a.salelink {
 	background-color: $color-secondary;
 	//box-shadow: 0 0 5px 2px darken($color-secondary,5%);
 	border: 1px solid $color-secondary;

@@ -1,5 +1,3 @@
-"use strict";
-
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -66,21 +64,8 @@ mongoose.connection.on('connected',()=>{
 		setInterval(currenciesRoutes.updateExchangeRates,1000*60*60*3);
 		gamesRoutes.refreshGames();
 		setInterval(gamesRoutes.refreshGames,1800000);
-    usersRoutes.deleteUnverifiedUsers();
-    setInterval(usersRoutes.deleteUnverifiedUsers,1800000);
+        usersRoutes.deleteUnverifiedUsers();
+        setInterval(usersRoutes.deleteUnverifiedUsers,1800000);
 		//usersRoutes.sendWaitlistEmails();
 	});
-  /*require("greenlock-express")
-    .init({
-        packageRoot: __dirname,
- 
-        // contact for security and critical bug notices
-        configDir: "./greenlock.d",
- 
-        // whether or not to run at cloudscale
-        cluster: false
-    })
-    // Serves on 80 and 443
-    // Get's SSL certificates magically!
-    .serve(app);*/
 });

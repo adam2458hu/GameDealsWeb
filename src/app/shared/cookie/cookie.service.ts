@@ -45,7 +45,9 @@ export class CookieService {
 
 	getCookie(name: string){
 		let cookie={};
-		document.cookie.split(';').forEach(element=>{
+		/*az egyes süti adatok után szóköz van, ezért azokat eltávolítjuk a replac-szel,
+		különben a süti nevek előtt egy szóköz szerepelne a splittel való feldarabolás után */
+		document.cookie.replace(/\s/g,'').split(';').forEach(element=>{
 			let key=element.split('=')[0];
 			let value=element.split('=')[1];
 			cookie[key]=value;

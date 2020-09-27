@@ -510,6 +510,7 @@ function scrapeStore(storeName,storeUrl,useProxy,needsTimeout,multiPage){
 				if (useProxy && process.env.NODE_ENV !== 'production') {
 					let proxys = await getProxyList();
 					if (proxys!=null) {
+						console.log(`Választott proxy: ${proxys[0].ip}:${proxys[0].port}`);
 						args.push(`--proxy-server=${proxys[0].ip}:${proxys[0].port}`);
 					} else {
 						console.log("Nincs megfelelő proxy")
@@ -1020,7 +1021,7 @@ async function refreshGames() {
 		response = await deleteGamesWithNoStore();
 		console.log(response);*//*
 		response = await scrapeStore('Blizzard',process.env.BLIZZARD_GAMES_URL,false,false,true);
-		console.log(response);
+		console.log(response);*//*
 		response = await scrapeStore('Epic Games Store',process.env.EPIC_GAMES_ALL_GAMES_URL,true,true,false);
 		console.log(response);*//*
 		response = await requestGameList({
