@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  siteURL: 'https://polar-savannah-25847.herokuapp.com',
+  siteURL: 'https://gamedealsweb.herokuapp.com',
   apiUsersURL: '/api/users',
   apiGamesURL: '/api/games',
   apiCurrenciesURL: '/api/currencies',

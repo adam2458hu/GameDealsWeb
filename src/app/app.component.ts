@@ -25,6 +25,17 @@ export class AppComponent {
 		private titleService: Title,
 		private languageService: LanguageService
 	) {
+		console.log(swPush.isEnabled);
+		if (swPush.isEnabled) {
+		  	swPush.requestSubscription({
+		      serverPublicKey: environment.PUBLIC_VAPID
+		    })
+		    .then(subscription => {
+		    	console.log(subscription);
+		      this.userService.sendSubscriptionToTheServer(subscription).subscribe()
+		    })
+		    .catch(console.error)
+		}
 
 		this.languageIsSet=false;
 		this.translateService.setDefaultLang('en');
@@ -52,18 +63,6 @@ export class AppComponent {
 			this.languageService.setLanguage(this.cookieService.getLanguageCookie());
 			this.translateService.use(this.cookieService.getLanguageCookie());
 			this.languageIsSet=true;
-		}
-
-		if (swPush.isEnabled) {
-		  swPush
-		    .requestSubscription({
-		      serverPublicKey: environment.PUBLIC_VAPID
-		    })
-		    .then(subscription => {
-		    	console.log(subscription);
-		      this.userService.sendSubscriptionToTheServer(subscription).subscribe()
-		    })
-		    .catch(console.error)
 		}
 
 		if (this.userService.isAuthenticated()){
