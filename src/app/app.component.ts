@@ -18,7 +18,7 @@ export class AppComponent {
 	languageIsSet;
 
 	constructor(
-		swPush: SwPush,
+		private swPush: SwPush,
 		private cookieService: CookieService,
 		private userService: UserService,
 		private translateService: TranslateService,
@@ -26,7 +26,7 @@ export class AppComponent {
 		private languageService: LanguageService
 	) {
 		console.log(swPush.isEnabled);
-		if (swPush.isEnabled) {
+		/*if (swPush.isEnabled) {
 		  	swPush.requestSubscription({
 		      serverPublicKey: environment.PUBLIC_VAPID
 		    })
@@ -35,6 +35,13 @@ export class AppComponent {
 		      this.userService.sendSubscriptionToTheServer(subscription).subscribe()
 		    })
 		    .catch(console.error)
+		}*/
+		if (this.swPush.isEnabled) {
+			this.swPush.requestSubscription({
+				serverPublicKey: environment.PUBLIC_VAPID
+	        })
+	        .then(sub => this.userService.sendSubscriptionToTheServer(sub).subscribe())
+	        .catch(err => console.error("Could not subscribe to notifications", err));
 		}
 
 		this.languageIsSet=false;
@@ -70,6 +77,14 @@ export class AppComponent {
 			this.userService.getMessages();
 		}
 	}
+
+	subscribeToNotifications() {
+        this.swPush.requestSubscription({
+            serverPublicKey: environment.PUBLIC_VAPID
+        })
+        .then(sub => this.userService.sendSubscriptionToTheServer(sub).subscribe())
+        .catch(err => console.error("Could not subscribe to notifications", err));
+    }
 
 	requestLanguage(){
 		this.userService.getIPAddress().subscribe(

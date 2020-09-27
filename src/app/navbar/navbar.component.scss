@@ -95,7 +95,7 @@ header {
 
 		li:not(:last-child) {
 			.nav-link {
-				border-bottom: 2px solid $color-secondary;
+				border-bottom: 1px solid lighten($color-primary,10%);
 			}
 		}
 
