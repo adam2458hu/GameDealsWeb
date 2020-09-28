@@ -259,8 +259,9 @@ export class UserService {
 		return this.http.get(environment.apiUsersURL+'/sendTwoFactorEmail',{headers: headers});
 	}
 
-	deleteProfile(id: String){
-		return this.http.delete(environment.apiUsersURL+'/'+id);
+	deleteProfile(){
+		var headers = new HttpHeaders({'authorization':'Bearer '+this.getAccessToken()});
+		return this.http.delete(environment.apiUsersURL+'/deleteProfile',{headers: headers});
 	}
 
 	refreshAccessToken(){

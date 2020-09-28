@@ -148,7 +148,7 @@ export class UserDetailsComponent implements OnInit {
 
 	deleteProfile(){
 		this.loadingScreenService.setAnimation(true);
-		this.userService.deleteProfile(this.userService.getUser()._id).subscribe(
+		this.userService.deleteProfile().subscribe(
 			(res: any)=>{
 				this.setPopup(false);
 				this.loadingScreenService.setAnimation(false);

@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "szakdolgozat": {
+    "GameDealsWeb": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/szakdolgozat",
+            "outputPath": "dist/GameDealsWeb",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -71,18 +71,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "szakdolgozat:build"
+            "browserTarget": "GameDealsWeb:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "szakdolgozat:build:production"
+              "browserTarget": "GameDealsWeb:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "szakdolgozat:build"
+            "browserTarget": "GameDealsWeb:build"
           }
         },
         "test": {
@@ -121,15 +121,15 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "szakdolgozat:serve"
+            "devServerTarget": "GameDealsWeb:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "szakdolgozat:serve:production"
+              "devServerTarget": "GameDealsWeb:serve:production"
             }
           }
         }
       }
     }},
-  "defaultProject": "szakdolgozat"
+  "defaultProject": "GameDealsWeb"
 }

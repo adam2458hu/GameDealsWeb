@@ -1085,9 +1085,9 @@ router.get('/:id',m.isAuthenticated,async(req,res)=>{
 	}
 });
 
-router.delete('/:id',m.isAuthenticated,async(req,res)=>{
+router.delete('/deleteProfile',m.isAuthenticated,async(req,res)=>{
 	try {
-		user = await User.findById(req.params.id);
+		user = await User.findById(req._id);
 		await user.remove();
 		res.status(200).json({message: 'profileSuccessfullyDeleted'});
 	} catch(err){
