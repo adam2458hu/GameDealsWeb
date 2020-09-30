@@ -13,7 +13,6 @@ import { Title } from '@angular/platform-browser';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-	//languageCookieIsSet = false;
 	availableLanguages = ['en','hu'];
 	languageIsSet;
 
@@ -25,17 +24,7 @@ export class AppComponent {
 		private titleService: Title,
 		private languageService: LanguageService
 	) {
-		console.log(swPush.isEnabled);
-		/*if (swPush.isEnabled) {
-		  	swPush.requestSubscription({
-		      serverPublicKey: environment.PUBLIC_VAPID
-		    })
-		    .then(subscription => {
-		    	console.log(subscription);
-		      this.userService.sendSubscriptionToTheServer(subscription).subscribe()
-		    })
-		    .catch(console.error)
-		}*/
+
 		if (this.swPush.isEnabled) {
 			this.swPush.requestSubscription({
 				serverPublicKey: environment.PUBLIC_VAPID
@@ -52,19 +41,6 @@ export class AppComponent {
 	      });
 	    });
 
-		/*
-	    if (this.cookieService.getConsent() && this.cookieService.getConsent().functional){
-	    	console.log("beleegyezett");
-			if (!localStorage.getItem('lang')) this.requestLanguage();
-			else {
-				this.languageService.setLanguage(localStorage.getItem('lang'));
-				this.translateService.use(localStorage.getItem('lang'));
-			}
-	    } else {
-	    	console.log("nem egyezett bele");
-	    	this.languageService.setLanguage('en');
-	    	this.translateService.use('en');
-	    }*/
 		if (!this.cookieService.getLanguageCookie()) this.requestLanguage();
 		else {
 			this.languageService.setLanguage(this.cookieService.getLanguageCookie());
@@ -77,14 +53,6 @@ export class AppComponent {
 			this.userService.getMessages();
 		}
 	}
-
-	subscribeToNotifications() {
-        this.swPush.requestSubscription({
-            serverPublicKey: environment.PUBLIC_VAPID
-        })
-        .then(sub => this.userService.sendSubscriptionToTheServer(sub).subscribe())
-        .catch(err => console.error("Could not subscribe to notifications", err));
-    }
 
 	requestLanguage(){
 		this.userService.getIPAddress().subscribe(
