@@ -18,6 +18,7 @@ import { UserDataRequestComponent } from './user-data-request/user-data-request.
 import { UserMessagesComponent } from './user-messages/user-messages.component';
 import { UserTrustDeviceComponent } from './user-trust-device/user-trust-device.component';
 import { DealsComponent } from './deals/deals.component';
+import { ArticleComponent } from './article/article.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 
 const routes: Routes = [
@@ -51,6 +52,9 @@ const routes: Routes = [
 				path: 'admin',component: UserAdminComponent
 			},
 		]
+	},
+	{
+		path: 'articles/:slug',component: ArticleComponent
 	},
 	{
 		path: 'deals',component: DealsComponent
