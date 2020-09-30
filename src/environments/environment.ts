@@ -5,10 +5,11 @@
 export const environment = {
   production: false,
   siteURL: 'http://localhost:3000',
-  apiUsersURL: 'http://localhost:3000/api/users',
-  apiGamesURL: 'http://localhost:3000/api/games',
-  apiCurrenciesURL: 'http://localhost:3000/api/currencies',
-  apiStoresURL: 'http://localhost:3000/api/stores',
+  apiUsersURL: 'http://192.168.1.9:3000/api/users',
+  apiGamesURL: 'http://192.168.1.9:3000/api/games',
+  apiCurrenciesURL: 'http://192.168.1.9:3000/api/currencies',
+  apiStoresURL: 'http://192.168.1.9:3000/api/stores',
+  apiArticlesURL: 'http://192.168.1.9:3000/api/articles',
   PUBLIC_VAPID: 'BDtA1qkTIC506t6RQ78ZLCAV1mfQGUwIMjAh4TAkyP22CCcWJsnPUj4reD_jd9wZyMNjjyWA861Zsq--27FLHKs'
 };
 
