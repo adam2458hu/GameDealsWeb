@@ -4,16 +4,14 @@
 			<div class="row">
 				<div class="col-lg-4 d-none d-lg-block big-screen-title">
 					<div class="news-container">
-						<div class="news-description text-center" [ngClass]="{'fadeIn':fadeIn}">
+						<div class="news-description text-center" [ngClass]="{'fadeIn':fadeIn && !isMobile()}">
 							<h3>{{titles[index]}} {{ 'sale' | translate }}</h3>
-							<!--<p>{{ 'endOfDeal' | translate }}: {{months[endOfOffer[index].getMonth()]}} {{endOfOffer[index].getDate()}}.</p>-->
 							<p>{{ 'endOfDeal' | translate }}: {{months[getLanguage()][endOfOffer[index].getMonth()]}} {{endOfOffer[index].getDate()}}.</p>
-							<!--<button (click)="goToExternalUrl(links[index])">{{ 'letssee' | translate}}</button>-->
 							<a class="salelink" href="{{links[index]}}" target="_blank">{{ 'letssee' | translate }}</a>
 						</div>
 					</div>
 					<span class="custom-badge d-none d-lg-block">
-						<span class="custom-badge-text" [ngClass]="{'fadeIn':fadeIn}">{{discounts[index]}}</span>
+						<span class="custom-badge-text" [ngClass]="{'fadeIn':fadeIn && !isMobile()}">{{discounts[index]}}</span>
 					</span>
 				</div>
 				<div class="col-12 col-lg-8">
@@ -29,135 +27,60 @@
 							</a>
 						</div>
 					</div>
-					<div class="news-image" (swipeleft)="deleteClass();next()" (swiperight)="deleteClass();previous()">
-						<img [ngClass]="{'fadeIn':fadeIn}" [src]='"/assets/"+images[index]+".jpg"' alt="{{titles[index]}}" (loaded)="loadingImages=false" width="100%">
+					<div class="news-image" (swipeleft)="next()" (swiperight)="previous()">
+						<img [ngClass]="{'fadeIn':fadeIn && !isMobile()}" [src]='"/assets/"+images[index]+".jpg"' alt="{{titles[index]}}" (loaded)="loadingImages=false" width="100%">
 					</div>
 					<span class="custom-badge d-inline-block d-lg-none">
-						<span class="custom-badge-text" [ngClass]="{'fadeIn':fadeIn}">{{discounts[index]}}</span>
+						<span class="custom-badge-text" [ngClass]="{'fadeIn':fadeIn && !isMobile()}">{{discounts[index]}}</span>
 					</span>
 				</div>
-				<span class="pager pager-left d-none d-md-inline-block" (click)="deleteClass();previous()"></span>
-				<span class="pager pager-right d-none d-md-inline-block" (click)="deleteClass();next()"></span>
+				<span class="pager pager-left" (click)="!isMobile() && previous()" (tap)="previous()"></span>
+				<span class="pager pager-right" (click)="!isMobile() && next()" (tap)="next()"></span>
 			</div>
 		</div>
-		<div class="nav-buttons text-center">
+		<div class="d-none d-lg-block nav-buttons text-center">
 			<span *ngFor="let img of images;index as i" [class.active]="index==i" [class.passed]="index>i" (click)="changeNews(i)"></span>
 		</div>
 	</div>
-	<div *ngIf="!getUserService().isAuthenticated();else elseBlock" class="text-center m-2 p-3">
-		<h4>{{ 'shouldLogin' | translate }}</h4>
-		<button [routerLink]="['/login']">{{ 'login' | translate }}</button>
+	<app-article-creator *ngIf="editorOpened" (created)="getArticles()" (close)="onCloseEditor()" [articleToEdit]="articleToEdit"></app-article-creator>
+	<div class="adminButtons">
+		<button *ngIf="isAdmin() && !editorOpened" type="button" (click)="editorOpened=true"><fa name="plus"></fa>{{ 'createArticle' | translate}}</button>
 	</div>
-	<ng-template #elseBlock>
-		<div *ngIf="numberOfWatchedGames>0">
-			<div id="recommendedGames" class="mt-5">
-				<div class="container-custom fixed deals">
-					<h2>{{ 'recommendedGames' | translate }}</h2>
-					<div class="table-responsive">
-						<table class="table table-hover table-dark">
-							<thead>
-								<tr>
-									<!--<th></th>-->
-									<th>{{ 'name' | translate }}</th>
-									<th class="text-center">{{ 'currentPrice' | translate }}</th>
-									<th class="text-center">{{ 'originalPrice' | translate }}</th>
-									<th class="text-center">{{ 'discount' | translate }}</th>
-									<th class="text-center">Metascore</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr *ngFor="let game of getRecommendedGames()" (click)="showAllStores(game)"><!--
-									<td id="productImage">
-										<img *ngIf="game.stores[0].image;else noimageBlock" src="{{ game.stores[0].image }}" alt="{{ game.name }}">
-										<ng-template #noimageBlock>
-											<span class="noimage"><fa name="photo"></fa></span>
-										</ng-template>
-									</td>-->
-									<td id="productName">
-										<div>{{ game.name }}</div>
-										<div id="genres">{{ game.genres }}</div>
-									</td>
-									<!--<td id="specialPrice" class="text-center">{{ currencyConverter(getCheapestStore(game).specialPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}</td>
-									<td id="originalPrice" class="text-center">{{ currencyConverter(getCheapestStore(game).originalPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}</td>
-									<td id="discountPercent" class="text-center">
-										<span>-{{ getCheapestStore(game).discountPercent }} %</span>
-									</td>-->
-									<td id="specialPrice" class="text-center">{{ currencyConverter(game.stores.specialPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}</td>
-									<td id="originalPrice" class="text-center">{{ currencyConverter(game.stores.originalPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}</td>
-									<td id="discountPercent" class="text-center">
-										<span>-{{ game.stores.discountPercent }} %</span>
-									</td>
-									<td id="metascore" class="text-center">
-										<span class="rated" *ngIf="game.metascore;else elseBlock">
-											{{ game.metascore }}
-										</span>
-										<ng-template #elseBlock>
-											<span class="tba" title="besorolás alatt">TBA</span>
-										</ng-template>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
+	<div class="row content">
+		<div class="col-12 col-lg-8 news">
+			<div class="d-none d-lg-block newsLabel">{{ 'latestNews' | translate }}</div>
+			<article class="row" *ngFor="let article of articles;index as i">
+				<div class="col-12 col-md-3">
+					<a href="/articles/{{article.slug}}">
+						<img src="{{article.image}}" alt="" width="100%">
+					</a>
 				</div>
-			</div>
-			<div id="watchedGames">
-				<div class="d-md-flex justify-content-between mt-3">
-					<h2>{{ 'watchHistory' | translate }}</h2>
-					<div class="d-flex justify-content-between d-md-inline-block mb-2 mb-md-0">
-						<button (click)="showViewedGenres=!showViewedGenres" class="mr-2">
-							<span *ngIf="!showViewedGenres;else elseBlock">{{ 'watchedGenresShow' | translate }}</span>
-							<ng-template #elseBlock>{{ 'watchedGenresHide' | translate }}</ng-template>
-						</button>
-						<button (click)="deleteGameHistory()">{{ 'watchHistoryDelete' | translate }}</button>
+				<div class="col-12 col-md-9">
+					<div class="d-flex justify-content-between">
+						<div class="d-inline-block date">
+							<fa name="calendar"></fa>{{article.createdAt | date: 'short'}}
+						</div>
+						<div class="d-inline-block" *ngIf="isAdmin()" class="adminActionIcons">
+							<fa name="pencil" size="lg" (click)="editArticle(article)"></fa>
+							<fa name="trash" size="lg" class="ml-2" (click)="deleteArticle(article._id)"></fa>
+						</div>
 					</div>
+					<h2>
+						<a href="/articles/{{article.slug}}">{{article.title}}</a>
+					</h2>
+					<div class="lead">{{article.lead}}</div>
+						<!--<span class="divider">|</span>
+						<span class="comments"><fa name="comments"></fa>0</span>-->
 				</div>
-				<div class="container-custom fixed deals">
-					<div *ngIf="showViewedGenres" id="chart-container">
-						<app-chart [genreStatistics]=genreStatistics [uniqueWatchedGenres]=uniqueWatchedGenres></app-chart>
-					</div>
-					<div class="table-responsive">
-						<table class="table table-hover table-dark">
-							<thead>
-								<!--<th></th>-->
-								<th>{{ 'name' | translate }}</th>
-								<th class="text-center">{{ 'currentPrice' | translate }}</th>
-								<th class="text-center">{{ 'originalPrice' | translate }}</th>
-								<th class="text-center">{{ 'discount' | translate }}</th>
-								<th class="text-center">Metascore</th>
-							</thead>
-							<tbody>
-								<tr *ngFor="let game of getGamesData()" (click)="showAllStores(game)">
-									<!--<td id="productImage">
-										<img *ngIf="game.stores[0].image;else noimageBlock" src="{{ game.stores[0].image }}" alt="{{ game.name }}">
-										<ng-template #noimageBlock>
-											<span class="noimage"><fa name="photo"></fa></span>
-										</ng-template>
-									</td>-->
-									<td id="productName">
-										<div>{{ game.name }}</div>
-										<div id="genres">{{ game.genres }}</div>
-									</td>
-									<td id="specialPrice" class="text-center">{{ currencyConverter(getCheapestStore(game).specialPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}</td>
-									<td id="originalPrice" class="text-center">{{ currencyConverter(getCheapestStore(game).originalPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}</td>
-									<td id="discountPercent" class="text-center">
-										<span>-{{ getCheapestStore(game).discountPercent }} %</span>
-									</td>
-									<td id="metascore" class="text-center">
-										<span class="rated" *ngIf="game.metascore;else elseBlock">
-											{{ game.metascore }}
-										</span>
-										<ng-template #elseBlock>
-											<span class="tba" title="besorolás alatt">TBA</span>
-										</ng-template>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
+			</article>
+		</div>
+		<div class="col-12 col-lg-4 sidebar">
+			<div class="topNews">
+				<div class="topNewsLabel">{{ 'topNews' | translate }}</div>
+				<div class="topNewsItem" *ngFor="let article of topArticles;index as i">
+					<a href="/articles/{{article.slug}}">{{i+1}}. {{ article.title }}</a>
 				</div>
 			</div>
 		</div>
-		<app-game-details *ngIf="selectedGame" [selectedGame]="selectedGame" (close)="onClose()"></app-game-details>
-	</ng-template>
+	</div>
 </div>

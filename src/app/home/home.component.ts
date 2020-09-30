@@ -1,12 +1,14 @@
 import { Component, OnInit, ElementRef, AfterViewInit, ViewChild} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Game } from '../game/game';
+import { Article } from '../shared/article/article';
 import { UserService } from '../shared/user/user.service';
 import { GameService } from '../game/game.service';
 import { CurrencyService } from '../shared/currency/currency.service';
 import { FilterService } from '../shared/filter/filter.service';
 import { LoadingScreenService } from '../shared/loading-screen/loading-screen.service';
 import { LanguageService } from '../shared/language/language.service';
+import { ArticleService } from '../shared/article/article.service';
 
 @Component({
   selector: 'app-home',
@@ -14,6 +16,8 @@ import { LanguageService } from '../shared/language/language.service';
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements AfterViewInit {
+	mobile: Boolean;
+	editorOpened: Boolean;
 	index=0;
 	numberOfWatchedGames=0;
 	showViewedGenres=false;
@@ -25,6 +29,9 @@ export class HomeComponent implements AfterViewInit {
 	links: String[]=['https://store.steampowered.com/app/275850/No_Mans_Sky/',
 	'https://store.steampowered.com/app/812140/Assassins_Creed_Odyssey/','https://store.steampowered.com/app/227300/Euro_Truck_Simulator_2/'];
 	t;
+	articleToEdit;
+	articles: Article[];
+	topArticles: Article[];
 	genreStatistics=[];
 	uniqueWatchedGenres=[];
 	r;
@@ -41,20 +48,45 @@ export class HomeComponent implements AfterViewInit {
 		private currencyService: CurrencyService,
 		private filterService: FilterService,
 		private loadingScreenService: LoadingScreenService,
-		private languageService: LanguageService
+		private languageService: LanguageService,
+		private articleService: ArticleService
 	) { }
 
 	ngAfterViewInit() {
+	    if (window.screen.width <= 992) {
+      		this.mobile = true;
+	    } else {
+	    	this.mobile = false;
+	    }
+
 		this.fadeIn = true;
 		this.resetAnimation();
 		this.startAnimation();
 		this.gameService.resetGamesData();
 		this.filterService.resetFilter();
 
+		this.getArticles();
+		this.getTopArticles();
+
 		if (this.userService.isAuthenticated()){
 			this.getRecommendedGamesByHistory();
 			this.getGameHistory();
 		}
+
+		this.editorOpened = false;
+	}
+
+	isAdmin(){
+		return this.userService.isAdmin();
+	}
+
+	isMobile(){
+		return this.mobile;
+	}
+
+	onCloseEditor(){
+		this.editorOpened=false;
+		if (this.articleToEdit) this.articleToEdit=null;
 	}
 
 	resetAnimation(){
@@ -77,13 +109,15 @@ export class HomeComponent implements AfterViewInit {
 		},4000);
 	}
 
-	deleteClass(){
+	deleteFadeIn(){
 		this.fadeIn = false;
 		clearTimeout(this.r);
 		clearInterval(this.t);
 	}
 
 	next(){
+		this.deleteFadeIn();
+		
 		this.fadeIn = true;
 		this.r = setTimeout(()=>{
 			this.fadeIn = false;
@@ -99,6 +133,8 @@ export class HomeComponent implements AfterViewInit {
 	}
 
 	previous(){
+		this.deleteFadeIn();
+		
 		this.fadeIn = true;
 		this.r = setTimeout(()=>{
 			this.fadeIn = false;
@@ -136,6 +172,47 @@ export class HomeComponent implements AfterViewInit {
 
 	getFilterService(){
 		return this.filterService;
+	}
+
+	getArticles(){
+		this.articleService.getArticles().subscribe(
+			(res: any)=>{
+				this.articles = res.articles;
+			},
+			(err)=>{
+				console.log(err);
+			})
+	}
+
+	editArticle(article: Article){
+		this.articleToEdit = article;
+		this.editorOpened = true;
+	}
+
+	deleteArticle(_id: string){
+		if (confirm('Biztosan törölni szeretné?')) {
+			this.loadingScreenService.setAnimation(true);
+			this.articleService.deleteArticle(_id).subscribe(
+				(res: any)=>{
+					this.articles.filter(article=>article._id!==_id);
+					this.loadingScreenService.setAnimation(false);
+					this.userService.setSuccessMessage(res.message);
+				},
+				(err)=>{
+					this.loadingScreenService.setAnimation(false);
+					this.userService.setErrorMessage(err.error.message);
+				})
+		}
+	}
+
+	getTopArticles() {
+		this.articleService.getTopArticles().subscribe(
+			(res: any)=>{
+				this.topArticles = res.topArticles;
+			},
+			(err)=>{
+				console.log(err);
+			})
 	}
 
 	getRecommendedGamesByHistory(){
