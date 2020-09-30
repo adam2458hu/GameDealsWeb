@@ -50,7 +50,7 @@
     "jspdf-autotable": "^3.5.3",
     "mongoose": "^5.9.2",
     "ngx-device-detector": "^1.4.1",
-    "ngx-quill": "^12.0.1",
+    "ngx-quill": "5.2.0",
     "nodemailer": "^6.4.5",
     "nodemailer-express-handlebars": "^3.1.0",
     "nodemailer-sendgrid": "^1.0.3",
