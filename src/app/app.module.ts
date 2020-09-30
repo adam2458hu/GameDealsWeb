@@ -1,4 +1,4 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, HAMMER_GESTURE_CONFIG, HammerGestureConfig } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -6,8 +6,9 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { DeviceDetectorModule } from 'ngx-device-detector';
 import { AngularFontAwesomeModule } from 'angular-font-awesome';
-import {TranslateModule, TranslateLoader} from '@ngx-translate/core';
-import {TranslateHttpLoader} from '@ngx-translate/http-loader';
+import { TranslateModule, TranslateLoader} from '@ngx-translate/core';
+import { TranslateHttpLoader} from '@ngx-translate/http-loader';
+import { QuillModule } from 'ngx-quill';
 import 'hammerjs';
 
 import { AppComponent } from './app.component';
@@ -23,6 +24,9 @@ import { ModalComponent } from './modal/modal.component';
 import { UserForgottenPasswordComponent } from './user-forgotten-password/user-forgotten-password.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { UserNewPasswordComponent } from './user-new-password/user-new-password.component';
+import { HasNumberValidatorDirective } from './shared/has-number-validator.directive';
+import { HasLowercaseValidatorDirective } from './shared/has-lowercase-validator.directive';
+import { HasUppercaseValidatorDirective } from './shared/has-uppercase-validator.directive';
 import { EqualPasswordValidatorDirective } from './shared/equal-password-validator.directive';
 import { MainComponent } from './main/main.component';
 import { PrivacyPolicyComponent } from './privacy-policy/privacy-policy.component';
@@ -46,9 +50,18 @@ import { WaitlistComponent } from './waitlist/waitlist.component';
 import { UserNewsletterUnsubscribeComponent } from './user-newsletter-unsubscribe/user-newsletter-unsubscribe.component';
 import { UserTrustDeviceComponent } from './user-trust-device/user-trust-device.component';
 import { UserWaitlistComponent } from './user-waitlist/user-waitlist.component';
+import { ArticleComponent } from './article/article.component';
+import { ArticleCreatorComponent } from './article-creator/article-creator.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
     return new TranslateHttpLoader(http);
+}
+
+export class MyHammerConfig extends HammerGestureConfig {
+    overrides = <any> {
+        'pinch': { enable: false },
+        'rotate': { enable: false }
+    }
 }
 
 @NgModule({
@@ -66,6 +79,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     UserForgottenPasswordComponent,
     NotFoundComponent,
     UserNewPasswordComponent,
+    HasNumberValidatorDirective,
+    HasLowercaseValidatorDirective,
+    HasUppercaseValidatorDirective,
     EqualPasswordValidatorDirective,
     MainComponent,
     PrivacyPolicyComponent,
@@ -85,7 +101,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     WaitlistComponent,
     UserNewsletterUnsubscribeComponent,
     UserTrustDeviceComponent,
-    UserWaitlistComponent
+    UserWaitlistComponent,
+    ArticleComponent,
+    ArticleCreatorComponent
   ], 
   imports: [
     BrowserModule,
@@ -94,6 +112,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
+    QuillModule.forRoot(),
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     TranslateModule.forRoot({
         loader: {
@@ -103,7 +122,13 @@ export function HttpLoaderFactory(http: HttpClient) {
         }
     })
   ],
-  providers: [HttpClient],
+  providers: [
+    HttpClient,
+    {
+        provide: HAMMER_GESTURE_CONFIG,
+        useClass: MyHammerConfig
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
