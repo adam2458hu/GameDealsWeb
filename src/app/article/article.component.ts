@@ -12,7 +12,7 @@ import { UserService } from '../shared/user/user.service';
   styleUrls: ['./article.component.scss']
 })
 export class ArticleComponent implements OnInit {
-	private article;
+	article;
 	srcSafe;
 	
 	constructor(
