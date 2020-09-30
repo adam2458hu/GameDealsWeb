@@ -452,7 +452,9 @@ export class UserService {
 	}
 
 	isAdmin(){
-		return this.user.role==='admin';
+		if (this.isAuthenticated() && this.user) {
+			return this.user.role==='admin';
+		} else return false;
 	}
 
 	getEmail(){
