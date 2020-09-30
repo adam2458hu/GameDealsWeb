@@ -1,0 +1,33 @@
+<div id="editor" class="editor">
+	<form #articleForm="ngForm" (ngSubmit)="onSubmit(articleForm)">
+		<h2 *ngIf="!articleToEdit;else editHeading">{{ 'createArticle' | translate}}</h2>
+		<ng-template #editHeading>
+			<h2>{{ 'editArticle' | translate }}</h2>
+		</ng-template>
+		<div class="form-group">
+			<label for="title">{{ 'title' | translate }}:</label>
+			<input type="text" class="form-control" name="title" [(ngModel)]="article.title" #title="ngModel" placeholder="{{ 'title' | translate }}" required>
+		</div>
+		<div class="form-group">
+			<label for="slug">{{ 'slug' | translate }}:</label>
+			<input type="text" class="form-control" name="slug" [(ngModel)]="article.slug" #slug="ngModel" placeholder="this_is_a_seo_friendly_url" required>
+		</div>
+		<div class="form-group">
+			<label for="lead">{{ 'lead' | translate }}:</label>
+			<textarea type="text" class="form-control" name="lead" [(ngModel)]="article.lead" #lead="ngModel" placeholder="{{ 'lead' | translate }}" required></textarea>
+		</div>
+		<div class="form-group">
+			<label for="image">{{ 'image' | translate }}:</label>
+			<input type="text" class="form-control" name="image" [(ngModel)]="article.image" #image="ngModel" placeholder="{{ 'image' | translate }}" required>
+		</div>
+		<label for="body">{{ 'bodyText' | translate }}:</label>
+		<quill-editor id="body" name="body" #body="ngModel" [(ngModel)]="article.body" required></quill-editor>
+		<div class="d-flex justify-content-between">
+			<button *ngIf="!articleToEdit;else editButton" type="submit">{{ 'create' | translate }}</button>
+			<ng-template #editButton>
+				<button type="submit">{{ 'edit' | translate }}</button>
+			</ng-template>
+			<button type="button" (click)="onClose()">{{ 'cancel' | translate }}</button>
+		</div>
+	</form>
+</div>
