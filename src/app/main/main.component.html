@@ -1,4 +1,4 @@
-<main class="container" [ngClass]="{'stretchedOnMobile': router.url==='/home' || router.url.includes('articles')}">
+<main class="container" [ngClass]="{'stretchedOnMobile': getRouter().url==='/home' || getRouter().url.includes('articles')}">
 	<div *ngIf="isLoading()" class="modal-container animated">
 		<div class="loading-icon"></div>
 	</div>

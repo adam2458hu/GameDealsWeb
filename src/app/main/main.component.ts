@@ -33,6 +33,10 @@ export class MainComponent implements OnInit {
     	}
 	}
 
+  getRouter(){
+    return this.router;
+  }
+
 	isLoading(){
 		return this.loadingScreenService.isLoading();
 	}
