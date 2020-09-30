@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { LoadingScreenService } from '../shared/loading-screen/loading-screen.service';
 import { UserService } from '../shared/user/user.service';
 
@@ -10,6 +11,7 @@ import { UserService } from '../shared/user/user.service';
 export class MainComponent implements OnInit {
 
 	constructor(
+    private router: Router,
 		private loadingScreenService: LoadingScreenService,
 		private userService: UserService
 	) { }

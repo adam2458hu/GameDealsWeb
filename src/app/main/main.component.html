@@ -1,6 +1,7 @@
-<main class="container">
+<main class="container" [ngClass]="{'stretchedOnMobile': router.url==='/home' || router.url.includes('articles')}">
 	<div *ngIf="isLoading()" class="modal-container animated">
 		<div class="loading-icon"></div>
 	</div>
+	<app-back-to-top></app-back-to-top>
 	<router-outlet (activate)="onActivate($event)"></router-outlet>
 </main>
