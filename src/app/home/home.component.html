@@ -43,8 +43,8 @@
 		</div>
 	</div>
 	<app-article-creator *ngIf="editorOpened" (created)="getArticles()" (close)="onCloseEditor()" [articleToEdit]="articleToEdit"></app-article-creator>
-	<div class="adminButtons">
-		<button *ngIf="isAdmin() && !editorOpened" type="button" (click)="editorOpened=true"><fa name="plus"></fa>{{ 'createArticle' | translate}}</button>
+	<div *ngIf="isAdmin() && !editorOpened" class="adminButtons">
+		<button type="button" (click)="editorOpened=true"><fa name="plus"></fa>{{ 'createArticle' | translate}}</button>
 	</div>
 	<div class="row content">
 		<div class="col-12 col-lg-8 news">
