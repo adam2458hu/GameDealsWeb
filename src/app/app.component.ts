@@ -6,6 +6,8 @@ import { UserService } from './shared/user/user.service';
 import { LanguageService } from './shared/language/language.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Title } from '@angular/platform-browser';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { filter, map } from "rxjs/operators";
 
 @Component({
   selector: 'app-root',
@@ -22,7 +24,9 @@ export class AppComponent {
 		private userService: UserService,
 		private translateService: TranslateService,
 		private titleService: Title,
-		private languageService: LanguageService
+		private languageService: LanguageService,
+		private router: Router,
+		private activatedRoute: ActivatedRoute
 	) {
 
 		if (this.swPush.isEnabled) {
@@ -52,6 +56,29 @@ export class AppComponent {
 			this.getUserProfile();
 			this.userService.getMessages();
 		}
+
+		this.router.events.pipe(
+            filter(event => event instanceof NavigationEnd),
+            map(() => {
+                let child = this.activatedRoute.firstChild;
+                while (child) {
+                    if (child.firstChild) {
+                        child = child.firstChild;
+                    } else if (child.snapshot.data && child.snapshot.data['title']) {
+                        return child.snapshot.data['title'];
+                    } else {
+                        return null;
+                    }
+                }
+                return null;
+            })
+        ).subscribe( (data: any) => {
+            if (data) {
+                this.translateService.get(data).subscribe((res: string) => {
+			        this.titleService.setTitle(data!=='pageTitle'?res+' | Game Deals Web':res);
+			      });
+            }
+        });
 	}
 
 	requestLanguage(){
