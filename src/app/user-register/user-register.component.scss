@@ -1,0 +1,25 @@
+.condition {
+	&.valid {
+		color: #4caf50;
+	}
+
+	&.invalid {
+		color: red;
+	}
+}
+
+input.form-control.ng-valid, select {
+	border: 2px solid #4caf50;
+}
+
+form.submitted {
+	input.form-control.ng-invalid,.privacyPolicyConsentRequired {
+		border: 2px solid red;
+	}
+}
+
+.privacyPolicyConsentRequired {
+	background-color: white;
+	color: black;
+	padding: 10px;
+}

@@ -4,69 +4,101 @@
 			<h2 class="text-center">{{ 'signUp' | translate }}</h2>
 		</div>
 		<div class="card-body">
-			<form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)">
+			<form #registerForm="ngForm" [ngClass]="{'submitted':registerForm.submitted}" (ngSubmit)="onSubmit(registerForm)">
 				<div class="form-group">
 					<label for="fname">{{ 'firstName' | translate }}</label>
 					<input type="text" id="fname" class="form-control" name="first_name" [(ngModel)]="user.first_name" #fname="ngModel" placeholder="{{ 'firstName' | translate }}" required>
-					<div *ngIf="!fname.valid && fname.dirty">
+					<div *ngIf="registerForm.submitted && !fname.valid">
 						<label *ngIf="fname.errors.required">{{ 'fieldRequired' | translate }}</label>
 					</div>
 				</div>
 				<div class="form-group">
 					<label for="lname">{{ 'lastName' | translate }}</label>
 					<input type="text" id="lname" class="form-control" name="last_name" [(ngModel)]="user.last_name" #lname="ngModel" placeholder="{{ 'lastName' | translate }}" required>
-					<div *ngIf="!lname.valid && lname.dirty">
+					<div *ngIf="registerForm.submitted && !lname.valid">
 						<label *ngIf="lname.errors.required">{{ 'fieldRequired' | translate }}</label>
 					</div>
-				</div><!--
-				<div class="form-group">
-					<label for="name">Teljes név</label>
-					<input type="text" id="name" class="form-control" name="name" [(ngModel)]="user.name" #lname="ngModel" placeholder="Teljes név" required>
-					<div *ngIf="!name.valid && name.dirty">
-						<label *ngIf="name.error.required">Ezt a mezőt kötelező kitölteni</label>
-					</div>
-				</div>-->
+				</div>
 				<div class="form-group">
 					<label for="email">Email</label>
 					<input type="email" id="email" class="form-control" name="email" [(ngModel)]="user.email" #email="ngModel" [pattern]="emailRegex" placeholder="example@mail.com" required>
-					<div *ngIf="!email.valid && email.dirty">
+					<div *ngIf="registerForm.submitted && !email.valid">
 						<label *ngIf="email.errors.required">{{ 'fieldRequired' | translate }}</label>
-						<label *ngIf="email.errors.pattern">{{ 'invalidEmail' | translate }}</label>
+					</div>
+					<div *ngIf="!email.valid && email.dirty">
+						<div class="condition" [ngClass]="email.errors.pattern && !email.errors.required?'invalid':'valid'">
+							<fa *ngIf="email.errors.pattern;else checkedIcon" name="remove"></fa>
+							<ng-template #checkedIcon>
+								<fa name="check"></fa>
+							</ng-template>
+							<label *ngIf="email.errors.pattern">{{ 'invalidEmail' | translate }}</label>
+						</div>
 					</div>
 				</div>
 				<div class="form-group">
 					<label for="password">{{ 'password' | translate }}</label>
 					<input type="password" id="password" class="form-control" name="password" [(ngModel)]="user.password" #password="ngModel" (input)="confirmPassword.control.updateValueAndValidity()" appHasUppercaseValidator="password" appHasLowercaseValidator="password" appHasNumberValidator="password" minlength="8" placeholder="********" required>
-					<div *ngIf="!password.valid && password.dirty">
+					<div *ngIf="registerForm.submitted && !password.valid">
 						<div *ngIf="password.errors.required">{{ 'fieldRequired' | translate }}</div>
-						<div *ngIf="password.errors.minlength">{{ 'passwordLength' | translate }}</div>
-						<div *ngIf="password.errors.needsLowercase && !password.errors.required">{{ 'needsLowercase' | translate }}</div>
-						<div *ngIf="password.errors.needsUppercase && !password.errors.required">{{ 'needsUppercase' | translate }}</div>
-						<div *ngIf="password.errors.needsNumber && !password.errors.required">{{ 'needsNumber' | translate }}</div>
+					</div>
+					<div *ngIf="!password.valid && password.dirty">
+						<div class="condition" [ngClass]="password.errors.minlength?'invalid':'valid'">
+							<fa *ngIf="password.errors.minlength;else checkedIcon" name="remove"></fa>
+							<ng-template #checkedIcon>
+								<fa name="check"></fa>
+							</ng-template>
+							{{ 'passwordLength' | translate }}
+						</div>
+						<div class="condition" [ngClass]="password.errors.needsLowercase && !password.errors.required?'invalid':'valid'">
+							<fa *ngIf="password.errors.needsLowercase;else checkedIcon" name="remove"></fa>
+							<ng-template #checkedIcon>
+								<fa name="check"></fa>
+							</ng-template>
+							{{ 'needsLowercase' | translate }}
+						</div>
+						<div class="condition" [ngClass]="password.errors.needsUppercase && !password.errors.required?'invalid':'valid'">
+							<fa *ngIf="password.errors.needsUppercase;else checkedIcon" name="remove"></fa>
+							<ng-template #checkedIcon>
+								<fa name="check"></fa>
+							</ng-template>
+							{{ 'needsUppercase' | translate }}
+						</div>
+						<div class="condition" [ngClass]="password.errors.needsNumber && !password.errors.required?'invalid':'valid'">
+							<fa *ngIf="password.errors.needsNumber;else checkedIcon" name="remove"></fa>
+							<ng-template #checkedIcon>
+								<fa name="check"></fa>
+							</ng-template>
+							{{ 'needsNumber' | translate }}
+						</div>
 					</div>
 				</div>
 				<div class="form-group">
 					<label for="confirmPassword">{{ 'passwordConfirm' | translate }}</label>
 					<input type="password" id="confirmPassword" class="form-control" name="confirmPassword" [(ngModel)]="user.confirmPassword" appEqualPasswordValidator="password" #confirmPassword="ngModel" placeholder="********" required>
-					<div *ngIf="!confirmPassword.valid && confirmPassword.dirty">
+					<div *ngIf="registerForm.submitted && !confirmPassword.valid">
 						<div *ngIf="confirmPassword.errors.required">{{ 'fieldRequired' | translate }}</div>
-						<div *ngIf="confirmPassword.errors.notEqual && !confirmPassword.errors.required">{{ 'notEqual' | translate }}</div>
+					</div>
+					<div *ngIf="!confirmPassword.valid && confirmPassword.dirty">
+						<div class="condition" [ngClass]="confirmPassword.errors.notEqual && !confirmPassword.errors.required?'invalid':'valid'">{{ 'notEqual' | translate }}</div>
 					</div>
 				</div>
 				<div class="form-group mb-3">
 					<label for="language">{{ 'language' | translate }}</label>
-					<select name="language" id="language" class="form-control" [(ngModel)]="user.language">
+					<select name="language" id="language" class="form-control" [(ngModel)]="user.language" required>
 						<option value="en">English</option>
 						<option value="hu">Magyar</option>
 					</select>
 				</div>
 				<div class="form-check mb-2">
 					<label class="form-check-label">
-						<input type="checkbox" name="consentToGDPR" [(ngModel)]="user.consentToGDPR" class="form-check-input" required>
+						<input type="checkbox" name="consentToGDPR" #consentToGDPR="ngModel" [(ngModel)]="user.consentToGDPR" class="form-check-input" required>
 						{{ 'privacyPolicyAcceptStart' | translate }}
 						<a [routerLink]="['/privacy-policy']">{{ 'privacyPolicyAcceptLink' | translate }}</a>
 						{{ 'privacyPolicyAcceptEnd' | translate }}
 					</label>
+					<div *ngIf="registerForm.submitted && !consentToGDPR.valid">
+						<div *ngIf="consentToGDPR.errors.required" class="privacyPolicyConsentRequired">{{ 'privacyPolicyConsentRequired' | translate }}</div>
+					</div>
 				</div>
 				<div class="form-check mb-3">
 					<label class="form-check-label">
@@ -74,7 +106,8 @@
 					</label>
 				</div>
 				<div class="text-center">
-					<input type="submit" class="btn-block" value="{{ 'signUp' | translate }}" [disabled]="!registerForm.valid">
+					<!--<input type="submit" class="btn-block" value="{{ 'signUp' | translate }}" [disabled]="!registerForm.valid">-->
+					<input type="submit" class="btn-block" value="{{ 'signUp' | translate }}">
 				</div>
 			</form>
 		</div>
