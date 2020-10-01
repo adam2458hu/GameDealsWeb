@@ -129,7 +129,9 @@ router.post('/register',async(req,res)=>{
 		await newUser.save();
 		i18next.changeLanguage(newUser.language,()=>{sendVerificationLink(newUser,res)});
 	} catch(err){
-		if (err.code==11000){
+		if (err._message==='User validation failed') {
+			return res.status(400).json({message: 'registrationFailed'});
+		} else if (err.code==11000){
 			return res.status(400).json({message: 'emailAlreadyRegistered'});
 		}
 		res.status(500).json({message: err.message});
