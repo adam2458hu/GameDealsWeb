@@ -23,13 +23,13 @@ import { NotFoundComponent } from './not-found/not-found.component';
 
 const routes: Routes = [
 	{
-		path: 'home',component: HomeComponent
+		path: 'home',component: HomeComponent, data: {title: 'pageTitle'}
 	},
 	{
-		path: 'register',component: UserRegisterComponent
+		path: 'register',component: UserRegisterComponent, data: {title: 'pageTitleRegister'}
 	},
 	{
-		path: 'login',component: UserLoginComponent
+		path: 'login',component: UserLoginComponent, data: {title: 'pageTitleLogin'}
 	},
 	{
 		path: 'profile',
@@ -40,16 +40,16 @@ const routes: Routes = [
 		component: UserProfileComponent,
 		children: [
 			{
-				path: 'details',component: UserDetailsComponent
+				path: 'details',component: UserDetailsComponent, data: {title: 'pageTitleDetails'}
 			},
 			{
-				path: 'security',component: UserSecurityComponent
+				path: 'security',component: UserSecurityComponent, data: {title: 'pageTitleSecurity'}
 			},
 			{
-				path: 'waitlist',component: UserWaitlistComponent
+				path: 'waitlist',component: UserWaitlistComponent, data: {title: 'pageTitleWaitlist'}
 			},
 			{
-				path: 'admin',component: UserAdminComponent
+				path: 'admin',component: UserAdminComponent, data: {title: 'pageTitleAdmin'}
 			},
 		]
 	},
@@ -57,40 +57,40 @@ const routes: Routes = [
 		path: 'articles/:slug',component: ArticleComponent
 	},
 	{
-		path: 'deals',component: DealsComponent
+		path: 'deals',component: DealsComponent, data: {title: 'pageTitleDeals'}
 	},
 	{
-		path: 'messages',component: UserMessagesComponent
+		path: 'messages',component: UserMessagesComponent, data: {title: 'pageTitleMessages'}
 	},
 	{
-		path: 'email-verification/:token',component: UserEmailVerificationComponent
+		path: 'email-verification/:token',component: UserEmailVerificationComponent, data: {title: 'pageTitleEmailVerification'}
 	},
 	{
-		path: 'data-request/:token',component: UserDataRequestComponent
+		path: 'data-request/:token',component: UserDataRequestComponent, data: {title: 'pageTitleDataRequest'}
 	},
 	{
-		path: 'forgot-password',component: UserForgottenPasswordComponent
+		path: 'forgot-password',component: UserForgottenPasswordComponent, data: {title: 'pageTitleForgottenPassword'}
 	},
 	{
-		path: 'newsletter-unsubscribe/:token',component: UserNewsletterUnsubscribeComponent
+		path: 'newsletter-unsubscribe/:token',component: UserNewsletterUnsubscribeComponent,data: {title: 'pageTitleNewsletterUnsubscribe'}
 	},
 	{
-		path: 'trust-device/:token',component: UserTrustDeviceComponent
+		path: 'trust-device/:token',component: UserTrustDeviceComponent, data: {title: 'pageTitleTrustDevice'}
 	},
 	{
-		path: 'new-password/:token',component: UserNewPasswordComponent
+		path: 'new-password/:token',component: UserNewPasswordComponent, data: {title: 'pageTitleNewPassword'}
 	},
 	{
-		path: 'privacy-policy',component: PrivacyPolicyComponent
+		path: 'privacy-policy',component: PrivacyPolicyComponent, data: {title: 'pageTitlePrivacyPolicy'}
 	},
 	{
-		path: 'cookie-policy',component: CookiePolicyComponent
+		path: 'cookie-policy',component: CookiePolicyComponent, data: {title: 'pageTitleCookiePolicy'}
 	},
 	{
 		path: '',redirectTo:'/home',pathMatch: 'full'
 	},
 	{
-		path: '404',component: NotFoundComponent
+		path: '404',component: NotFoundComponent, data: {title: 'pageTitle404'}
 	},
 	{
 		path: '**',redirectTo:'/404'
