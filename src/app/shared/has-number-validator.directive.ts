@@ -14,7 +14,7 @@ export class HasNumberValidatorDirective implements Validator{
 	@Input() appHasNumberValidator: string;
 	validate(control: AbstractControl): { [key:string]:any } | null {
 		//const controlToCompare = control.parent.get(this.appEqualPasswordValidator);
-		if (!/\d/.test(control.value)) {
+		if (control.value && !/\d/.test(control.value)) {
 			return { 'needsNumber' : true };
 		}
 

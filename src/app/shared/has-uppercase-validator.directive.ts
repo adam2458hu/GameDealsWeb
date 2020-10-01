@@ -14,7 +14,7 @@ export class HasUppercaseValidatorDirective implements Validator{
 	@Input() appHasUppercaseValidator: string;
 	validate(control: AbstractControl): { [key:string]:any } | null {
 		//const controlToCompare = control.parent.get(this.appEqualPasswordValidator);
-		if (control.value.toLowerCase()==control.value) {
+		if (control.value && control.value.toLowerCase()==control.value) {
 			return { 'needsUppercase' : true };
 		}
 
