@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+var ValidationError = mongoose.Error.ValidationError;
+var ValidatorError  = mongoose.Error.ValidatorError;
 const userSchema = new mongoose.Schema({
 	role : {
 		type : String,
@@ -38,7 +40,8 @@ const userSchema = new mongoose.Schema({
 	},
 	consentToGDPR : {
 		type : Boolean,
-		default : false
+		required : true,
+		default : null
 	},
 	consentToNewsletter : {
 		type : Boolean,
@@ -168,6 +171,10 @@ const userSchema = new mongoose.Schema({
 },	{
 	timestamps: true
 });
+
+userSchema.path('consentToGDPR').validate(function (value) {
+    return value===true
+  }, 'consentError');
 
 userSchema.pre('save',async function(next){
 	try {
