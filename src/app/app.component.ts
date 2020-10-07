@@ -37,6 +37,9 @@ export class AppComponent {
 	        .catch(err => console.error("Could not subscribe to notifications", err));
 		}
 
+		this.cookieService.setAnalyticalCookies();
+		this.cookieService.setAdvertisingCookies();
+
 		this.languageIsSet=false;
 		this.translateService.setDefaultLang('en');
 		this.translateService.onLangChange.subscribe((res: string) => {

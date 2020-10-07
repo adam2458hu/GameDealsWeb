@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class CookieService {
 	cookieNames = {
-		necessary : [],
+		necessary : ['cookieConsent'],
 		functional : ['lang','currency'],
 		analytical : [],
 		advertising : []
@@ -26,7 +26,7 @@ export class CookieService {
 		Object.keys(this.consent).forEach(type=>{
 			if (this.consent[type]==true && c[type]==false){
 				this.cookieNames[type].forEach(name=>{
-					localStorage.removeItem(name);
+					if (localStorage.getItem(name)) localStorage.removeItem(name);
 				})
 			}
 		})
@@ -34,6 +34,7 @@ export class CookieService {
 		this.consent.functional=c.functional;
 		this.consent.analytical=c.analytical;
 		this.consent.advertising=c.advertising;
+		if (!this.consent.analytical) window['ga-disable-UA-115370291-4'] = true;
 		this.setCookie("cookieConsent",JSON.stringify(this.consent));
 	}
 
@@ -90,5 +91,38 @@ export class CookieService {
 
 	getCurrencyCookie(){
 		return localStorage.getItem('currency');
+	}
+
+	setAnalyticalCookies(){
+		if (this.getConsent().analytical){
+			let head = document.getElementsByTagName("head")[0];
+
+			let analyticsScript = document.createElement("script");
+			analyticsScript.text = 
+			"window.dataLayer = window.dataLayer || [];"+
+			"function gtag(){dataLayer.push(arguments);}"+
+			"gtag('js', new Date());"+
+			"gtag('config', 'UA-115370291-4');";
+			head.insertBefore(analyticsScript, head.firstChild);
+
+			let tagManagerScript = document.createElement("script");
+			tagManagerScript.type = "text/javascript";
+			tagManagerScript.src = "https://www.googletagmanager.com/gtag/js?id=UA-115370291-4";
+			tagManagerScript.async = true;
+			head.insertBefore(tagManagerScript,head.firstChild);
+		} else {
+			window['ga-disable-UA-115370291-4'] = true;
+		}
+	}
+
+	setAdvertisingCookies(){
+		if (this.getConsent().advertising){
+			let adsenseScript = document.createElement("script");
+			adsenseScript.type = "text/javascript";
+			adsenseScript.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
+			adsenseScript.async = true;
+			adsenseScript.setAttribute("data-ad-client","ca-pub-7608652986167905");
+			document.getElementsByTagName("head")[0].appendChild(adsenseScript);
+		}
 	}
 }
