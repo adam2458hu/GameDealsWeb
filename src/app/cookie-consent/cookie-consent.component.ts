@@ -60,7 +60,7 @@ export class CookieConsentComponent implements OnInit {
 	consentToAllCookies(){
 		this.consent.functional = true;
 		this.consent.analytical = true;
-		this.consent.advertising = true;
+		this.consent.advertising = false;
 		this.cookieService.consentToCookies(this.consent);
 		this.consented = true;
 		this.popupOpened = false;

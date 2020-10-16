@@ -82,7 +82,8 @@
 			</div>
 			<div class="col-3 col-sm-2 text-right">
 				<label>
-					<input type="checkbox" name="advertising" [(ngModel)]="consent.advertising">
+					<input type="hidden" name="advertising" [(ngModel)]="consent.advertising">
+					<input type="checkbox" disabled>
 					<span class="custom-checkbox"></span>
 				</label>
 			</div>
