@@ -351,7 +351,7 @@ router.get('/generateQRcode',m.isAuthenticated,async(req,res)=>{
 	try {
 		const user = await User.findById(req._id);
 		const secret = speakeasy.generateSecret({
-			name : `Game Deals List (${user.email})`
+			name : `${process.env.SITE_NAME} (${user.email})`
 		})
 
 		await User.findOneAndUpdate(
