@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router,ActivatedRoute } from '@angular/router';
 import { LoadingScreenService } from '../shared/loading-screen/loading-screen.service';
 import { UserService } from '../shared/user/user.service';
-import * as jsPDF from 'jspdf';
+import { jsPDF } from "jspdf";
 import 'jspdf-autotable';
 
 @Component({
@@ -11,7 +11,7 @@ import 'jspdf-autotable';
   styleUrls: ['./user-data-request.component.scss']
 })
 export class UserDataRequestComponent implements OnInit {
-
+	documentPDF: any = new jsPDF();
 	format: string='';
   	constructor(
 		private router: Router,
@@ -36,8 +36,7 @@ export class UserDataRequestComponent implements OnInit {
 
 	downloadPersonalInformations(type: string){
 		if (type=='pdf'){
-			var doc = new jsPDF();
-			doc.autoTable({
+			this.documentPDF.autoTable({
 				body : [
 					[
 						'Azonosító',this.userService.getUser()._id],[
@@ -69,7 +68,7 @@ export class UserDataRequestComponent implements OnInit {
 					]
 				]
 			})
-			doc.save(`${this.userService.getUser().last_name} ${this.userService.getUser().first_name}_${this.userService.getUser()._id}.pdf`
+			this.documentPDF.save(`${this.userService.getUser().last_name} ${this.userService.getUser().first_name}_${this.userService.getUser()._id}.pdf`
 				);
 		} else if (type=='json'){
 			this.loadingScreenService.setAnimation(true);
