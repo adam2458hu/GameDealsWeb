@@ -441,10 +441,23 @@ function getProxyList(){
 	return new Promise((resolve,reject)=>{
 		(async()=>{
 			try {
-				let browser = await puppeteer.launch({'args' : [
-				    '--no-sandbox',
-				    '--disable-setuid-sandbox'
-				]});
+
+				let browser;
+				if (process.env.NODE_ENV !== 'production'){
+					browser = await puppeteer.launch({'args' : [
+					    '--no-sandbox',
+					    '--disable-setuid-sandbox'
+					]});
+				} else {
+					/*az executablePath: az AWS Elastic Beanstalkra telepített Chrome miatt kell*/
+					browser = await puppeteer.launch({
+						executablePath: '/usr/bin/google-chrome-stable',
+							'args' : [
+						    '--no-sandbox',
+						    '--disable-setuid-sandbox'
+						]});
+				}
+
 				let page = await browser.newPage();
 				await page.setDefaultNavigationTimeout(0);
 				await page.goto(process.env.PROXY_LIST_URL,{waitUntil: 'networkidle0'});
@@ -518,7 +531,17 @@ function scrapeStore(storeName,storeUrl,useProxy,needsTimeout,multiPage){
 					}
 				}
 
-				let browser = await puppeteer.launch({'args' : args,ignoreHTTPSErrors: true});
+				let browser;
+				if (process.env.NODE_ENV !== 'production'){
+					browser = await puppeteer.launch({'args' : args,ignoreHTTPSErrors: true});
+				} else {
+					browser = await puppeteer.launch({
+						executablePath: '/usr/bin/google-chrome-stable',
+						'args' : args,
+						ignoreHTTPSErrors: true
+					});
+				}
+
 				let page = await browser.newPage();
 				await page.setDefaultNavigationTimeout(0);
 				await page.goto(storeUrl,{waitUntil: 'networkidle0'});
@@ -1010,8 +1033,6 @@ function printOutIP(){
 async function refreshGames() {
 	try {
 		let response;
-		/*response = await getProxyList();
-		console.log(response);*/
 		/*response = await insertHistoricalLowPrices();
 		console.log(response);
 		response = await setExpiredPrices();
@@ -1019,7 +1040,8 @@ async function refreshGames() {
 		response = await deleteFalseStoreFields();
 		console.log(response);
 		response = await deleteGamesWithNoStore();
-		console.log(response);*//*
+		console.log(response);*/
+		/*
 		response = await scrapeStore('Blizzard',process.env.BLIZZARD_GAMES_URL,false,false,true);
 		console.log(response);*//*
 		response = await scrapeStore('Epic Games Store',process.env.EPIC_GAMES_ALL_GAMES_URL,true,true,false);
