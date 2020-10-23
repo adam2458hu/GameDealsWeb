@@ -31,10 +31,6 @@ export class FilterComponent implements OnInit {
 		return this.filterService;
 	}
 
-	getCurrencies(){
-		return this.currencyService.getCurrencies();
-	}
-
 	getAllStores(){
 		return this.filterService.getAllStores();
 	}

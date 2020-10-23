@@ -9,23 +9,3 @@
 		padding-right: -10px !important;
 	}
 }
-
-.filter-container{
-	button {
-		box-shadow: none;
-		border-radius: 5px 5px 0 0;
-	}
-
-	.filter-body {
-		background-color: $color-secondary;
-		padding: 20px;
-		animation: slideDownFilter 3s linear;
-
-		button {
-			background-color: darken($color-primary,5%);
-			border:none;
-			box-shadow: none;
-			border-radius: 0 !important;
-		}
-	}
-}
