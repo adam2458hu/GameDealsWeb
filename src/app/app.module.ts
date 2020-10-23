@@ -30,7 +30,6 @@ import { HasUppercaseValidatorDirective } from './shared/has-uppercase-validator
 import { EqualPasswordValidatorDirective } from './shared/equal-password-validator.directive';
 import { MainComponent } from './main/main.component';
 import { PrivacyPolicyComponent } from './privacy-policy/privacy-policy.component';
-import { TwoFactorAuthComponent } from './two-factor-auth/two-factor-auth.component';
 import { UserSecurityComponent } from './user-security/user-security.component';
 import { UserEmailVerificationComponent } from './user-email-verification/user-email-verification.component';
 import { CookieConsentComponent } from './cookie-consent/cookie-consent.component';
@@ -85,7 +84,6 @@ export class MyHammerConfig extends HammerGestureConfig {
     EqualPasswordValidatorDirective,
     MainComponent,
     PrivacyPolicyComponent,
-    TwoFactorAuthComponent,
     UserSecurityComponent,
     UserEmailVerificationComponent,
     CookieConsentComponent,
