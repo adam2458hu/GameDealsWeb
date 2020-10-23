@@ -4,10 +4,19 @@ const gameSchema = new mongoose.Schema({
 		type : String,
 		required : true
 	},
+	cover : {
+		type : String
+	},
 	genres : [{
 		type : String
 	}],
-	metascore : {
+	userRating : {
+		type : Number
+	},
+	criticRating : {
+		type : Number
+	},
+	totalRating : {
 		type : Number
 	},
 	releaseDate : {
@@ -40,10 +49,6 @@ const gameSchema = new mongoose.Schema({
 		linkToGame : {
 			type : String,
 			required : true
-		},
-		image : {
-			type : String,
-			required : false
 		},
 		steamID : {
 			type : String
