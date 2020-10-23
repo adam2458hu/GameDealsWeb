@@ -6,7 +6,8 @@ import { CurrencyService } from '../shared/currency/currency.service';
 import { StoreService } from '../shared/store/store.service';
 
 @Component({
-  selector: 'tr[app-filter]',
+  //selector: 'tr[app-filter]',
+  selector: 'app-filter',
   templateUrl: './filter.component.html',
   styleUrls: ['./filter.component.scss']
 })
@@ -22,7 +23,7 @@ export class FilterComponent implements OnInit {
 	ngOnInit() {
 	}
 
-	onSubmit(form: NgForm){
+	onSubmit(){
 		this.filtered.emit();
 	}
 

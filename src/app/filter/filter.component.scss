@@ -1,6 +1,15 @@
 @import "../../variables";
 @import "../../mixins";
 
+.filter {
+	background-color: #0D1315;
+	padding: 20px;
+
+	.col-sm-4 {
+		padding-right: -10px !important;
+	}
+}
+
 .filter-container{
 	button {
 		box-shadow: none;
