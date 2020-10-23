@@ -29,7 +29,7 @@ export class FilterService {
 		symbol: '€',
 		decimalPlaces: 2
 	}
-	private filterOpened: boolean = true;
+	private filterOpened: boolean = false;
 	isAllSelected: boolean = true;
 	private allStores: {name: String,isSelected: Boolean}[] = [];
 
@@ -80,6 +80,11 @@ export class FilterService {
 			if (currency.name==value){
 				this.filter.symbol = currency.symbol;
 				this.filter.decimalPlaces = currency.decimalPlaces;
+				this.cookieService.setCurrencyCookie(JSON.stringify({
+					code: currency.name,
+					symbol: currency.symbol,
+					decimalPlaces: currency.decimalPlaces
+				}));
 			}
 		})
 
