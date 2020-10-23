@@ -1,45 +1,47 @@
-<div [class.loadingImages]="loadingImages">
+<!--<div [class.loadingImages]="loadingImages">-->
+<div *ngIf="slides">
 	<div class="news-slideshow">
 		<div class="news-main">
 			<div class="row">
 				<div class="col-lg-4 d-none d-lg-block big-screen-title">
 					<div class="news-container">
 						<div class="news-description text-center" [ngClass]="{'fadeIn':fadeIn && !isMobile()}">
-							<h3>{{titles[index]}} {{ 'sale' | translate }}</h3>
-							<p>{{ 'endOfDeal' | translate }}: {{months[getLanguage()][endOfOffer[index].getMonth()]}} {{endOfOffer[index].getDate()}}.</p>
-							<a class="salelink" href="{{links[index]}}" target="_blank">{{ 'letssee' | translate }}</a>
+							<h3>{{slides[index].title}} {{ 'sale' | translate }}</h3>
+							<p>{{ 'endOfDeal' | translate }}: {{months[getLanguage()][slides[index].endOfOffer.getMonth()]}} {{slides[index].endOfOffer.getDate()}}.</p>
+							<a class="salelink" href="{{slides[index].link}}" target="_blank">{{ 'letssee' | translate }}</a>
 						</div>
 					</div>
 					<span class="custom-badge d-none d-lg-block">
-						<span class="custom-badge-text" [ngClass]="{'fadeIn':fadeIn && !isMobile()}">{{discounts[index]}}</span>
+						<span class="custom-badge-text" [ngClass]="{'fadeIn':fadeIn && !isMobile()}">-{{slides[index].discountPercent}}%</span>
 					</span>
 				</div>
 				<div class="col-12 col-lg-8">
 					<div class="small-screen-title d-block d-lg-none">
 						<div>
-							<a href="{{links[index]}}" target="_blank">
-								<h3>{{titles[index]}}</h3>
+							<a href="{{slides[index].link}}" target="_blank">
+								<h3>{{slides[index].titles}}</h3>
 							</a>
 						</div>
 						<div>
-							<a href="{{links[index]}}" target="_blank">
-								<p>{{ 'endOfDeal' | translate }}: {{months[endOfOffer[index].getMonth()]}} {{endOfOffer[index].getDate()}}.</p>
+							<a href="{{slides[index].link}}" target="_blank">
+								<p>{{ 'endOfDeal' | translate }}: {{months[slides[index].endOfOffer.getMonth()]}} {{slides[index].endOfOffer.getDate()}}.</p>
 							</a>
 						</div>
 					</div>
 					<div class="news-image" (swipeleft)="next()" (swiperight)="previous()">
-						<img [ngClass]="{'fadeIn':fadeIn && !isMobile()}" [src]='"/assets/"+images[index]+".jpg"' alt="{{titles[index]}}" (loaded)="loadingImages=false" width="100%">
+						<!--<img [ngClass]="{'fadeIn':fadeIn && !isMobile()}" [src]='"/assets/"+images[index]+".jpg"' alt="{{titles[index]}}" (loaded)="loadingImages=false" width="100%">-->
+						<img [ngClass]="{'fadeIn':fadeIn && !isMobile()}" [src]="slides[index].image" alt="{{slides[index].title}}" (loaded)="loadingImages=false" width="100%">
 					</div>
 					<span class="custom-badge d-inline-block d-lg-none">
-						<span class="custom-badge-text" [ngClass]="{'fadeIn':fadeIn && !isMobile()}">{{discounts[index]}}</span>
+						<span class="custom-badge-text" [ngClass]="{'fadeIn':fadeIn && !isMobile()}">-{{slides[index].discountPercent}}%</span>
 					</span>
 				</div>
-				<span class="pager pager-left" (click)="!isMobile() && previous()" (tap)="previous()"></span>
-				<span class="pager pager-right" (click)="!isMobile() && next()" (tap)="next()"></span>
+				<span class="pager pager-left" (click)="!isMobile() && previous()" (tap)="isMobile() && previous()"></span>
+				<span class="pager pager-right" (click)="!isMobile() && next()" (tap)="isMobile() && next()"></span>
 			</div>
 		</div>
 		<div class="d-none d-lg-block nav-buttons text-center">
-			<span *ngFor="let img of images;index as i" [class.active]="index==i" [class.passed]="index>i" (click)="changeNews(i)"></span>
+			<span *ngFor="let slide of slides;index as i" [class.active]="index==i" [class.passed]="index>i" (click)="changeNews(i)"></span>
 		</div>
 	</div>
 	<app-article-creator *ngIf="editorOpened" (created)="getArticles()" (close)="onCloseEditor()" [articleToEdit]="articleToEdit"></app-article-creator>
@@ -66,9 +68,9 @@
 						</div>
 					</div>
 					<h2>
-						<a href="/articles/{{article.slug}}">{{article.title}}</a>
+						<a href="/articles/{{article.slug}}">{{ getArticlePropertyTextByLang(article,'title') }}</a>
 					</h2>
-					<div class="lead">{{article.lead}}</div>
+					<div class="lead">{{ getArticlePropertyTextByLang(article,'lead') }}</div>
 						<!--<span class="divider">|</span>
 						<span class="comments"><fa name="comments"></fa>0</span>-->
 				</div>
@@ -78,7 +80,7 @@
 			<div class="topNews">
 				<div class="topNewsLabel">{{ 'topNews' | translate }}</div>
 				<div class="topNewsItem" *ngFor="let article of topArticles;index as i">
-					<a href="/articles/{{article.slug}}">{{i+1}}. {{ article.title }}</a>
+					<a href="/articles/{{article.slug}}">{{i+1}}. {{ getArticlePropertyTextByLang(article,'title') }}</a>
 				</div>
 			</div>
 		</div>

@@ -2,6 +2,7 @@ import { Component, OnInit, ElementRef, AfterViewInit, ViewChild} from '@angular
 import { DatePipe } from '@angular/common';
 import { Game } from '../game/game';
 import { Article } from '../shared/article/article';
+import { Slide } from '../shared/slide/slide';
 import { UserService } from '../shared/user/user.service';
 import { GameService } from '../game/game.service';
 import { CurrencyService } from '../shared/currency/currency.service';
@@ -9,6 +10,7 @@ import { FilterService } from '../shared/filter/filter.service';
 import { LoadingScreenService } from '../shared/loading-screen/loading-screen.service';
 import { LanguageService } from '../shared/language/language.service';
 import { ArticleService } from '../shared/article/article.service';
+import { SlideService } from '../shared/slide/slide.service';
 
 @Component({
   selector: 'app-home',
@@ -21,14 +23,9 @@ export class HomeComponent implements AfterViewInit {
 	index=0;
 	numberOfWatchedGames=0;
 	showViewedGenres=false;
-	images: String[]=['nms','aco','ets2'];
 	loadingImages = true;
-	titles: String[]=["No Man's Sky",'Assassins Creed: Odyssey','Euro Truck Simulator 2'];
-	discounts: String[]=['-50%','-67%','-75%'];
-	endOfOffer: Date[]=[new Date(2020, 10, 5, 0, 0, 0, 0),new Date(2020, 7, 27, 0, 0, 0, 0),new Date(2020, 7, 27, 0, 0, 0, 0)];
-	links: String[]=['https://store.steampowered.com/app/275850/No_Mans_Sky/',
-	'https://store.steampowered.com/app/812140/Assassins_Creed_Odyssey/','https://store.steampowered.com/app/227300/Euro_Truck_Simulator_2/'];
 	t;
+	slides: Slide[];
 	articleToEdit;
 	articles: Article[];
 	topArticles: Article[];
@@ -49,6 +46,7 @@ export class HomeComponent implements AfterViewInit {
 		private filterService: FilterService,
 		private loadingScreenService: LoadingScreenService,
 		private languageService: LanguageService,
+		private slideService: SlideService,
 		private articleService: ArticleService
 	) { }
 
@@ -65,6 +63,7 @@ export class HomeComponent implements AfterViewInit {
 		this.gameService.resetGamesData();
 		this.filterService.resetFilter();
 
+		this.getSlides();
 		this.getArticles();
 		this.getTopArticles();
 
@@ -99,7 +98,7 @@ export class HomeComponent implements AfterViewInit {
 		this.t = setInterval(()=>{
 			this.fadeIn = true;
 
-			if (this.index+1>this.images.length-1){
+			if (this.index+1>this.slides.length-1){
 				this.index=0;
 			} else {
 				++this.index;
@@ -123,12 +122,12 @@ export class HomeComponent implements AfterViewInit {
 			this.fadeIn = false;
 		},200);
 
-		if (this.index+1>this.images.length-1){
+		if (this.index+1>this.slides.length-1){
 			this.index=0;
 		} else {
 			++this.index;
 		}
-
+		console.log(this.index);
 		this.startAnimation();
 	}
 
@@ -141,7 +140,7 @@ export class HomeComponent implements AfterViewInit {
 		},200);
 
 		if (this.index-1<0){
-			this.index=this.images.length-1;
+			this.index=this.slides.length-1;
 		} else {
 			--this.index;
 		}
@@ -174,6 +173,19 @@ export class HomeComponent implements AfterViewInit {
 		return this.filterService;
 	}
 
+	getSlides(){
+		this.slideService.getSlides().subscribe(
+			(res: any)=>{
+				this.slides = res.slides;
+				this.slides.forEach(slide=>{
+					slide.endOfOffer = new Date(slide.endOfOffer);
+				})
+			},
+			(err)=>{
+				console.log(err);
+			})
+	}
+
 	getArticles(){
 		this.articleService.getArticles().subscribe(
 			(res: any)=>{
@@ -182,6 +194,10 @@ export class HomeComponent implements AfterViewInit {
 			(err)=>{
 				console.log(err);
 			})
+	}
+
+	getArticlePropertyTextByLang(article,property){
+		return article[property].filter(propertyObject=>propertyObject.lang==this.languageService.getLanguage())[0].text;
 	}
 
 	editArticle(article: Article){
