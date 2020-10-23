@@ -196,7 +196,7 @@ function getRecommendedGames(uniqueWatchedGenres){
 			{$match: {genres: {$in: uniqueWatchedGenres}}},
 			{$unwind: '$stores'},
 			{$match: {'stores.expired':false}},
-			{$sort: {userRating: -1,discountPercent: -1}},
+			{$sort: {totalRating: -1,discountPercent: -1}},
 			{$limit: 10}
 			]).exec(function(err,results){
 				if (err) return reject(err);

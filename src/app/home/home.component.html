@@ -1,5 +1,5 @@
 <!--<div [class.loadingImages]="loadingImages">-->
-<div *ngIf="slides">
+<div *ngIf="slides" [class.loadingImages]="loadingImages">
 	<div class="news-slideshow">
 		<div class="news-main">
 			<div class="row">
@@ -19,7 +19,7 @@
 					<div class="small-screen-title d-block d-lg-none">
 						<div>
 							<a href="{{slides[index].link}}" target="_blank">
-								<h3>{{slides[index].titles}}</h3>
+								<h3>{{slides[index].title}}</h3>
 							</a>
 						</div>
 						<div>

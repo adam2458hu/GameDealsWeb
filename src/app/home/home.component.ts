@@ -1,12 +1,9 @@
 import { Component, OnInit, ElementRef, AfterViewInit, ViewChild} from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { Game } from '../game/game';
+import { TranslateService } from '@ngx-translate/core';
 import { Article } from '../shared/article/article';
 import { Slide } from '../shared/slide/slide';
 import { UserService } from '../shared/user/user.service';
-import { GameService } from '../game/game.service';
-import { CurrencyService } from '../shared/currency/currency.service';
-import { FilterService } from '../shared/filter/filter.service';
 import { LoadingScreenService } from '../shared/loading-screen/loading-screen.service';
 import { LanguageService } from '../shared/language/language.service';
 import { ArticleService } from '../shared/article/article.service';
@@ -21,33 +18,26 @@ export class HomeComponent implements AfterViewInit {
 	mobile: Boolean;
 	editorOpened: Boolean;
 	index=0;
-	numberOfWatchedGames=0;
-	showViewedGenres=false;
 	loadingImages = true;
 	t;
 	slides: Slide[];
 	articleToEdit;
 	articles: Article[];
 	topArticles: Article[];
-	genreStatistics=[];
-	uniqueWatchedGenres=[];
 	r;
 	fadeIn: Boolean;
 	months = {
 		'hu' : ['január','február','március','április','május','június','július','augusztus','szeptember','október','november','december'],
 		'en' : ["January","February","March","April","May","June","July","August","September","October","November","December"]
 	};
-	selectedGame: Game;
 
 	constructor(
 		private userService: UserService,
-		private gameService: GameService,
-		private currencyService: CurrencyService,
-		private filterService: FilterService,
 		private loadingScreenService: LoadingScreenService,
 		private languageService: LanguageService,
 		private slideService: SlideService,
-		private articleService: ArticleService
+		private articleService: ArticleService,
+		private translateService: TranslateService
 	) { }
 
 	ngAfterViewInit() {
@@ -57,22 +47,15 @@ export class HomeComponent implements AfterViewInit {
 	    	this.mobile = false;
 	    }
 
+		this.editorOpened = false;
+
 		this.fadeIn = true;
 		this.resetAnimation();
 		this.startAnimation();
-		this.gameService.resetGamesData();
-		this.filterService.resetFilter();
 
 		this.getSlides();
 		this.getArticles();
 		this.getTopArticles();
-
-		if (this.userService.isAuthenticated()){
-			this.getRecommendedGamesByHistory();
-			this.getGameHistory();
-		}
-
-		this.editorOpened = false;
 	}
 
 	isAdmin(){
@@ -127,7 +110,7 @@ export class HomeComponent implements AfterViewInit {
 		} else {
 			++this.index;
 		}
-		console.log(this.index);
+		
 		this.startAnimation();
 	}
 
@@ -159,18 +142,6 @@ export class HomeComponent implements AfterViewInit {
 			clearInterval(this.t);
 			this.startAnimation();
 		}
-	}
-
-	goToExternalUrl(url){
-		window.location.href = url;
-	}
-
-	getUserService(){
-		return this.userService;
-	}
-
-	getFilterService(){
-		return this.filterService;
 	}
 
 	getSlides(){
@@ -206,7 +177,7 @@ export class HomeComponent implements AfterViewInit {
 	}
 
 	deleteArticle(_id: string){
-		if (confirm('Biztosan törölni szeretné?')) {
+		if (confirm(this.translateService.instant('confirmDelete'))) {
 			this.loadingScreenService.setAnimation(true);
 			this.articleService.deleteArticle(_id).subscribe(
 				(res: any)=>{
@@ -231,89 +202,8 @@ export class HomeComponent implements AfterViewInit {
 			})
 	}
 
-	getRecommendedGamesByHistory(){
-		this.userService.getGameHistory().subscribe(
-			(res: any)=>{
-				this.gameService.getRecommendedGamesByHistory(res.gameHistory).subscribe(
-					(res: any)=>{
-						this.genreStatistics = res.genreStatistics;
-						this.uniqueWatchedGenres = res.uniqueWatchedGenres;
-						this.gameService.resetRecommendedGames();
-						for(let i=0;i<res.recommendedGames.length;i++){
-							this.gameService.pushRecommendedGames(res.recommendedGames[i]);
-						}
-					},
-					(err)=>{
-						console.log(err);
-					})
-			},
-			(err)=>{
-				console.log(err);
-			})
-	}
-
-	getGameHistory(){
-		this.userService.getGameHistory().subscribe(
-			(res: any)=>{
-				this.gameService.getGameHistory(res.gameHistory).subscribe(
-					(res: any)=>{
-						this.gameService.resetGamesData();
-						for (let i=0;i<res.watchedGames.length;i++){
-							this.gameService.pushGamesData(res.watchedGames[i]);
-						}
-						this.numberOfWatchedGames=res.watchedGames.length;
-					},
-					(err)=>{
-						console.log(err);
-					});
-			},
-			(err)=>{
-				console.log(err);
-			})
-	}
-
-	getRecommendedGames(){
-		return this.gameService.getRecommendedGames();
-	}
-
-	getGamesData(){
-		return this.gameService.getGamesData();
-	}
-
 	getLanguage(){
 		return this.languageService.getLanguage();
-	}
-
-	getCheapestStore(game){
-		return game.stores.reduce((accumulator, currentValue)=>{
-			return (accumulator.specialPrice<currentValue.specialPrice)?accumulator:currentValue;
-		})
-	}
-
-	currencyConverter(amount: number,from: String,to: String){
-		return this.currencyService.currencyConverter(amount,from,to);
-	}
-
-	deleteGameHistory(){
-		this.loadingScreenService.setAnimation(true);
-		this.userService.deleteGameHistory().subscribe(
-			(res: any)=>{
-				this.loadingScreenService.setAnimation(false);
-				this.userService.setSuccessMessage(res.message);
-				this.numberOfWatchedGames = 0;
-			},
-			(err)=>{
-				this.loadingScreenService.setAnimation(false);
-				this.userService.setSuccessMessage(err.error.message);
-			})
-	}
-
-	showAllStores(game){
-		this.selectedGame = game;
-	}
-
-	onClose(){
-		this.selectedGame = null;
 	}
 
 }

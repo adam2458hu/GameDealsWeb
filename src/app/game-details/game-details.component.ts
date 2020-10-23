@@ -54,7 +54,7 @@ export class GameDetailsComponent implements AfterViewInit {
 				this.gameIsOnWaitlist = res.isGameOnWaitlist;
 				this.gameDetailsReceived = true;
 				setTimeout(()=>{
-					this.gameDetailsDiv.nativeElement.style.top = (window.pageYOffset+50)+"px";
+					this.gameDetailsDiv.nativeElement.style.top = (window.pageYOffset+100)+"px";
 				},10);
 			},
 			(err)=>{
