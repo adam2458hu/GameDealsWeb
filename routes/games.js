@@ -12,15 +12,182 @@ const mongoose = require('mongoose');
 const router = express.Router();
 const https = require('https');
 const request = require('request');
+const stringSimilarity = require('string-similarity');
 const puppeteer = require('puppeteer');
-const cheerio = require('cheerio');
 const Game = require('../models/game');
+const Genre = require('../models/genre');
 const Currency = require('../models/currency');
 const m = require('../config/middlewares');
 var appList=[];
 var requestStartIndex=32800;
 var requestEndIndex=33000;
 var stepToNextStore = false;
+
+async function deleteImages(){
+	try {
+ 		let games = await Game.find();
+ 		games.forEach(async game=>{
+ 			var storesWithoutImage = [];
+ 			game.stores.forEach(store=>{
+ 				storesWithoutImage.push({
+ 					_id: store._id,
+ 					name: store.name,
+ 					originalPrice: store.originalPrice,
+ 					specialPrice: store.specialPrice,
+ 					discountPercent: store.discountPercent,
+ 					linkToGame: store.linkToGame,
+ 					expired: store.expired,
+ 					stillOnSale: store.stillOnSale,
+ 					historicalLowPrice: store.historicalLowPrice
+ 				})
+ 			})
+ 			await Game.findOneAndUpdate({_id: ObjectId(game._id)},{$set: {stores:storesWithoutImage}});
+ 		});
+
+ 		/*User.findOne({}, function(err, user){
+			user.key_to_delete = undefined;
+		  user.save();
+		});*/
+
+ 		/*await Game.updateMany({},{$unset : {'stores.$.image':1}},(err,doc)=>{
+ 			if (err) console.log(err);
+ 			else console.log(doc);
+ 		});*/
+	} catch(err){
+		console.log(err);
+	}
+}
+
+async function deleteFields(nameArray){
+	try {
+		let fieldNames={};
+		nameArray.forEach(name=>{
+			fieldNames[name]=1;
+		})
+ 		await Game.updateMany({},{$unset : fieldNames},{multi: true},(err,doc)=>{
+ 			if (err) console.log(err);
+ 			else console.log(doc);
+ 		});
+	} catch(err){
+		console.log(err);
+	}
+}
+
+function requestIGDBAccessToken(){
+	var options = {
+		method: 'POST',
+		url: encodeURI(`https://id.twitch.tv/oauth2/token?client_id=${process.env.IGDB_CLIENT_ID}&client_secret=${process.env.IGDB_CLIENT_SECRET}&grant_type=client_credentials`)
+	};
+
+	request(options, async function (error, response, body) {
+		//console.log(body);
+	});
+}
+
+function updateIGDBGenres(){
+	var options = {
+		method: 'POST',
+		url: encodeURI('https://api.igdb.com/v4/genres'),
+		headers: {
+			'Client-ID': process.env.IGDB_CLIENT_ID,
+			'Authorization': `Bearer ${process.env.IGDB_ACCESS_TOKEN}`,
+			'Accept': 'application/json'
+		},
+		body : `fields *;`
+	};
+
+	request(options, async function (error, response, body) {
+		if (body) {
+			JSON.parse(body).forEach(async IGDBGenre=>{
+				try {
+					const genreFound = await Genre.findOne({IGDBGenreID:IGDBGenre.id});
+					if (!genreFound) {
+						let genre = new Genre({
+							IGDBGenreID : IGDBGenre.id,
+							name : IGDBGenre.name
+						})
+
+						genre.save();
+					}
+				} catch(err){
+					console.log(err);
+				}
+			})
+		}
+	});
+}
+
+async function appendIGDBGameData(){
+	try {
+		const gamesWithoutIGDBData=await Game.find({$and: [
+			{'cover' : {$exists : false}},
+			{'userRating' : {$exists : false}},
+			{'criticRating' : {$exists : false}},
+			{'totalRating' : {$exists : false}},
+			{'description' : {$exists : false}},
+			{'releaseDate' : {$exists : false}},
+			{'genres' : {$exists : false}}]});
+		console.log(gamesWithoutIGDBData.length+' játékhoz IGDB adat keresése folyamatban');
+		let startIndex=0;
+		let interval = setInterval(()=>{
+			if (startIndex>=gamesWithoutIGDBData.length) clearInterval(interval);
+			endIndex=startIndex+4;
+			for(i=startIndex;i<endIndex && i<gamesWithoutIGDBData.length;i++){
+				getIGDBGameData(gamesWithoutIGDBData[i].name);
+			}
+			startIndex+=4;
+		},1000);
+	} catch(err){
+		console.log(err);
+	}
+}
+
+function getIGDBGameData(gameName){
+	var options = {
+		method: 'POST',
+		url: encodeURI('https://api.igdb.com/v4/games'),
+		headers: {
+			'Client-ID': process.env.IGDB_CLIENT_ID,
+			'Authorization': `Bearer ${process.env.IGDB_ACCESS_TOKEN}`
+		},
+		/*body : `query games "Game Info" {
+				fields name,cover.url,rating,aggregated_rating,total_rating,summary,first_release_date,genres.name;where slug="${names}";
+			};`*/
+		body : `fields name,cover.url,rating,aggregated_rating,total_rating,summary,first_release_date,genres.name;search "${gameName.replace(/[^a-zA-Z0-9\s]/g,'')}";`
+	};
+
+	request(options, async function (error, response, body) {
+		if (body && JSON.parse(body)[0]) {
+			var gameData = JSON.parse(body)[0];
+			try {
+
+				let IGDBData={};
+				if (gameData.cover) IGDBData.cover = gameData.cover.url.replace('thumb','logo_med');
+				if (gameData.rating && gameData.rating>=0 && gameData.rating<=100) IGDBData.userRating = gameData.rating;
+				if (gameData.aggregated_rating && gameData.aggregated_rating>=0 && gameData.aggregated_rating<=100) IGDBData.criticRating = gameData.aggregated_rating;
+				if (gameData.total_rating && gameData.total_rating>=0 && gameData.total_rating<=100) IGDBData.totalRating = gameData.total_rating;
+				if (gameData.summary) IGDBData.description = gameData.summary;
+				if (gameData.first_release_date) IGDBData.releaseDate = new Date(gameData.first_release_date*1000);
+				if (gameData.genres) {
+					IGDBData.genres=[];
+					gameData.genres.forEach(genre=>{
+						IGDBData.genres.push(genre.name);
+					})
+				}
+
+				await Game.findOneAndUpdate(
+					{name: gameName},
+					{$set : IGDBData},
+					{new: true},(err,game)=>{
+						if (err) console.log(err);
+						//else console.log(game);
+				});
+			} catch(err) {
+				console.log(err);
+			}
+		}
+	});
+}
 
 function getRecommendedGames(uniqueWatchedGenres){
 	return new Promise(async(resolve,reject)=>{
@@ -29,7 +196,7 @@ function getRecommendedGames(uniqueWatchedGenres){
 			{$match: {genres: {$in: uniqueWatchedGenres}}},
 			{$unwind: '$stores'},
 			{$match: {'stores.expired':false}},
-			{$sort: {metascore: -1,discountPercent: -1}},
+			{$sort: {userRating: -1,discountPercent: -1}},
 			{$limit: 10}
 			]).exec(function(err,results){
 				if (err) return reject(err);
@@ -114,9 +281,9 @@ router.get('/',async(req,res)=>{
 		const filteredGamesCount = await Game.countDocuments(filter);
 		//const discountedGames = await Game.find(filter).sort(sortObject).limit(10).skip(parseInt(req.query.gameRequestOffset));
 		const unwindedDiscountedGames = await Game.aggregate([
-			{$match: filter},
-			{$unwind:"$stores"},
 			{$match: {'stores.expired':false}},
+			{$unwind:"$stores"},
+			{$match: filter},
 			{$sort: sortObject},
 			{$skip: parseInt(req.query.gameRequestOffset)},
 			{$limit:10}
@@ -203,80 +370,80 @@ function getFilter(req){
 
 	if (req.query.minSpecialPrice!=null && req.query.minSpecialPrice!=''){
 		if (filter['stores.specialPrice']){
-			filter['stores.specialPrice']['$gte'] = req.query.minSpecialPrice;
+			filter['stores.specialPrice']['$gte'] = parseInt(req.query.minSpecialPrice);
 		} else {
 			filter['stores.specialPrice'] = {
-				$gte : req.query.minSpecialPrice
+				$gte : parseInt(req.query.minSpecialPrice)
 			}
 		}
 	}
 
 	if (req.query.maxSpecialPrice!=null && req.query.maxSpecialPrice!=''){
 		if (filter['stores.specialPrice']){
-			filter['stores.specialPrice']['$lte'] = req.query.maxSpecialPrice;
+			filter['stores.specialPrice']['$lte'] = parseInt(req.query.maxSpecialPrice);
 		} else {
 			filter['stores.specialPrice'] = {
-				$lte : req.query.maxSpecialPrice
+				$lte : parseInt(req.query.maxSpecialPrice)
 			}
 		}
 	}
 
 	if (req.query.minOriginalPrice!=null && req.query.minOriginalPrice!=''){
 		if (filter['stores.originalPrice']){
-			filter['stores.originalPrice']['$gte'] = req.query.minOriginalPrice;
+			filter['stores.originalPrice']['$gte'] = parseInt(req.query.minOriginalPrice);
 		} else {
 			filter['stores.originalPrice'] = {
-				$gte : req.query.minOriginalPrice
+				$gte : parseInt(req.query.minOriginalPrice)
 			}
 		}
 	}
 
 	if (req.query.maxOriginalPrice!=null && req.query.maxOriginalPrice!=''){
 		if (filter['stores.originalPrice']){
-			filter['stores.originalPrice']['$lte'] = req.query.maxOriginalPrice;
+			filter['stores.originalPrice']['$lte'] = parseInt(req.query.maxOriginalPrice);
 		} else {
 			filter['stores.originalPrice'] = {
-				$lte : req.query.maxOriginalPrice
+				$lte : parseInt(req.query.maxOriginalPrice)
 			}
 		}
 	}
 
 	if (req.query.minDiscountPercent!=null && req.query.minDiscountPercent!=''){
 		if (filter['stores.discountPercent']){
-			filter['stores.discountPercent']['$gte'] = req.query.minDiscountPercent;
+			filter['stores.discountPercent']['$gte'] = parseInt(req.query.minDiscountPercent);
 		} else {
 			filter['stores.discountPercent'] = {
-				$gte : req.query.minDiscountPercent
+				$gte : parseInt(req.query.minDiscountPercent)
 			}
 		}
 	}
 
 	if (req.query.maxDiscountPercent!=null && req.query.maxDiscountPercent!=''){
 		if (filter['stores.discountPercent']){
-			filter['stores.discountPercent']['$lte'] = req.query.maxDiscountPercent;
+			filter['stores.discountPercent']['$lte'] = parseInt(req.query.maxDiscountPercent);
 		} else {
 			filter['stores.discountPercent'] = {
-				$lte : req.query.maxDiscountPercent
+				$lte : parseInt(req.query.maxDiscountPercent)
 			}
 		}
 	}
 
-	if (req.query.minMetascore!=null && req.query.minMetascore!=''){
-		if (filter.metascore){
-			filter.metascore.$lte = req.query.minMetascore;
+	if (req.query.minTotalRating!=null && req.query.minTotalRating!=''){
+		if (filter.totalRating){
+			filter.totalRating.$lte = parseInt(req.query.minTotalRating);
 		} else {
-			filter.metascore={
-				$gte : req.query.minMetascore
+			filter.totalRating={
+				$gte : parseInt(req.query.minTotalRating)
 			}
 		}
 	}
 
-	if (req.query.maxMetascore!=null && req.query.maxMetascore!=''){
-		if (filter.metascore){
-			filter.metascore.$lte = req.query.maxMetascore;
+	if (req.query.maxTotalRating!=null && req.query.maxTotalRating!=''){
+		if (filter.totalRating){
+			filter.totalRating.$lte = parseInt(req.query.maxTotalRating);
 		} else {
-			filter.metascore={
-				$lte : req.query.maxMetascore
+			filter.totalRating={
+				$lte : parseInt(req.query.maxTotalRating)
 			}
 		}
 	}
@@ -672,47 +839,22 @@ function checkScrapedGames(storeName,scrapedGames,lastPage){
 					//(hogy a honlap találati listájában a játékokat ez alapján rangsorolni tudjuk,)
 					//és azt hozzáfűzve beillesztjük az adatbázisba.
 					if (!gameFoundInDatabase && game.originalPrice>0.5) {
-						var options = {
-							method: 'GET',
-							url: encodeURI(process.env.RAPIDAPI_ENDPOINT+game.title),
-							qs: {platform: 'pc'},
-							headers: {
-								'x-rapidapi-host': process.env.RAPIDAPI_HOST,
-								'x-rapidapi-key': process.env.RAPIDAPI_KEY,
-								useQueryString: true
-							}
-						};
+						const newGame = new Game({
+							name : game.title
+						})
 
-						request(options, async function (error, response, body) {
-							if (error) throw new Error(error);
+						newGame.stores.push({
+							name : storeName,
+							originalPrice : game.originalPrice,
+							specialPrice : game.discountPrice,
+							historicalLowPrice : game.discountPrice,
+							discountPercent : Math.round((1-(game.discountPrice/game.originalPrice))*100),
+							linkToGame : game.linkToGame,
+							expired : false,
+							stillOnSale : true
+						})
 
-							const newGame = new Game({
-								name : game.title
-							})
-
-							newGame.stores.push({
-								name : storeName,
-								originalPrice : game.originalPrice,
-								specialPrice : game.discountPrice,
-								historicalLowPrice : game.discountPrice,
-								discountPercent : Math.round((1-(game.discountPrice/game.originalPrice))*100),
-								linkToGame : game.linkToGame,
-								expired : false,
-								stillOnSale : true
-							})
-
-							if (JSON.parse(body).result && JSON.parse(body).result.score) {
-								newGame.metascore = JSON.parse(body).result.score;
-								newGame.genres = JSON.parse(body).result.genre;
-								newGame.description = JSON.parse(body).result.description;
-
-								if (IsValidDate(JSON.parse(body).result.releaseDate)) {
-									newGame.releaseDate = JSON.parse(body).result.releaseDate;
-								}
-							}
-
-							await newGame.save();
-						});
+						await newGame.save();
 					} else if (gameFoundInDatabase){
 						//ha az adatbázisban található játékhoz már szerepel az adott áruházból
 						//származó ár
@@ -844,44 +986,21 @@ function requestGameList(store){
 
 									let gameFoundInDatabase = await Game.findOne({name: game[`${store.gameTitleField}`]});
 									if (!gameFoundInDatabase && originalPrice>0.5) {
-										var options = {
-											method: 'GET',
-											url: encodeURI(process.env.RAPIDAPI_ENDPOINT+game[`${store.gameTitleField}`]),
-											qs: {platform: 'pc'},
-											headers: {
-												'x-rapidapi-host': process.env.RAPIDAPI_HOST,
-												'x-rapidapi-key': process.env.RAPIDAPI_KEY,
-												useQueryString: true
-											},
-											//a 443 as port jelöli hogy HTTPS-t használ
-											//80 lenne a HTTP
-											agent : new https.Agent({
-												host : process.env.RAPIDAPI_HOST,
-												port : 443,
-												path : '/',
-												rejectUnauthorized : false
-											})
-										};
-										request(options, function (error, response, body) {
-											if (error) throw new Error(error);
+										let newGame = new Game({
+											name : game[`${store.gameTitleField}`]
+										})
+										if (store.genresField) {
+											newGame.genres = game[`${store.genresField}`];
+										}
 
-											let newGame = new Game({
-												name : game[`${store.gameTitleField}`]
-											})
-											if (store.genresField) {
-												newGame.genres = game[`${store.genresField}`];
-											}
+										saveNewStore(newGame,store,game,originalPrice,specialPrice);
 
-											setMetacriticData(body,newGame,store);
-											saveNewStore(newGame,store,game,originalPrice,specialPrice);
-
-											if (currentPageIndex==totalPages-1 && index==arr.length-1){
-												markExpiredDeals(store.name);
-												resolve(`${store.name} játékok frissítése befejezve`);
-											} else if (currentPageIndex==toPageIndex-1 && index==arr.length-1) {
-												console.log(`${store.name}`+' játékok átnézve: '+toPageIndex+'/'+totalPages+' oldal');
-											}
-										});
+										if (currentPageIndex==totalPages-1 && index==arr.length-1){
+											markExpiredDeals(store.name);
+											resolve(`${store.name} játékok frissítése befejezve`);
+										} else if (currentPageIndex==toPageIndex-1 && index==arr.length-1) {
+											console.log(`${store.name}`+' játékok átnézve: '+toPageIndex+'/'+totalPages+' oldal');
+										}
 									} else if (gameFoundInDatabase){
 
 										if (gameFoundInDatabase.stores.filter(function(s){
@@ -902,14 +1021,6 @@ function requestGameList(store){
 													if (s.name==store.name){
 														s.stillOnSale = true;
 														s.linkToGame = store.url+game[`${store.gameUrlField}`];
-														if (s.image && game[`${store.imageField}`]) {
-															let imageUrl=game[`${store.imageField}`];
-
-															if (store.imageFormat){
-																imageUrl += store.imageFormat;
-															}
-															s.image = imageUrl;
-														}
 													}
 												});
 
@@ -970,32 +1081,9 @@ async function saveNewStore(gameInstance,store,game,originalPrice,specialPrice){
 		expired : false,
 		stillOnSale : true
 	};
-	//ha az adott áruház játék adatai között létezik képhez mutató URL,
-	//akkor rögzítjük azt
-	if (store.imageField && game[`${store.imageField}`]) {
-		let imageUrl=game[`${store.imageField}`];
-		if (store.imageFormat){
-			imageUrl += store.imageFormat;
-		}
-		newStore.image = imageUrl;
-	}
 	gameInstance.stores.push(newStore);
 
 	await gameInstance.save();	
-}
-
-function setMetacriticData(body,gameInstance,store){
-	if (IsJsonString(body) && JSON.parse(body).result && JSON.parse(body).result.score) {
-		gameInstance.metascore = JSON.parse(body).result.score;
-		gameInstance.description = JSON.parse(body).result.description;
-		if (!store.genresField){
-			gameInstance.genres = JSON.parse(body).result.genre;
-		}
-
-		if (IsValidDate(JSON.parse(body).result.releaseDate)) {
-			gameInstance.releaseDate = JSON.parse(body).result.releaseDate;
-		}
-	}
 }
 
 function refreshSteamGames(callback){
@@ -1033,6 +1121,10 @@ function printOutIP(){
 async function refreshGames() {
 	try {
 		let response;
+		//deleteFields(['genres','userRating','description','releaseDate']);
+		//deleteImages();
+		//updateIGDBGenres();
+		//appendIGDBGameData();
 		/*response = await insertHistoricalLowPrices();
 		console.log(response);
 		response = await setExpiredPrices();
@@ -1057,8 +1149,6 @@ async function refreshGames() {
 			gameTitleField : 'human_name',
 			fieldsToOriginalPrice : ['full_price','amount'],
 			fieldsToSpecialPrice : ['current_price','amount'],
-			imageField : 'standard_carousel_image',
-			imageFormat : '.jpg',
 			maxRequests : 20,
 		});
 		console.log(response);
@@ -1074,8 +1164,6 @@ async function refreshGames() {
 			genresField : 'genres',
 			fieldsToOriginalPrice : ['price','baseAmount'],
 			fieldsToSpecialPrice : ['price','finalAmount'],
-			imageField : 'image',
-			imageFormat : '.jpg',
 			maxRequests : 1000,
 		});
 		console.log(response);*/
@@ -1107,7 +1195,7 @@ function getGameDetails(){
 		}
 
 		const resp = JSON.parse(response.body);
-		Object.keys(resp).forEach(id=>{
+		Object.keys(resp).forEach(async id=>{
 			const appData = resp[id];
 			if (appData.success){
 				if (appData.data.price_overview && appData.data.price_overview.discount_percent!=0){
@@ -1121,43 +1209,17 @@ function getGameDetails(){
 						}
 					})
 
-					var options = {
-						method: 'GET',
-						url: encodeURI(`https://chicken-coop.p.rapidapi.com/games/${discountedGame.name}`),
-						qs: {platform: 'pc'},
-						headers: {
-							'x-rapidapi-host': 'chicken-coop.p.rapidapi.com',
-							'x-rapidapi-key': process.env.RAPIDAPI_KEY,
-							useQueryString: true
-						}
-					};
+					discountedGame.stores.push({
+						name : 'Steam',
+						originalPrice : appData.data.price_overview.initial/100,
+						specialPrice : appData.data.price_overview.final/100,
+						historicalLowPrice : appData.data.price_overview.final/100,
+						discountPercent : appData.data.price_overview.discount_percent,
+						linkToGame : process.env.STEAM_APP_LINK_URL+parseInt(id),
+						steamID : id
+					})
 
-					request(options, async function (error, response, body) {
-						if (error) throw new Error(error);
-
-						discountedGame.stores.push({
-							name : 'Steam',
-							originalPrice : appData.data.price_overview.initial/100,
-							specialPrice : appData.data.price_overview.final/100,
-							historicalLowPrice : appData.data.price_overview.final/100,
-							discountPercent : appData.data.price_overview.discount_percent,
-							linkToGame : process.env.STEAM_APP_LINK_URL+parseInt(id),
-							image : process.env.STEAM_APP_IMAGE_URL+parseInt(id)+'/header.jpg',
-							steamID : id
-						})
-
-						if (JSON.parse(body).result && JSON.parse(body).result.score) {
-							discountedGame.metascore = JSON.parse(body).result.score;
-							discountedGame.genres = JSON.parse(body).result.genres;
-							discountedGame.description = JSON.parse(body).result.description;
-
-							if (IsValidDate(JSON.parse(body).result.releaseDate)) {
-								discountedGame.releaseDate = JSON.parse(body).result.releaseDate;
-							}
-						}
-
-						await discountedGame.save();
-					});
+					await discountedGame.save();
 				}
 			}
 		})
