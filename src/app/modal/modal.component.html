@@ -1,15 +1,15 @@
 <div *ngIf="getUserService().isAuthenticated() && getTimeLeftInMilisecs()<=getMaxIdleInMilisecs()" class="sessionTimeout">
 	<div class="container-custom">
 		<div class="card">
-			<div class="card-header text-center">Automatikus kijelentkezés</div>
-			<div class="card-body text-justify">A munkamenet {{ getTimeLeftAsString() }} múlva lejár. Kérjük kattintson a megújítás gombra, hogy továbbra is bejelentkezve maradjon.
+			<div class="card-header text-center">{{ 'automaticLogout' | translate }}</div>
+			<div class="card-body text-justify">{{ 'sessionExpire' | translate: {timeLeft:getTimeLeftAsString()} }}
 				<div class="progress mt-2">
 					<div class="progress-bar progress-bar-c bg-info progress-bar-striped" style="width: 100%"></div>
 				</div>
 			</div>
 			<div class="card-footer">
-				<button class="btn btn-info mr-2 mb-3 mb-sm-0" (click)="getUserService().logoutUser('Sikeres kijelentkezés')">Kilépés</button>
-				<button class="btn btn-success" (click)="refreshAccessToken()">Megújítás</button>
+				<button class="btn btn-info mr-2 mb-3 mb-sm-0" (click)="getUserService().logoutUser('Sikeres kijelentkezés')">{{ 'logout' | translate }}</button>
+				<button class="btn btn-success" (click)="refreshAccessToken()">{{ 'renew' | translate }}</button>
 			</div>
 		</div>
 	</div>
