@@ -1,5 +1,5 @@
 import { Component, AfterViewInit, EventEmitter, Input, Output,ViewChild, ElementRef } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe,DecimalPipe } from '@angular/common';
 import { Game } from '../game/game';
 import { UserService } from '../shared/user/user.service';
 import { GameService } from '../game/game.service';
