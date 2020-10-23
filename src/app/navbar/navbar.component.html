@@ -29,8 +29,9 @@
 							<fa name="user-plus"></fa>{{ 'register' | translate}}
 						</a>
 					</li>
-					<li *ngIf="getUserService().isAuthenticated()" class="nav-item dropdown">
-						<a class="nav-link" href="#" id="navbarDropdown" [routerLink]="['/profile']" routerLinkActive="active">
+					<li *ngIf="getUserService().isAuthenticated()" class="nav-ite dropdown">
+						<!--<a class="nav-link" [class.mobile-menu-item]="isMobile()" id="navbarDropdown" [routerLink]="['/profile']" routerLinkActive="active">-->
+						<a class="nav-link" [class.mobile-menu-item]="isMobile()" id="navbarDropdown" [routerLink]="!isMobile()?['/profile']:null" [class.active]="getRouter().url.includes('profile')">
 				          <fa name="user"></fa>{{ 'myprofile' | translate}}
 				        </a>
 				        <div class="dropdown-menu">

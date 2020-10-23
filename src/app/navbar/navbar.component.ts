@@ -1,4 +1,5 @@
 import { Component, HostListener, OnInit, ViewChild,ElementRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { UserService } from '../shared/user/user.service';
 
 @Component({
@@ -32,12 +33,15 @@ export class NavbarComponent implements OnInit {
 
   @HostListener('window:click',['$event'])
   onClick(event) {
-    if (this.responsiveNavbar.nativeElement.classList.contains('show') && !event.target.classList.contains('navbar-toggler-icon')) {
+    if (this.responsiveNavbar.nativeElement.classList.contains('show') 
+      && !event.target.classList.contains('navbar-toggler-icon')
+      && !event.target.classList.contains('mobile-menu-item')) {
       this.navbarToggler.nativeElement.click();
     }
   }
 
   constructor(
+    private router: Router,
     private userService: UserService
   ) { }
 
@@ -46,6 +50,10 @@ export class NavbarComponent implements OnInit {
     if (window.screen.width <= 576) {
       this.mobile = true;
     }
+  }
+
+  getRouter(){
+    return this.router;
   }
 
   getUserService(){
