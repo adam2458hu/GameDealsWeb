@@ -1,0 +1,22 @@
+.blurred-background {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: -webkit-linear-gradient(left, #0C1D21, #2F383A, #0C1D21);
+	background: -o-linear-gradient(left, #0C1D21, #2F383A, #0C1D21);
+	background: linear-gradient(to right, #0C1D21, #2F383A, #0C1D21);
+	z-index: 98;
+}
+
+#waitlist-editor {
+	position: fixed;
+	top: 100px;
+	left: 50%;
+	transform: translateX(-50%);
+	background-color: #141414;
+	max-width: 80%;
+	width: 1000px;
+	z-index: 99;
+}

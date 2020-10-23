@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Game } from '../game/game';
 import { UserService } from '../shared/user/user.service';
+import { FilterService } from '../shared/filter/filter.service';
+import { TranslateService } from '@ngx-translate/core';
 import { LoadingScreenService } from '../shared/loading-screen/loading-screen.service';
 
 @Component({
@@ -10,13 +12,16 @@ import { LoadingScreenService } from '../shared/loading-screen/loading-screen.se
   styleUrls: ['./user-waitlist.component.scss']
 })
 export class UserWaitlistComponent implements OnInit {
-	selectedGame;
+	selectedGame=null;
 	waitlist=[];
+	waitlistOpened = false;
 
 	constructor(
 		private router: Router,
 		private userService: UserService,
-		private loadingScreenService: LoadingScreenService
+		private filterService: FilterService,
+		private loadingScreenService: LoadingScreenService,
+		private translateService: TranslateService
 	) { }
 
 	ngOnInit() {
@@ -38,21 +43,29 @@ export class UserWaitlistComponent implements OnInit {
 	}
 
 	deleteWaitlistItem(waitlistID: String){
-		this.loadingScreenService.setAnimation(true);
-		this.userService.deleteWaitlistItem(waitlistID).subscribe(
-			(res: any)=>{
-				this.loadingScreenService.setAnimation(false);
-				this.waitlist = this.waitlist.filter(item=>item._id!=waitlistID);
-				this.userService.setSuccessMessage(res.message);
-			},
-			(err)=>{
-				this.loadingScreenService.setAnimation(false);
-				this.userService.setErrorMessage(err.error.message);
-			})
+		if (confirm(this.translateService.instant('confirmDelete'))) {
+			this.loadingScreenService.setAnimation(true);
+			this.userService.deleteWaitlistItem(waitlistID).subscribe(
+				(res: any)=>{
+					this.loadingScreenService.setAnimation(false);
+					this.waitlist = this.waitlist.filter(item=>item._id!=waitlistID);
+					this.userService.setSuccessMessage(res.message);
+				},
+				(err)=>{
+					this.loadingScreenService.setAnimation(false);
+					this.userService.setErrorMessage(err.error.message);
+				})
+		}
 	}
 
 	showAllStores(gameID){
 		this.selectedGame = {_id: gameID};
+	}
+
+	onClose(){
+		this.waitlistOpened = false;
+		this.selectedGame = null;
+		this.getWaitlist();
 	}
 
 }

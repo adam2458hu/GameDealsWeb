@@ -1,3 +1,4 @@
+<div *ngIf="waitlistOpened" class="blurred-background" (click)="onClose()"></div>
 <div id="waitlist" class="mt-5">
 	<div class="container-custom fixed deals">
 		<h3>{{ 'waitlist' | translate }}</h3>
@@ -18,8 +19,9 @@
 						</td>
 						<td id="specialPrice" class="text-center">{{ item.maxPrice }} €</td>
 						<td id="originalPrice" class="text-center">{{ item.minDiscount }} %</td>
-						<td>
-							<button (click)="deleteWaitlistItem(item._id);$event.stopPropagation()">{{ 'delete' | translate }}</button>
+						<td class="text-right">
+							<button (click)="selectedGame=item;waitlistOpened = !waitlistOpened;$event.stopPropagation()">{{ 'edit' | translate }}</button>
+							<button class="ml-2" (click)="deleteWaitlistItem(item._id);$event.stopPropagation()">{{ 'delete' | translate }}</button>
 						</td>
 					</tr>
 				</tbody>
@@ -28,6 +30,9 @@
 		<ng-template #noGamesOnWaitlist>
 			<div class="text-center">{{ 'noGamesOnWaitlist' | translate }}</div>
 		</ng-template>
+		<div id="waitlist-editor">	
+			<app-waitlist *ngIf="waitlistOpened" [selectedGame]="selectedGame" [gameIsOnWaitlist]="selectedGame" (edit)="getWaitlist()" (delete)="getWaitlist()" (close)="onClose()"></app-waitlist>
+		</div>
 	</div>
 </div>
-<app-game-details *ngIf="selectedGame" [selectedGame]="selectedGame" (close)="selectedGame=null"></app-game-details>
+<app-game-details *ngIf="selectedGame && !waitlistOpened" [selectedGame]="selectedGame" (close)="onClose()"></app-game-details>
