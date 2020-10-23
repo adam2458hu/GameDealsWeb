@@ -7,6 +7,7 @@ const usersRoutes = require('./routes/users');
 const gamesRoutes = require('./routes/games');
 const currenciesRoutes = require('./routes/currencies');
 const storesRoutes = require('./routes/stores');
+const slidesRoutes = require('./routes/slides');
 const articlesRoutes = require('./routes/articles');
 const cors = require('cors');
 const i18next = require('i18next');
@@ -20,6 +21,7 @@ app.use('/api/users',usersRoutes);
 app.use('/api/games',gamesRoutes);
 app.use('/api/currencies',currenciesRoutes);
 app.use('/api/stores',storesRoutes);
+app.use('/api/slides',slidesRoutes);
 app.use('/api/articles',articlesRoutes);
 //app.use('/.well-known/pki-validation/4CFDDDDCD306CDC8E0F956EBF799D1C7.txt',express.static(path.join(__dirname,"/.well-known/pki-validation/4CFDDDDCD306CDC8E0F956EBF799D1C7.txt")))
 app.get('*', function (req, res){

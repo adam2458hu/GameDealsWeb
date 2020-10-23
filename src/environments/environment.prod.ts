@@ -6,6 +6,7 @@ export const environment = {
   apiGamesURL: '/api/games',
   apiCurrenciesURL: '/api/currencies',
   apiStoresURL: '/api/stores',
+  apiSlidesURL: '/api/slides',
   apiArticlesURL: '/api/articles',
   PUBLIC_VAPID: 'BDtA1qkTIC506t6RQ78ZLCAV1mfQGUwIMjAh4TAkyP22CCcWJsnPUj4reD_jd9wZyMNjjyWA861Zsq--27FLHKs'
 }

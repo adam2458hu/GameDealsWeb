@@ -15,6 +15,7 @@ export const environment = {
   apiGamesURL: 'http://localhost:3000/api/games',
   apiCurrenciesURL: 'http://localhost:3000/api/currencies',
   apiStoresURL: 'http://localhost:3000/api/stores',
+  apiSlidesURL: 'http://localhost:3000/api/slides',
   apiArticlesURL: 'http://localhost:3000/api/articles',
   PUBLIC_VAPID: 'BDtA1qkTIC506t6RQ78ZLCAV1mfQGUwIMjAh4TAkyP22CCcWJsnPUj4reD_jd9wZyMNjjyWA861Zsq--27FLHKs'
 };
