@@ -1,73 +1,192 @@
 <app-back-to-top></app-back-to-top>
-<div *ngIf="!getLoadingScreenService().isLoading() && areCurrenciesReceived() && areStoresReceived()" class="container-custom deals">
-	<h3 class="text-center">{{ 'totalDeals' | translate }}: {{ getTotalGamesCount() }}</h3>
-	<h4 class="text-center">{{ 'searchResults' | translate }}: {{ getFilteredGamesCount() }}</h4>
-	<div class="mt-3 mb-2">
-		<button type="button" (click)="getFilterService().toggleFilter()">
-			<span *ngIf="!isFilterOpened();else elseBlock">
-				<fa name="plus"></fa>{{ 'showFilters' | translate }}
-			</span>
-			<ng-template #elseBlock>
-				<fa name="minus"></fa>{{ 'hideFilters' | translate }}
-			</ng-template>
+<div *ngIf="!getLoadingScreenService().isLoading() && areCurrenciesReceived() && areStoresReceived()">
+	<div class="container-custom deals">
+		<h3 class="text-center">{{ 'totalDeals' | translate }}: {{ getTotalGamesCount() }}</h3>
+		<h4 class="text-center">{{ 'searchResults' | translate }}: {{ getFilteredGamesCount() }}</h4>
+		<div class="d-flex justify-content-between mt-3 mb-2">
+			<button type="button" (click)="getFilterService().toggleFilter()">
+				<span *ngIf="!isFilterOpened();else hideAdvancedSearch">
+					<fa name="plus"></fa>{{ 'showAdvancedSearch' | translate }}
+				</span>
+				<ng-template #hideAdvancedSearch>
+					<fa name="minus"></fa>{{ 'hideAdvancedSearch' | translate }}
+				</ng-template>
+			</button>
+			<div class="d-inline-block">
+					<div class="d-inline-block">
+						<span>{{ 'currency' | translate }}:</span>
+					</div>
+					<div class="d-inline-block ml-2">
+						<select class="form-control" name="filterCurrency" id="filterCurrency" [(ngModel)]="getFilterService().filter.currency" (change)="getFilterService().onCurrencyChange($event.target.value)" title="{{ 'selectedCurrency' | translate }}">
+							<option *ngFor="let currency of getCurrencies()" value="{{ currency.name }}">{{ currency.name }}</option>
+						</select>
+					</div>
+			</div>
+		</div>
+		<form #filterForm="ngForm" (ngSubmit)="sortTable()">
+			<app-filter *ngIf="isFilterOpened()" (filtered)="sortTable($event)"></app-filter>
+		</form>
+		<div class="table-responsive">
+			<form #filterForm="ngForm" (ngSubmit)="sortTable()">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th title="Rendezés név szerint" (click)="sortTable('name')">{{ 'name' | translate }}
+								<span>{{ checkSorting('name') }}</span>
+							</th>
+							<th title="Rendezés akciós ár szerint" (click)="sortTable('specialPrice')" class="text-center">{{ 'discountPrice'| translate }}
+								<span>{{ checkSorting('specialPrice') }}</span>
+							</th>
+							<th title="Rendezés eredeti ár szerint" (click)="sortTable('originalPrice')" class="text-center">
+								{{ 'originalPrice' | translate }}
+								<span>{{ checkSorting('originalPrice') }}</span>
+							</th>
+							<th title="Rendezés kedvezmény szerint" (click)="sortTable('discountPercent')" class="text-center">{{ 'discount' | translate }}
+								<span>{{ checkSorting('discountPercent') }}</span>
+							</th>
+							<th title="Rendezés felhasználói értékelés szerint" (click)="sortTable('totalRating')" class="text-center">{{ 'rating' | translate }}
+								<span>{{ checkSorting('totalRating') }}</span>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let game of getUniqueGames(getUnwindedGamesList())" (click)="showAllStores(game)">
+							<td id="productName">
+								<div>{{ game.name }}</div>
+								<div id="genres">{{ game.genres }}</div>
+							</td>
+							<td id="specialPrice" class="text-center">
+								{{ currencyConverter(game.stores.specialPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}
+							</td>
+							<td id="originalPrice" class="text-center">
+								{{ currencyConverter(game.stores.originalPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}
+							</td>
+							<td id="discountPercent" class="text-center">
+								<span>-{{ game.stores.discountPercent }} %</span>
+							</td>
+							<td id="metascore" class="text-center">
+								<span class="metascore rated" *ngIf="game.totalRating;else elseBlock">
+									{{ game.totalRating | number: '1.0-0' }}
+								</span>
+								<ng-template #elseBlock>
+									<span class="metascore tba" title="besorolás alatt">TBA</span>
+								</ng-template>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
+		</div>
+		<button type="button" *ngIf="numberOfGamesLeft()>0" class="btn-block" (click)="showMore()">
+			{{ 'showNextResults' | translate: {gamesPerRequest:getGamesPerRequest()} }}
 		</button>
 	</div>
-	<form #filterForm="ngForm" (ngSubmit)="sortTable()">
-		<app-filter *ngIf="isFilterOpened()" (filtered)="sortTable($event)"></app-filter>
-	</form>
-	<div class="table-responsive">
-		<form #filterForm="ngForm" (ngSubmit)="sortTable()">
-			<table class="table table-hover">
-				<thead>
-					<tr>
-						<th title="Rendezés név szerint" (click)="sortTable('name')">{{ 'name' | translate }}
-							<span>{{ checkSorting('name') }}</span>
-						</th>
-						<th title="Rendezés akciós ár szerint" (click)="sortTable('specialPrice')" class="text-center">{{ 'currentPrice'| translate }}
-							<span>{{ checkSorting('specialPrice') }}</span>
-						</th>
-						<th title="Rendezés eredeti ár szerint" (click)="sortTable('originalPrice')" class="text-center">
-							{{ 'originalPrice' | translate }}
-							<span>{{ checkSorting('originalPrice') }}</span>
-						</th>
-						<th title="Rendezés kedvezmény szerint" (click)="sortTable('discountPercent')" class="text-center">{{ 'discount' | translate }}
-							<span>{{ checkSorting('discountPercent') }}</span>
-						</th>
-						<th title="Rendezés felhasználói értékelés szerint" (click)="sortTable('totalRating')" class="text-center">{{ 'rating' | translate }}
-							<span>{{ checkSorting('totalRating') }}</span>
-						</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr *ngFor="let game of getUniqueGames(getUnwindedGamesList())" (click)="showAllStores(game)">
-						<td id="productName">
-							<div>{{ game.name }}</div>
-							<div id="genres">{{ game.genres }}</div>
-						</td>
-						<td id="specialPrice" class="text-center">
-							{{ currencyConverter(game.stores.specialPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}
-						</td>
-						<td id="originalPrice" class="text-center">
-							{{ currencyConverter(game.stores.originalPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}
-						</td>
-						<td id="discountPercent" class="text-center">
-							<span>-{{ game.stores.discountPercent }} %</span>
-						</td>
-						<td id="metascore" class="text-center">
-							<span class="metascore rated" *ngIf="game.totalRating;else elseBlock">
-								{{ game.totalRating | number: '1.0-0' }}
-							</span>
-							<ng-template #elseBlock>
-								<span class="metascore tba" title="besorolás alatt">TBA</span>
-							</ng-template>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</form>
+	<app-game-details *ngIf="selectedGame" [selectedGame]="selectedGame" (close)="onClose()"></app-game-details>
+	<div *ngIf="!userService.isAuthenticated();else elseBlock" class="text-center m-2 p-3">
+		<h4>{{ 'shouldLogin' | translate }}</h4>
+		<button [routerLink]="['/login']">{{ 'signIn' | translate }}</button>
 	</div>
-	<button type="button" *ngIf="numberOfGamesLeft()>0" class="btn-block" (click)="showMore()">
-		{{ 'showNextResults' | translate: {gamesPerRequest:getGamesPerRequest()} }}
-	</button>
+	<ng-template #elseBlock>
+		<div *ngIf="numberOfWatchedGames>0">
+			<div id="recommendedGames" class="my-5">
+				<div class="d-flex justify-content-between mt-3">
+					<h2>{{ 'recommendedGames' | translate }}</h2>
+				</div>
+				<div class="container-custom fixed deals">
+					<div class="table-responsive">
+						<table class="table table-hover table-dark">
+							<thead>
+								<tr>
+									<th>{{ 'name' | translate }}</th>
+									<th class="text-center">{{ 'discountPrice' | translate }}</th>
+									<th class="text-center">{{ 'originalPrice' | translate }}</th>
+									<th class="text-center">{{ 'discount' | translate }}</th>
+									<th class="text-center">{{ 'rating' | translate }}</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr *ngFor="let game of getRecommendedGames()" (click)="showAllStores(game)">
+									<td id="productName">
+										<div>{{ game.name }}</div>
+										<div id="genres">{{ game.genres }}</div>
+									</td>
+									<td id="specialPrice" class="text-center">
+										{{ currencyConverter(game.stores.specialPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}
+									</td>
+									<td id="originalPrice" class="text-center">
+										{{ currencyConverter(game.stores.originalPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}
+									</td>
+									<td id="discountPercent" class="text-center">
+										<span>-{{ game.stores.discountPercent }} %</span>
+									</td>
+									<td id="metascore" class="text-center">
+										<span class="metascore rated" *ngIf="game.totalRating;else elseBlock">
+											{{ game.totalRating | number: '1.0-0' }}
+										</span>
+										<ng-template #elseBlock>
+											<span class="metascore tba" title="besorolás alatt">TBA</span>
+										</ng-template>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div id="watchedGames">
+				<div class="d-flex justify-content-between mt-3">
+					<h2>{{ 'watchHistory' | translate }}</h2>
+					<div class="inline-block">
+						<button class="mr-2" (click)="showViewedGenres=!showViewedGenres">
+							<span *ngIf="!showViewedGenres; else hideViewedGenres">
+								<fa name="plus"></fa>{{ 'watchedGenresShow' | translate }}</span>
+							<ng-template #hideViewedGenres>
+								<span><fa name="minus"></fa>{{ 'watchedGenresHide' | translate }}</span>
+							</ng-template>
+						</button>
+						<button (click)="deleteGameHistory()"><fa name="trash"></fa>{{ 'deleteHistory' | translate }}</button>
+					</div>
+				</div>
+				<app-chart *ngIf="showViewedGenres" [genreStatistics]="genreStatistics" [uniqueWatchedGenres]="uniqueWatchedGenres"></app-chart>
+				<div class="container-custom fixed deals">
+					<div class="table-responsive">
+						<table class="table table-hover table-dark">
+							<thead>
+								<th>{{ 'name' | translate }}</th>
+								<th class="text-center">{{ 'currentPrice' | translate }}</th>
+								<th class="text-center">{{ 'originalPrice' | translate }}</th>
+								<th class="text-center">{{ 'discount' | translate }}</th>
+								<th class="text-center">{{ 'rating' | translate }}</th>
+							</thead>
+							<tbody>
+								<tr *ngFor="let game of getGamesData()" (click)="showAllStores(game)">
+									<td id="productName">
+										<div>{{ game.name }}</div>
+										<div id="genres">{{ game.genres }}</div>
+									</td>
+									<td id="specialPrice" class="text-center">
+										{{ currencyConverter(getCheapestStore(game).specialPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}
+									</td>
+									<td id="originalPrice" class="text-center">
+										{{ currencyConverter(getCheapestStore(game).originalPrice,'EUR',getFilterService().filter.currency).toFixed(getFilterService().filter.decimalPlaces) }} {{ getFilterService().filter.symbol}}
+									</td>
+									<td id="discountPercent" class="text-center">
+										<span>-{{ getCheapestStore(game).discountPercent }} %</span>
+									</td>
+									<td id="metascore" class="text-center">
+										<span class="metascore rated" *ngIf="game.totalRating;else elseBlock">
+											{{ game.totalRating | number: '1.0-0' }}
+										</span>
+										<ng-template #elseBlock>
+											<span class="metascore tba" title="besorolás alatt">TBA</span>
+										</ng-template>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</ng-template>
 </div>
-<app-game-details *ngIf="selectedGame" [selectedGame]="selectedGame" (close)="onClose()"></app-game-details>

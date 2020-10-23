@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { Game } from '../game/game';
 import { GameService } from '../game/game.service';
 import { UserService } from '../shared/user/user.service';
@@ -17,6 +18,10 @@ import { LoadingScreenService } from '../shared/loading-screen/loading-screen.se
 
 export class DealsComponent implements OnInit {
 	selectedGame: Game;
+	numberOfWatchedGames=0;
+	uniqueWatchedGenres=[];
+	genreStatistics=[];
+	showViewedGenres=false;
 
 	constructor(
 		private router: Router,
@@ -25,7 +30,8 @@ export class DealsComponent implements OnInit {
 		private userService: UserService,
 		private storeService: StoreService,
 		private filterService: FilterService,
-		private currencyService: CurrencyService
+		private currencyService: CurrencyService,
+		private translateService: TranslateService
 	) {}
 
 	ngOnInit() {
@@ -38,6 +44,11 @@ export class DealsComponent implements OnInit {
 		this.gameService.resetUnwindedGamesList();
 		this.filterService.resetFilter();
 		this.getGameList(this.filterService.filter,true);
+
+		if (this.userService.isAuthenticated()){
+			this.getRecommendedGamesByHistory();
+			this.getGameHistory();
+		}
 	}
 
 	getGameList(filter,startLoadingAnimation){
@@ -65,6 +76,77 @@ export class DealsComponent implements OnInit {
 			()=>{
 				if (startLoadingAnimation) this.loadingScreenService.setAnimation(false);
 			});
+	}
+
+	getRecommendedGamesByHistory(){
+		this.userService.getGameHistory().subscribe(
+			(res: any)=>{
+				this.gameService.getRecommendedGamesByHistory(res.gameHistory).subscribe(
+					(res: any)=>{
+						this.genreStatistics = res.genreStatistics;
+						this.uniqueWatchedGenres = res.uniqueWatchedGenres;
+						this.gameService.resetRecommendedGames();
+						for(let i=0;i<res.recommendedGames.length;i++){
+							this.gameService.pushRecommendedGames(res.recommendedGames[i]);
+						}
+					},
+					(err)=>{
+						console.log(err);
+					})
+			},
+			(err)=>{
+				console.log(err);
+			})
+	}
+
+	getGameHistory(){
+		this.userService.getGameHistory().subscribe(
+			(res: any)=>{
+				this.gameService.getGameHistory(res.gameHistory).subscribe(
+					(res: any)=>{
+						this.gameService.resetGamesData();
+						for (let i=0;i<res.watchedGames.length;i++){
+							this.gameService.pushGamesData(res.watchedGames[i]);
+						}
+						this.numberOfWatchedGames=res.watchedGames.length;
+					},
+					(err)=>{
+						console.log(err);
+					});
+			},
+			(err)=>{
+				console.log(err);
+			})
+	}
+
+	deleteGameHistory(){
+		if (confirm(this.translateService.instant('confirmDelete'))) {
+			this.loadingScreenService.setAnimation(true);
+			this.userService.deleteGameHistory().subscribe(
+				(res: any)=>{
+					this.loadingScreenService.setAnimation(false);
+					this.userService.setSuccessMessage(res.message);
+					this.numberOfWatchedGames = 0;
+				},
+				(err)=>{
+					this.loadingScreenService.setAnimation(false);
+					this.userService.setSuccessMessage(err.error.message);
+				})
+		}
+	}
+
+	getCurrencies(){
+		return this.currencyService.getCurrencies();
+	}
+
+	getRecommendedGames(){
+		return this.gameService.getRecommendedGames();
+	}
+
+	getCheapestStore(game){
+		return game.stores.reduce((accumulator, currentValue)=>{
+			return (accumulator.specialPrice<currentValue.specialPrice)?accumulator:currentValue;
+		})
 	}
 
 	checkSorting(sortBy: String){
@@ -153,6 +235,10 @@ export class DealsComponent implements OnInit {
 	getUniqueGames(gamesList){
 		return gamesList.filter((currentElement,currentIndex,compareArray)=>
 			compareArray.findIndex(element=>(element._id === currentElement._id))===currentIndex);
+	}
+
+	goToExternalUrl(url){
+		window.location.href = url;
 	}
 
 	showAllStores(game){
