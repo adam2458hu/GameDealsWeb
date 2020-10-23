@@ -6,8 +6,8 @@ export class Filter {
 	maxOriginalPrice: number;
 	minDiscountPercent?: number;
 	maxDiscountPercent?: number;
-	minMetascore?: number;
-	maxMetascore?: number;
+	minTotalRating?: number;
+	maxTotalRating?: number;
 	selectedStores?: String[];
 	gamesPerRequest: number;
 	gameRequestOffset: number;
