@@ -3,6 +3,7 @@ import { NgForm } from '@angular/forms';
 import { UserService } from '../shared/user/user.service';
 import { StoreService } from '../shared/store/store.service';
 import { LoadingScreenService } from '../shared/loading-screen/loading-screen.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-waitlist',
@@ -30,11 +31,13 @@ export class WaitlistComponent implements OnInit {
 	constructor(
 		private userService: UserService,
 		private storeService: StoreService,
-		private loadingScreenService: LoadingScreenService
+		private loadingScreenService: LoadingScreenService,
+		private translateService: TranslateService
 	) { }
 
 	ngOnInit() {
 		this.getStores();
+		console.log(this.stores);
 		this.waitlist.gameID = this.selectedGame._id;
 		this.waitlist.name = this.selectedGame.name;
 		if (this.gameIsOnWaitlist){
@@ -78,30 +81,32 @@ export class WaitlistComponent implements OnInit {
 		})
 		form.value.selectedStores = this.selectedStores;
   		this.userService.editWaitlistItem(waitlistID,form.value).subscribe(
-		(res: any)=>{
-			this.loadingScreenService.setAnimation(false);
-			this.userService.setSuccessMessage(res.message);
-			this.edit.emit();
-			this.close.emit();
-		},
-		(err)=>{
-			this.loadingScreenService.setAnimation(false);
-			this.userService.setErrorMessage(err.error.message);
-		});
+			(res: any)=>{
+				this.loadingScreenService.setAnimation(false);
+				this.userService.setSuccessMessage(res.message);
+				this.edit.emit();
+				this.close.emit();
+			},
+			(err)=>{
+				this.loadingScreenService.setAnimation(false);
+				this.userService.setErrorMessage(err.error.message);
+			});
   	}
 
   	deleteWaitlistItem(waitlistID: String){
-  		this.userService.deleteWaitlistItem(waitlistID).subscribe(
-		(res: any)=>{
-			this.loadingScreenService.setAnimation(false);
-			this.userService.setSuccessMessage(res.message);
-			this.delete.emit();
-			this.close.emit();
-		},
-		(err)=>{
-			this.loadingScreenService.setAnimation(false);
-			this.userService.setErrorMessage(err.error.message);
-		});
+		if (confirm(this.translateService.instant('confirmDelete'))) {
+	  		this.userService.deleteWaitlistItem(waitlistID).subscribe(
+				(res: any)=>{
+					this.loadingScreenService.setAnimation(false);
+					this.userService.setSuccessMessage(res.message);
+					this.delete.emit();
+					this.close.emit();
+				},
+				(err)=>{
+					this.loadingScreenService.setAnimation(false);
+					this.userService.setErrorMessage(err.error.message);
+				});
+	  	}
   	}
 
   	getStores(){
