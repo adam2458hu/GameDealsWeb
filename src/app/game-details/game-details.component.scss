@@ -47,8 +47,8 @@
 		left: 50%;
 		transform: translateX(-50%);
 		background-color: #141414;
-		max-width: 80%;
-		width: 1000px;
+		width: calc( 100% - 30px);
+		max-width: 800px;
 		//max-height: 400px;
 		//overflow-y: auto;
 		z-index: 99;

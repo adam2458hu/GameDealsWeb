@@ -4,7 +4,7 @@
 		<span class="close" (click)="onClose()">&times;</span>
 		<div class="card-header">
 			<div class="row">
-				<div class="col-12 col-sm-2 mb-2 mb-sm-0">
+				<div class="col-12 col-sm-2 mb-2 mb-sm-0 text-center text-left-sm">
 					<img *ngIf="gameDetails.cover;else noimageBlock" src="{{ gameDetails.cover }}" alt="{{ gameDetails.name }}" (loaded)="loadingImages=false" height="100%">
 					<ng-template #noimageBlock>
 						<span class="noimage"><fa name="photo"></fa></span>
