@@ -93,6 +93,14 @@ export class CookieService {
 		return localStorage.getItem('currency');
 	}
 
+	setPushNotificationConsent(value){
+		this.setCookie('pushNotificationsAllowed',value);
+	}
+
+	getPushNotificationConsent(){
+		return this.getCookie('pushNotificationsAllowed');
+	}
+
 	setAnalyticalCookies(){
 		if (this.getConsent().analytical){
 			let head = document.getElementsByTagName("head")[0];
