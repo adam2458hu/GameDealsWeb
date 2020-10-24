@@ -28,14 +28,25 @@ export class AppComponent {
 		private router: Router,
 		private activatedRoute: ActivatedRoute
 	) {
-
+		/*
+		//ellenőrzi, hogy a böngészőben engedélyezve vannak e a push értesítések
 		if (this.swPush.isEnabled) {
-			this.swPush.requestSubscription({
-				serverPublicKey: environment.PUBLIC_VAPID
-	        })
-	        .then(sub => this.userService.sendSubscriptionToTheServer(sub).subscribe())
-	        .catch(err => console.error("Could not subscribe to notifications", err));
-		}
+			//ellenőrzi, hogy az eszközhöz tartozik-e push értesítés feliratkozás
+			this.swPush.subscription.subscribe(
+			(pushSubscription: any)=>{
+				//ha nem, akkor megkérdezzük a látogatót, akar e push értesítést fogadni
+				if (!pushSubscription){
+					this.swPush.requestSubscription({
+						serverPublicKey: environment.PUBLIC_VAPID
+			        })
+			        .then(sub => this.userService.sendSubscriptionToTheServer(sub).subscribe())
+			        .catch(err => console.error("Could not subscribe to notifications", err));
+				}
+			},
+			(err)=>{
+				console.log(err);
+			})
+		}*/
 
 		this.cookieService.setAnalyticalCookies();
 		this.cookieService.setAdvertisingCookies();
