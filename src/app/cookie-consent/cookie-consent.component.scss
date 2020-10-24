@@ -3,7 +3,6 @@
 
 h1 {
 	color: black;
-	font-size: 24px;
 	text-align: center;	
 }
 
@@ -198,10 +197,6 @@ h1 {
 }
 
 @media screen and (max-width: 578px) {
-	* {
-		font-size: 12px;
-	}
-
 	#cookieConsent {
 		button {
 			font-size: 12px;

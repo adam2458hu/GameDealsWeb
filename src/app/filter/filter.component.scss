@@ -9,3 +9,15 @@
 		padding-right: -10px !important;
 	}
 }
+
+@media screen and (max-width: 768px) {
+	.filter {
+		font-size: 14px;
+	}
+}
+
+@media screen and (max-width: 578px) {
+	.filter {
+		font-size: 12px;
+	}
+}

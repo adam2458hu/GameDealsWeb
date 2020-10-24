@@ -121,7 +121,7 @@ table {
 		background-color: $color-secondary;
 		border-top: none;
 		color: white;
-		font-size: 18px;
+		font-size: 16px;
 	}
 
 	td {
@@ -445,8 +445,18 @@ input[type="submit"],button,a.salelink {
 }
 
 @media screen and (max-width: 768px){
-	* {
+	body {
 		font-size: 14px;
+	}
+
+	table {
+		th {
+			font-size: 14px;
+		}
+
+		#genres {
+			font-size: 12px;
+		}
 	}
 
 	.container {
@@ -454,6 +464,10 @@ input[type="submit"],button,a.salelink {
 			padding-left: 0;
 			padding-right: 0;
 		}
+	}
+
+	h1 {
+		font-size: 26px;
 	}
 
 	h2 {
@@ -470,5 +484,37 @@ input[type="submit"],button,a.salelink {
 
 	h5 {
 		font-size: 18px;
+	}
+}
+
+@media screen and (max-width: 578px){
+	body {
+		font-size: 12px;
+	}
+
+	table {
+		th {
+			font-size: 12px;
+		}
+	}
+
+	h1 {
+		font-size: 22px;
+	}
+
+	h2 {
+		font-size: 20px;
+	}
+
+	h3 {
+		font-size: 18px;
+	}
+
+	h4 {
+		font-size: 16px;
+	}
+
+	h5 {
+		font-size: 14px;
 	}
 }
