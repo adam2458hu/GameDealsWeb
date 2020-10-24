@@ -163,6 +163,7 @@ export class UserService {
 	}
 
 	sendSubscriptionToTheServer(subscription: PushSubscription) {
+		console.log(subscription);
 		return this.http.post(environment.apiUsersURL+'/subscription', subscription)
 	}
 
