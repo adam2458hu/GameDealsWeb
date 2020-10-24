@@ -12,7 +12,6 @@ const mongoose = require('mongoose');
 const router = express.Router();
 const https = require('https');
 const request = require('request');
-const stringSimilarity = require('string-similarity');
 const puppeteer = require('puppeteer');
 const Game = require('../models/game');
 const Genre = require('../models/genre');
