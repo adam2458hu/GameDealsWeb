@@ -82,7 +82,7 @@
 		</button>
 	</div>
 	<app-game-details *ngIf="selectedGame" [selectedGame]="selectedGame" (close)="onClose()"></app-game-details>
-	<div *ngIf="!userService.isAuthenticated();else elseBlock" class="text-center m-2 p-3">
+	<div *ngIf="!getUserService().isAuthenticated();else elseBlock" class="text-center m-2 p-3">
 		<h4>{{ 'shouldLogin' | translate }}</h4>
 		<button [routerLink]="['/login']">{{ 'signIn' | translate }}</button>
 	</div>

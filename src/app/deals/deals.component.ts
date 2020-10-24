@@ -206,6 +206,10 @@ export class DealsComponent implements OnInit {
 		return this.gameService.getUnwindedGamesList();
 	}
 
+	getUserService(){
+		return this.userService;
+	}
+
 	getGamesPerRequest(){
 		if (this.numberOfGamesLeft()>=this.getFilterService().filter.gamesPerRequest){
 			return this.getFilterService().filter.gamesPerRequest;
