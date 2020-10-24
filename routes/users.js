@@ -7,6 +7,7 @@ const ObjectId = require('mongoose').Types.ObjectId;
 const router = express.Router();
 const User = require('../models/user');
 const Game = require('../models/game');
+const PushSubscriber = require('../models/pushSubscriber');
 const jwt = require('jsonwebtoken');
 const m = require('../config/middlewares');
 const transporter = require('../config/transporter');
@@ -787,11 +788,15 @@ router.put('/deleteProperties/:id',m.isAuthenticated,async(req,res)=>{
 });
 
 webpush.setVapidDetails(`mailto:${process.env.SITE_EMAIL}`, process.env.PUBLIC_VAPID, process.env.PRIVATE_VAPID)
-let fakeDatabase = [];
 
-router.post('/subscription', (req, res) => {
-  const subscription = req.body
-  fakeDatabase.push(subscription)
+router.post('/subscription', async(req, res) => {
+  const subscription = req.body;
+  /*const pushSubscriber = new PushSubscriber({
+
+  })
+
+  await PushSubscriber.save();*/
+  //fakeDatabase.push(subscription)
 })
 
 router.post('/sendPushNotifications',[m.isAuthenticated,m.isAdmin], (req, res) => {
@@ -802,8 +807,6 @@ router.post('/sendPushNotifications',[m.isAuthenticated,m.isAdmin], (req, res) =
       icon: 'assets/deal.png',
     },
   }
-  console.log(fakeDatabase);
-  console.log(notificationPayload);
   
   const promises = []
   fakeDatabase.forEach(subscription => {
