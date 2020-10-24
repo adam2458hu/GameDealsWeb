@@ -5,8 +5,7 @@ const pushSubscriberSchema = new mongoose.Schema({
 		required: true
 	},
   	expirationTime: {
-  		type: Number,
-  		required: true
+  		type: Number
   	},
   	keys : {
   		p256dh : {
