@@ -791,15 +791,24 @@ webpush.setVapidDetails(`mailto:${process.env.SITE_EMAIL}`, process.env.PUBLIC_V
 
 router.post('/subscription', async(req, res) => {
   const subscription = req.body;
-  /*const pushSubscriber = new PushSubscriber({
-
+  const pushSubscriber = new PushSubscriber({
+  		endpoint: subscription.endpoint,
+  		expirationTime: subscription.expirationTime,
+  		keys: {
+  			p256dh: subscription.keys.p256dh,
+  			auth: subscription.keys.auth
+  		}
   })
 
-  await PushSubscriber.save();*/
-  //fakeDatabase.push(subscription)
+  try {
+  	await pushSubscriber.save();
+  	console.log("Push értesítésre feliratkozó mentve az adatbázisba");
+  } catch(err) {
+  	console.log(err);
+  }
 })
 
-router.post('/sendPushNotifications',[m.isAuthenticated,m.isAdmin], (req, res) => {
+router.post('/sendPushNotifications',[m.isAuthenticated,m.isAdmin], async (req, res) => {
   const notificationPayload = {
     notification: {
       title: req.body.pushNotificationTitle,
@@ -809,7 +818,8 @@ router.post('/sendPushNotifications',[m.isAuthenticated,m.isAdmin], (req, res) =
   }
   
   const promises = []
-  fakeDatabase.forEach(subscription => {
+  const pushSubscribers = await PushSubscriber.find();
+  pushSubscribers.forEach(subscription => {
     promises.push(
       webpush.sendNotification(subscription,JSON.stringify(notificationPayload))
     )
