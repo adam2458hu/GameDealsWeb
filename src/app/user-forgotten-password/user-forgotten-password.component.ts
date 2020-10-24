@@ -35,6 +35,7 @@ export class UserForgottenPasswordComponent implements OnInit {
         this.router.navigate(['/']);
 	  	},
 	  	(err)=>{
+        this.loadingScreenService.setAnimation(false);
 	  		this.userService.setErrorMessage(err.error.message);
 	  	}
 	  );
