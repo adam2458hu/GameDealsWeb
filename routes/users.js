@@ -790,6 +790,7 @@ router.put('/deleteProperties/:id',m.isAuthenticated,async(req,res)=>{
 webpush.setVapidDetails(`mailto:${process.env.SITE_EMAIL}`, process.env.PUBLIC_VAPID, process.env.PRIVATE_VAPID)
 
 router.post('/subscription', async(req, res) => {
+	console.log("push feliratkozó mentése folyamatban");
   const subscription = req.body;
   const pushSubscriber = new PushSubscriber({
   		endpoint: subscription.endpoint,
@@ -818,12 +819,17 @@ router.post('/sendPushNotifications',[m.isAuthenticated,m.isAdmin], async (req, 
   }
   
   const promises = []
-  const pushSubscribers = await PushSubscriber.find();
-  pushSubscribers.forEach(subscription => {
-    promises.push(
-      webpush.sendNotification(subscription,JSON.stringify(notificationPayload))
-    )
-  })
+  try {
+	  const pushSubscribers = await PushSubscriber.find();
+	  pushSubscribers.forEach(subscription => {
+	    promises.push(
+	      webpush.sendNotification(subscription,JSON.stringify(notificationPayload))
+	    )
+	  })
+  }
+  catch(err){
+  	console.log(err);
+  }
   //Promise.all(promises).then(() => res.sendStatus(200))
   Promise.all(promises)
   	.then(() => res.status(200).json({message: 'pushNotificationsSent'}))
