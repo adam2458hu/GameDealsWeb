@@ -139,9 +139,9 @@ export class FilterService {
 			decimalPlaces: this.filter.decimalPlaces
 		}
 
-		if (this.cookieService.getConsent().functional) {
+		//if (this.cookieService.getConsent().functional) {
 			this.setLocalCurrency();
-		}
+		//}
 	}
 
 	selectAllStores(){
@@ -204,11 +204,14 @@ export class FilterService {
 						this.filter.currency = res.currency.code;
 						this.filter.symbol = currency.symbol;
 						this.filter.decimalPlaces = currency.decimalPlaces;
-						localStorage.setItem('currency',JSON.stringify({
-							code: res.currency.code,
-							symbol: currency.symbol,
-							decimalPlaces: currency.decimalPlaces
-						}))
+
+						if (this.cookieService.getConsent().functional) {
+							localStorage.setItem('currency',JSON.stringify({
+								code: res.currency.code,
+								symbol: currency.symbol,
+								decimalPlaces: currency.decimalPlaces
+							}))
+						}
 					}
 				})	
 			},
