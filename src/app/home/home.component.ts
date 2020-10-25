@@ -1,4 +1,5 @@
-import { Component, OnInit, ElementRef, AfterViewInit, ViewChild} from '@angular/core';
+//import { Component, OnInit, ElementRef, AfterViewInit, ViewChild} from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { TranslateService } from '@ngx-translate/core';
 import { Article } from '../shared/article/article';
@@ -14,9 +15,11 @@ import { SlideService } from '../shared/slide/slide.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements AfterViewInit {
+//export class HomeComponent implements AfterViewInit {
+export class HomeComponent implements OnInit {
 	mobile: Boolean;
 	editorOpened: Boolean;
+	animationStopped: Boolean;
 	index=0;
 	loadingImages = true;
 	t;
@@ -40,7 +43,25 @@ export class HomeComponent implements AfterViewInit {
 		private translateService: TranslateService
 	) { }
 
-	ngAfterViewInit() {
+	ngOnInit() {
+		if (window.screen.width <= 992) {
+      		this.mobile = true;
+	    } else {
+	    	this.mobile = false;
+	    }
+
+		this.editorOpened = false;
+		/*
+		this.fadeIn = true;
+		this.resetAnimation();
+		this.startAnimation();*/
+
+		this.getSlides();
+		this.getArticles();
+		this.getTopArticles();
+	}
+
+	/*ngAfterViewInit() {
 	    if (window.screen.width <= 992) {
       		this.mobile = true;
 	    } else {
@@ -56,7 +77,7 @@ export class HomeComponent implements AfterViewInit {
 		this.getSlides();
 		this.getArticles();
 		this.getTopArticles();
-	}
+	}*/
 
 	isAdmin(){
 		return this.userService.isAdmin();
@@ -71,7 +92,7 @@ export class HomeComponent implements AfterViewInit {
 		if (this.articleToEdit) this.articleToEdit=null;
 	}
 
-	resetAnimation(){
+	/*resetAnimation(){
 		this.r = setTimeout(()=>{
 			this.fadeIn = false;
 		},300);
@@ -89,8 +110,68 @@ export class HomeComponent implements AfterViewInit {
 
 			this.resetAnimation();
 		},4000);
+	}*/
+	startAnimation(index: any,slides: any){
+		this.fadeIn = true;
+
+		if (index+1>slides.length-1){
+			index=0;
+		} else {
+			++index;
+		}
+
+		this.index=index;
+
+		this.r=setTimeout(()=>{this.fadeIn=false},300);
+		this.t=setTimeout(()=>{this.startAnimation(index,slides)},4000);
 	}
 
+	resetAnimation(){
+		this.fadeIn = false;
+		clearTimeout(this.r);
+		clearTimeout(this.t);
+		this.fadeIn = true;
+	}
+
+	next(){
+		this.resetAnimation();
+		if (this.index+1>this.slides.length-1){
+			this.index=0;
+		} else {
+			++this.index;
+		}
+
+
+		this.r = setTimeout(()=>{this.fadeIn=false},300);
+		this.t = setTimeout(()=>{this.startAnimation(this.index,this.slides)},4000);
+	}
+
+	previous(){
+		this.resetAnimation();
+
+		if (this.index-1<0){
+			this.index=this.slides.length-1;
+		} else {
+			--this.index;
+		}
+
+		this.r = setTimeout(()=>{this.fadeIn=false},300);
+		this.t = setTimeout(()=>{this.startAnimation(this.index,this.slides)},4000);
+	}
+
+
+	changeNews(i){
+		if (this.index!=i){
+			this.resetAnimation();
+			
+			this.index = i;
+
+			this.r = setTimeout(()=>{this.fadeIn=false},300);
+			this.t = setTimeout(()=>{this.startAnimation(this.index,this.slides)},4000);
+		}
+	}
+
+	/*
 	deleteFadeIn(){
 		this.fadeIn = false;
 		clearTimeout(this.r);
@@ -131,6 +212,7 @@ export class HomeComponent implements AfterViewInit {
 		this.startAnimation();
 	}
 
+
 	changeNews(i){
 		if (this.index!=i){
 			this.fadeIn = true;
@@ -142,7 +224,7 @@ export class HomeComponent implements AfterViewInit {
 			clearInterval(this.t);
 			this.startAnimation();
 		}
-	}
+	}*/
 
 	getSlides(){
 		this.slideService.getSlides().subscribe(
@@ -151,6 +233,7 @@ export class HomeComponent implements AfterViewInit {
 				this.slides.forEach(slide=>{
 					slide.endOfOffer = new Date(slide.endOfOffer);
 				})
+				this.startAnimation(this.index,this.slides);
 			},
 			(err)=>{
 				console.log(err);
