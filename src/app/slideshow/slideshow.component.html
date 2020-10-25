@@ -1,0 +1,43 @@
+<div *ngIf="slides" class="news-slideshow" [class.loadingImages]="loadingImages">
+	<div class="news-main">
+		<div class="row">
+			<div class="col-lg-4 d-none d-lg-block big-screen-title">
+				<div class="news-container">
+					<div class="news-description text-center" [ngClass]="{'fadeIn':fadeIn && !isMobile()}">
+						<h3>{{slides[index].title}} {{ 'sale' | translate }}</h3>
+						<p>{{ 'endOfDeal' | translate }}: {{months[getLanguage()][slides[index].endOfOffer.getMonth()]}} {{slides[index].endOfOffer.getDate()}}.</p>
+						<a class="salelink" href="{{slides[index].link}}" target="_blank">{{ 'letssee' | translate }}</a>
+					</div>
+				</div>
+				<span class="custom-badge d-none d-lg-block">
+					<span class="custom-badge-text" [ngClass]="{'fadeIn':fadeIn && !isMobile()}">-{{slides[index].discountPercent}}%</span>
+				</span>
+			</div>
+			<div class="col-12 col-lg-8">
+				<div class="small-screen-title d-block d-lg-none">
+					<div>
+						<a href="{{slides[index].link}}" target="_blank">
+							<h3>{{slides[index].title}}</h3>
+						</a>
+					</div>
+					<div>
+						<a href="{{slides[index].link}}" target="_blank">
+							<p>{{ 'endOfDeal' | translate }}: {{months[slides[index].endOfOffer.getMonth()]}} {{slides[index].endOfOffer.getDate()}}.</p>
+						</a>
+					</div>
+				</div>
+				<div class="news-image" (swipeleft)="next()" (swiperight)="previous()">
+					<img [ngClass]="{'fadeIn':fadeIn && !isMobile()}" [src]="slides[index].image" alt="{{slides[index].title}}" (loaded)="loadingImages=false" width="100%">
+				</div>
+				<span class="custom-badge d-inline-block d-lg-none">
+					<span class="custom-badge-text" [ngClass]="{'fadeIn':fadeIn && !isMobile()}">-{{slides[index].discountPercent}}%</span>
+				</span>
+			</div>
+			<span class="pager pager-left" (click)="!isMobile() && previous()" (tap)="isMobile() && previous()"></span>
+			<span class="pager pager-right" (click)="!isMobile() && next()" (tap)="isMobile() && next()"></span>
+		</div>
+	</div>
+	<div class="d-none d-lg-block nav-buttons text-center">
+		<span *ngFor="let slide of slides;index as i" [class.active]="index==i" [class.passed]="index>i" (click)="changeNews(i)"></span>
+	</div>
+</div>
