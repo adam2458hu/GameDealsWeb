@@ -1,8 +1,8 @@
 import { Component, AfterViewInit, EventEmitter, Input, Output,ViewChild, ElementRef } from '@angular/core';
 import { DatePipe,DecimalPipe } from '@angular/common';
-import { Game } from '../game/game';
+import { Game } from '../shared/game/game';
 import { UserService } from '../shared/user/user.service';
-import { GameService } from '../game/game.service';
+import { GameService } from '../shared/game/game.service';
 import { LoadingScreenService } from '../shared/loading-screen/loading-screen.service';
 
 @Component({
