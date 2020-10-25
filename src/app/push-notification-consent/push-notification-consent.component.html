@@ -1,11 +1,7 @@
 <div *ngIf="consented===undefined" id="pushNotificationConsent">
-	<div class="row mb-2">
-		<div class="col-2 text-right">
-			<img src="assets/deal.png" width="100%">
-		</div>
-		<div class="col-10">{{ 'getPushNotificationConsent' | translate }}
-			<div id="consentInfo">{{ 'getPushNotificationConsentInfo' | translate }}</div>
-		</div>
+	<div class="mb-2">
+		{{ 'getPushNotificationConsent' | translate }}
+		<div id="consentInfo">{{ 'getPushNotificationConsentInfo' | translate }}</div>
 	</div>
 	<div class="d-flex justify-content-between">
 		<button (click)="deny()">{{ 'deny' | translate }}</button>
