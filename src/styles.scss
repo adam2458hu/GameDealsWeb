@@ -122,6 +122,7 @@ table {
 		border-top: none;
 		color: white;
 		font-size: 16px;
+		padding: 6px 12px !important;
 	}
 
 	td {
@@ -343,6 +344,7 @@ input[type="submit"],button,a.salelink {
 	background-color: $color-secondary;
 	width: 200px;
 	height: 22px;
+	font-size: 14px;
 	text-align: center;
 	z-index: 99;
 

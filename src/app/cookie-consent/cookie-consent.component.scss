@@ -191,6 +191,20 @@ h1 {
 
 
 @media screen and (max-width: 768px) {
+	.custom-checkbox {
+		font-size: 14px;
+	}
+
+	#settingsPanel {
+		b {
+			font-size: 14px;
+		}
+
+		p {
+			font-size: 12px;
+		}
+	}
+
 	#settingsButton {
 		left: 40px;
 	}
@@ -199,12 +213,6 @@ h1 {
 @media screen and (max-width: 578px) {
 	#cookieConsent {
 		button {
-			font-size: 12px;
-		}
-	}
-
-	#settingsPanel {
-		p {
 			font-size: 12px;
 		}
 	}
