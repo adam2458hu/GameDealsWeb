@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Game } from '../game/game';
+import { Game } from '../shared/game/game';
 import { UserService } from '../shared/user/user.service';
 import { FilterService } from '../shared/filter/filter.service';
 import { TranslateService } from '@ngx-translate/core';

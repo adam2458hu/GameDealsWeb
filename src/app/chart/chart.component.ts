@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Chart } from 'chart.js';
-import { GameService } from '../game/game.service';
+import { GameService } from '../shared/game/game.service';
 
 @Component({
   selector: 'app-chart',
