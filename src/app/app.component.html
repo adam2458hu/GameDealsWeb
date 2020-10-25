@@ -1,6 +1,6 @@
-<app-modal *ngIf="languageIsSet"></app-modal>
-<app-navbar *ngIf="languageIsSet"></app-navbar>
-<app-main *ngIf="languageIsSet"></app-main>
-<app-footer *ngIf="languageIsSet"></app-footer>
-<app-cookie-consent *ngIf="languageIsSet"></app-cookie-consent>
-<app-push-notification-consent *ngIf="languageIsSet"></app-push-notification-consent>
+<app-modal *ngIf="serviceWorkerChecked && languageIsSet"></app-modal>
+<app-navbar *ngIf="serviceWorkerChecked && languageIsSet"></app-navbar>
+<app-main *ngIf="serviceWorkerChecked && languageIsSet"></app-main>
+<app-footer *ngIf="serviceWorkerChecked && languageIsSet"></app-footer>
+<app-cookie-consent *ngIf="serviceWorkerChecked && languageIsSet"></app-cookie-consent>
+<!--<app-push-notification-consent *ngIf="languageIsSet"></app-push-notification-consent>-->

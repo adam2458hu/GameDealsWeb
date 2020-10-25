@@ -52,6 +52,7 @@ import { UserWaitlistComponent } from './user-waitlist/user-waitlist.component';
 import { ArticleComponent } from './article/article.component';
 import { ArticleCreatorComponent } from './article-creator/article-creator.component';
 import { PushNotificationConsentComponent } from './push-notification-consent/push-notification-consent.component';
+import { SlideshowComponent } from './slideshow/slideshow.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
     return new TranslateHttpLoader(http);
@@ -103,7 +104,8 @@ export class MyHammerConfig extends HammerGestureConfig {
     UserWaitlistComponent,
     ArticleComponent,
     ArticleCreatorComponent,
-    PushNotificationConsentComponent
+    PushNotificationConsentComponent,
+    SlideshowComponent
   ], 
   imports: [
     BrowserModule,

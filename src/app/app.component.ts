@@ -15,8 +15,9 @@ import { filter, map } from "rxjs/operators";
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-	availableLanguages = ['en','hu'];
+	availableLanguages;
 	languageIsSet;
+	serviceWorkerChecked;
 
 	constructor(
 		private swPush: SwPush,
@@ -28,13 +29,21 @@ export class AppComponent {
 		private router: Router,
 		private activatedRoute: ActivatedRoute
 	) {
-		/*
+		this.availableLanguages = ['en','hu'];
+		
+		//EZ A RÉSZ AZÉRT NAGYON FONTOS, MERT HA A SERVICE WORKER-t MÉG NEM HASZNÁLTUK
+		//MIELŐTT OLYAN KOMPONENST HIVNÁNK MEG, AMI TARTALMAZZA A setTimeout VAGY setInterval()
+		//METÓDUSOKAT, PÉLDÁUL A SLIDESHOW LÉPTETÉSÉHEZ HASZNÁLT METÓDUSOKAT,
+		//AKKOR A SERVICE WORKER ÉS EZÁLTAL A PUSH ÉRTESÍTÉST ENGEDÉLYEZŐ PANEL NEM
+		//FOG MŰKÖDÉSBE LÉPNI. HOGY EZ MIÉRT VAN ANNAK AZ OKÁT NEM TUDOM
+		//EZÉRT A KOMPONENSEKET CSAK AKKOR JELENÍTJÜK MEG AZ app.component.html-ben,
+		// HA A serviceWorkerChecked VÁLTOZÓ MÁR IGAZ
+		this.serviceWorkerChecked = false;
 		//ellenőrzi, hogy a böngészőben engedélyezve vannak e a push értesítések
 		if (this.swPush.isEnabled) {
 			//ellenőrzi, hogy az eszközhöz tartozik-e push értesítés feliratkozás
 			this.swPush.subscription.subscribe(
 			(pushSubscription: any)=>{
-				//ha nem, akkor megkérdezzük a látogatót, akar e push értesítést fogadni
 				if (!pushSubscription){
 					this.swPush.requestSubscription({
 						serverPublicKey: environment.PUBLIC_VAPID
@@ -42,11 +51,15 @@ export class AppComponent {
 			        .then(sub => this.userService.sendSubscriptionToTheServer(sub).subscribe())
 			        .catch(err => console.error("Could not subscribe to notifications", err));
 				}
+				this.serviceWorkerChecked = true;
 			},
 			(err)=>{
+				this.serviceWorkerChecked = true;
 				console.log(err);
 			})
-		}*/
+		} else {
+			this.serviceWorkerChecked = true;
+		}
 
 		this.cookieService.setAnalyticalCookies();
 		this.cookieService.setAdvertisingCookies();
