@@ -790,52 +790,71 @@ router.put('/deleteProperties/:id',m.isAuthenticated,async(req,res)=>{
 webpush.setVapidDetails(`mailto:${process.env.SITE_EMAIL}`, process.env.PUBLIC_VAPID, process.env.PRIVATE_VAPID)
 
 router.post('/subscription', async(req, res) => {
-	console.log("push feliratkozó mentése folyamatban");
-  const subscription = req.body;
-  const pushSubscriber = new PushSubscriber({
-  		endpoint: subscription.endpoint,
-  		expirationTime: subscription.expirationTime,
-  		keys: {
-  			p256dh: subscription.keys.p256dh,
-  			auth: subscription.keys.auth
-  		}
-  })
+	console.log("Push feliratkozó mentése folyamatban");
+	const subscription = req.body;
+	const pushSubscriber = new PushSubscriber({
+			endpoint: subscription.endpoint,
+			expirationTime: subscription.expirationTime,
+			keys: {
+				p256dh: subscription.keys.p256dh,
+				auth: subscription.keys.auth
+			}
+	})
 
-  try {
-  	await pushSubscriber.save();
-  	console.log("Push értesítésre feliratkozó mentve az adatbázisba");
-  } catch(err) {
-  	console.log(err);
-  }
+	try {
+		await pushSubscriber.save();
+		console.log("Push értesítésre feliratkozó mentve az adatbázisba");
+	} catch(err) {
+		console.log(err);
+	}
 })
 
 router.post('/sendPushNotifications',[m.isAuthenticated,m.isAdmin], async (req, res) => {
-  const notificationPayload = {
-    notification: {
-      title: req.body.pushNotificationTitle,
-      body: req.body.pushNotificationText,
-      icon: 'assets/deal.png',
-    },
-  }
-  
-  const promises = []
-  try {
-	  const pushSubscribers = await PushSubscriber.find();
+	const notificationPayload = {
+		notification: {
+		  title: req.body.pushNotificationTitle,
+		  body: req.body.pushNotificationText,
+		  icon: 'assets/deal.png',
+		},
+	}
+
+	let promises = [];
+	let pushSubscribers = [];
+	try {
+	  pushSubscribers = await PushSubscriber.find();
 	  pushSubscribers.forEach(subscription => {
 	    promises.push(
 	      webpush.sendNotification(subscription,JSON.stringify(notificationPayload))
 	    )
 	  })
-  }
-  catch(err){
-  	console.log(err);
-  }
-  //Promise.all(promises).then(() => res.sendStatus(200))
-  Promise.all(promises)
-  	.then(() => res.status(200).json({message: 'pushNotificationsSent'}))
-  	.catch((err)=>{
+	} catch(err){
+		console.log(err);
+	}
+
+  	let promiseResults = [];
+  	let rejectedEndpoints = [];
+  	try {
+	  	promiseResults = await Promise.allSettled(promises);
+	  	//ha az adott push értesítés küldése el lett utasítva, az azt jelenti, hogy
+	  	//a feliratkozás lejárt vagy a feliratkozó iratkozott le, ezért rögzítjük a
+	  	//feliratkozóhoz tartozó végpontot
+	  	promiseResults.forEach((result,index,arr)=>{
+	  		if (result.status=='rejected') {
+	  			rejectedEndpoints.push(pushSubscribers[index].endpoint);
+	  		}
+	  	})
+
+	  	//a feliratkozókon végigmegyünk, és ha a végpontja szerepel a visszautasított végpontok
+	  	//között, akkor töröljük az adatbázisból
+	  	let subscribersToDelete = await PushSubscriber.find({endpoint: {$in: rejectedEndpoints}});
+	  	subscribersToDelete.forEach(async subscriber=>{
+	  		await subscriber.remove();
+	  	})
+	  	console.log(subscribersToDelete.length+' push feliratkozó törölve az adatbázisból');
+	  	res.status(200).json({message: 'pushNotificationsSent'});
+  	} catch(err){
   		res.status(500).json({message: err.message});
-  	});
+  	}
 })			
 
 async function sendWaitlistEmails(){
