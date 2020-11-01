@@ -1,70 +1,105 @@
 <h2 class="text-center">
 	{{ 'cookiePolicy' | translate }}
 </h2>
+<hr>
 <h3>{{ 'whatIsACookieQuestion' | translate }}</h3>
 <p>{{ 'whatIsACookieAnswer' | translate }}</p>
 <hr>
-<h3>{{ 'whatTypeOfCookiesQuestion' | translate }}</h3>
+<h3>Mit kell érteni a "hasonló technológia" alatt?</h3>
+<p>A hasonló technológián a sütikhez hasonló célt betöltő, webes tárolásra szolgáló HTML5 localStorage objektumot kell érteni, amiben kulcs – érték párok tárolhatóak. A Local Storage-ben olyan adatok kerülnek tárolásra, amelyeket csak a felhasználó gépe használ fel, és a szervernek nem szükségesek. Ennek megfelelően a webhelyen a honlap nyelve és az árak pénzneme van a Local Storage-ben tárolva. A sütikkel ellentétben nem rendelkeznek lejárati dátummal, ezért nem törlődnek automatikusan a böngészőből, viszont manuálisan törölhetőek a böngésző beállításaiban.</p>
+<hr>
+<h3>Hol állíthatom be a sütik használatát a böngészőben?</h3>
+<p>A sütik kezelése böngészőnként eltérő, így ezek módja az alábbi linkeken található meg:</p>
+<ul>
+	<li><a href="https://support.google.com/chrome/answer/95647?co=GENIE.Platform%3DDesktop&hl=hu">Chrome</a></li>
+	<li><a href="https://support.mozilla.org/hu/kb/sutik-informacio-amelyet-weboldalak-tarolnak-szami">Firefox</a></li>
+	<li><a href="https://support.apple.com/hu-hu/guide/safari/sfri11471/mac">Safari</a></li>
+	<li><a href="https://support.microsoft.com/hu-hu/microsoft-edge/cookie-k-t%C3%B6rl%C3%A9se-a-microsoft-edge-ben-63947406-40ac-c3b8-57b9-2a946a29ae09">Microsoft Edge</a></li>
+	<li><a href="https://support.microsoft.com/hu-hu/topic/cookie-k-t%C3%B6rl%C3%A9se-%C3%A9s-kezel%C3%A9se-168dab11-0753-043d-7c16-ede5947fc64d">Internet Explorer</a></li>
+</ul>
+<hr>
+<h3>{{ 'cookieTypesAndTheirPurpose' | translate }}</h3>
+<b>{{ 'necessaryCookies' | translate }}</b>
+<p>{{ 'necessaryCookiesInfo' | translate }}</p>
+<b>{{ 'functionalCookies' | translate }}</b>
+<p>{{ 'functionalCookiesInfo' | translate }}</p>
+<b>{{ 'analyticalCookies' | translate }}</b>
+<p>{{ 'analyticalCookiesInfo' | translate }}</p>
+<b>{{ 'advertisingCookies' | translate }}</b>
+<p>{{ 'advertisingCookiesInfo' | translate }}</p>
+<hr>
+<h3>Használt sütik</h3>
 <div class="table-responsive">
 	<table class="table table-hover">
 		<thead>
 			<tr>
-				<th width="15%">{{ 'cookieName' | translate }}</th>
-				<th width="10%">{{ 'category' | translate }}</th>
 				<th width="10%">{{ 'type' | translate }}</th>
-				<th width="55%">{{ 'purpose' | translate }}</th>
-				<th width="10%">{{ 'validity' | translate }}</th>
+				<th width="15%">{{ 'cookieName' | translate }}</th>
+				<th>Tárolás helye</th>
+				<th>Adatkezelés jogalapja</th>
+				<th width="50%">Adatkezelés célja</th>
+				<th width="15%">Adatkezelés időtartama</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr>
+				<td rowspan="4">{{ 'necessary' | translate }}</td>
+				<td>cookieConsent</td>
+				<td rowspan="4">Cookies</td>
+				<td rowspan="4">Jogos érdek</td>
+				<td>A felhasználó - egyes süti típusokhoz való - hozzájárulásának megismerése, ami meghatározza, hogy milyen süti típusok helyezhetőek el a felhasználó gépén.</td>
+				<td>1 év</td>
+			</tr>
+			<tr>
 				<td>accessToken</td>
-				<td>{{ 'necessary' | translate }}</td>
-				<td>{{ 'session' | translate }}</td>
-				<td>A sikeres bejelentkezést követően generált hozzáférést biztosító token.</td>
-				<td>5 {{ 'minutes' | translate }}</td>
+				<td>A sikeres bejelentkezést követően a regisztrációhoz kötött tartalmakhoz való hozzáférés biztosítása.</td>
+				<td>5 perc</td>
 			</tr>
 			<tr>
 				<td>refreshToken</td>
-				<td>{{ 'necessary' | translate }}</td>
-				<td>{{ 'session' | translate }}</td>
-				<td>A munkamenet során használt 5 perces számláló frissítésére szolgáló frissítő token.</td>
-				<td></td>
+				<td>Amennyiben még nem járt le az 5 perc hosszúságú munkamenet, akkor a refreshToken segítségével egy új hozzáférési token(accessToken) biztosítása a felhasználónak anélkül, hogy újra meg kellene adnia a belépési adatait, így a munkamenetből hátralévő 5 percnyi idő számlálása előről kezdődhet. </td>
+				<td>1 óra</td>
 			</tr>
 			<tr>
-				<td>remmeberMeToken</td>
-				<td>{{ 'necessary' | translate }}</td>
-				<td>{{ 'session' | translate }}</td>
-				<td>Az "emlékezz rám" funkció használatakor a felhasználó azonosítását szolgáló tokent tartalmazza, amit az azonnali beléptetéshez használunk.</td>
-				<td></td>
+				<td>rememberMeToken</td>
+				<td>Az "emlékezz rám" funkció használatakor a felhasználó azonosítását szolgáló token segítségével a felhasználó azonnali beléptetése.</td>
+				<td>7 nap</td>
 			</tr>
 			<tr>
+				<td rowspan="2">{{ 'functional' | translate }}</td>
 				<td>lang</td>
-				<td>{{ 'functional' | translate }}</td>
-				<td>{{ 'persistent' | translate }}</td>
-				<td>A honlap nyelve, ami alapértelmezetten az IP cím alapján kerül kiválasztásra, de a felhasználó megváltoztathatja a lap alján található legördülő menüvel.</td>
-				<td></td>
+				<td rowspan="2">Local Storage</td>
+				<td rowspan="2">Érintett hozzájárulása</td>
+				<td>A honlap nyelvének meghatározása</td>
+				<td rowspan="2">addig tart, amíg a felhasználó önként nem törli ezen sütiket a böngésző beállításaiban</td>
 			</tr>
 			<tr>
 				<td>currency</td>
-				<td>{{ 'functional' | translate }}</td>
-				<td>{{ 'persistent' | translate }}</td>
-				<td>A honlapon található árak pénzneme, ami alapértelmezetten az IP cím alapján kerül kiválasztásra, de a felhasználó megváltoztathatja az akciók listája felett található pénznem választó legördülő menüvel.</td>
-				<td></td>
+				<td>A honlapon található árak pénznemének meghatározása</td>
 			</tr>
 			<tr>
-				<td>Google Analytics</td>
-				<td>{{ 'analytical' | translate }}</td>
-				<td></td>
-				<td>A Google Analytics által létrehozott sütik - A felhasználói látogatottságot elemző sütik. Ezeket az adatvédelmi beállítások gombra kattintva, a felugró panelen kikapcsolhatóak.</td>
-				<td></td>
+				<td rowspan="3">{{ 'analytical' | translate }}</td>
+				<td>_ga</td>
+				<td rowspan="3">Cookies</td>
+				<td rowspan="3">Érintett hozzájárulása</td>
+				<td rowspan="3">A Google Analytics által elhelyezett sütik segítségével a webhelyen található oldalak látogatottságának figyelése. További részleteket ezen sütikről a <a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/cookie-usage" target="_blank">Google Analytics süti használati oldalán</a> olvashat.</td>
+				<td>2 év</td>
 			</tr>
 			<tr>
-				<td>Google Adsense</td>
+				<td>_gid</td>
+				<td>24 óra</td>
+			</tr>
+			<tr>
+				<td>_gat</td>
+				<td>1 perc</td>
+			</tr>
+			<tr>
 				<td>{{ 'advertising' | translate }}</td>
-				<td></td>
-				<td>{{ 'advertisingCookiesInfo' | translate }}</td>
-				<td></td>
+				<td>Jelenleg az oldal nem használ reklám sütiket.</td>
+				<td>-</td>
+				<td>-</td>
+				<td>-</td>
+				<td>-</td>
 			</tr>
 		</tbody>
 	</table>
