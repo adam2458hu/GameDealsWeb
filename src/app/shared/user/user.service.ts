@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient,HttpHeaders } from '@angular/common/http';
+import { CookieService } from '../cookie/cookie.service';
 import { Router } from '@angular/router';
 import { User } from './user';
 import { LoginDetails } from '../login-details/login-details';
@@ -62,7 +63,11 @@ export class UserService {
 		}]
 	};*/
 
-	constructor(private http: HttpClient,private router: Router) { }
+	constructor(
+		private http: HttpClient,
+		private router: Router,
+		private cookieService: CookieService
+	) { }
 
 	registerUser(user: User){
 		return this.http.post(environment.apiUsersURL+'/register',user);
@@ -90,7 +95,7 @@ export class UserService {
 	}
 
 	loginUser(user: User){
-		return this.http.post(environment.apiUsersURL+'/login',user);
+		return this.http.post(environment.apiUsersURL+'/login',user,{withCredentials: true});
 	}
 
 	loginRememberedUser(){
@@ -270,7 +275,8 @@ export class UserService {
 	}
 
 	setAccessToken(token: string){
-		localStorage.setItem('accessToken',token);
+		this.cookieService.setCookie('accessToken',token);
+		//localStorage.setItem('accessToken',token);
 	}
 
 	setTempToken(token: string){
@@ -278,11 +284,13 @@ export class UserService {
 	}
 
 	setRefreshToken(token: string){
-		localStorage.setItem('refreshToken',token);
+		this.cookieService.setCookie('refreshToken',token);
+		//localStorage.setItem('refreshToken',token);
 	}
 
 	setRememberMeToken(token: string){
-		localStorage.setItem('rememberMeToken',token);
+		this.cookieService.setCookie('rememberMeToken',token);
+		//localStorage.setItem('rememberMeToken',token);
 	}
 
 	setLanguage(language: string){
@@ -294,7 +302,8 @@ export class UserService {
 	}
 
 	getAccessToken(){
-		return localStorage.getItem('accessToken');
+		return this.cookieService.getCookie('accessToken');
+		//return localStorage.getItem('accessToken');
 	}
 
 	getTempToken(){
@@ -302,15 +311,18 @@ export class UserService {
 	}
 
 	getRefreshToken(){
-		return localStorage.getItem('refreshToken');
+		return this.cookieService.getCookie('refreshToken');
+		//return localStorage.getItem('refreshToken');
 	}
 
 	getRememberMeToken(){
-		return localStorage.getItem('rememberMeToken');
+		return this.cookieService.getCookie('rememberMeToken');
+		//return localStorage.getItem('rememberMeToken');
 	}
 
 	removeAccessToken(){
-		localStorage.removeItem('accessToken');
+		this.cookieService.deleteCookie('accessToken');
+		//localStorage.removeItem('accessToken');
 	}
 
 	removeTempToken(){
@@ -318,20 +330,21 @@ export class UserService {
 	}
 
 	removeRefreshToken(){
-		localStorage.removeItem('refreshToken');
+		this.cookieService.deleteCookie('refreshToken');
+		//localStorage.removeItem('refreshToken');
 		/*var headers = new HttpHeaders({'authorization':'Bearer '+this.getAccessToken()});
 		return this.http.delete(environment.apiUsersURL+'/logout',{token: this.getRefreshToken()},{headers:headers});
 	*/}
 
 	removeRememberMeToken(){
-		localStorage.removeItem('rememberMeToken');
+		this.cookieService.deleteCookie('rememberMeToken');
+		//localStorage.removeItem('rememberMeToken');
 	}
 
 	startSessionCountdown(){	
 	    this.refreshTimeLeft();
 	    this.sessionRefreshInterval = setInterval(()=>{
 	        if (this.refreshTimeLeft()<=0){
-	        	console.log("idő: "+this.refreshTimeLeft());
 	        	this.logoutUser('sessionIsOver');
 	        }
 	      },1000);
