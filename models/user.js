@@ -31,9 +31,6 @@ const userSchema = new mongoose.Schema({
 		type : Boolean,
 		default : false
 	},
-	secretSalt : {
-		type : String
-	},
 	language : {
 		type : String,
 		required : true
@@ -181,7 +178,7 @@ userSchema.pre('save',async function(next){
 		const salt = await bcrypt.genSalt(10);
 		const hashedPassword = await bcrypt.hash(this.password,salt);
 		this.password = hashedPassword;
-		this.secretSalt = salt;
+		//this.secretSalt = salt;
 		next();
 	} catch (err){
 		next(err);
@@ -194,7 +191,7 @@ userSchema.pre('findOneAndUpdate',async function(next){
 			const salt = await bcrypt.genSalt(10);
 			const hashedPassword = await bcrypt.hash(this._update.$set.password,salt);
 			this._update.$set.password = hashedPassword;
-			this._update.$set.secretSalt = salt;
+			//this._update.$set.secretSalt = salt;
 		}
 		next();
 	} catch (err){
@@ -226,10 +223,6 @@ userSchema.methods.generateDataRequestToken = function(format){
 	return jwt.sign({_id: this._id,format: format},process.env.DATA_REQUEST_TOKEN,{expiresIn: "5m"});
 }
 
-userSchema.methods.verifyEmailToken = function(token){
-	return jwt.verify(token,process.env.EMAIL_SECRET);
-}
-
 userSchema.methods.generateForgottenToken = function(){
 	return jwt.sign({_id: this._id},process.env.FORGOTTEN_SECRET,{expiresIn: "5m"});
 }
@@ -244,10 +237,6 @@ userSchema.methods.generateTrustDeviceToken = function(loginDetails){
 
 userSchema.methods.generateUnsubscribeToken = function(){
 	return jwt.sign({_id: this._id},process.env.UNSUBSCRIBE_SECRET,{expiresIn: "5m"});
-}
-
-userSchema.methods.verifyToken = function(token){
-	return jwt.verify(token,this.secretSalt);
 }
 
 module.exports = mongoose.model('User',userSchema);
