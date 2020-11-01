@@ -1,33 +1,83 @@
-<div class="container-custom animated">
+<div id="privacy-policy" class="container-custom animated">
 	<div class="card">
 		<div class="card-header">
 			<h2 class="text-center">{{"pageTitlePrivacyPolicy" | translate }}</h2>
 		</div>
 		<div class="card-body">
 			<h3>Mi az adatkezelés jogalapja?</h3>
-			<p>Az adatkezelés jogalapja a felhasználó kifejezett hozzájárulása az adatainak tárolásához és kezeléséhez, amelyet a regisztráció során az erre vonatkozó jelölőnégyzet bepipálásával ismer el, és ennek ténye rögzítésre kerül adatbázisunkban, e nélkül a regisztráció nem lehetséges.</p>
+			<p>Az adatkezelés jogalapja a felhasználó kifejezett hozzájárulása az adatainak tárolásához és kezeléséhez, amelyet a regisztráció során az erre vonatkozó jelölőnégyzet bepipálásával ismer el, és ennek ténye rögzítésre kerül az adatbázisban, e nélkül a regisztráció nem lehetséges.</p>
+			<hr>
+			<h3>Hogyan módosíthatom az adataimat, ammenyiben hibát észlelek bennük?</h3>
+			<p>Ha a felhasználó a regisztrációkor megadott adataiban hibát észlel, akkor a profilom->adataim menüpontban módosíthatja azokat utólag, akárcsak a hírlevélre való fel-és leiratkozást is. Aki úgy dönt, hogy nem kér több hírlevelet, akkor a további üzenetküldést a levelekben található linkre kattintva is lemondhatja.</p>
 			<hr>
 			<h3>Hogyan törölhetem a rólam tárolt adatokat?</h3>
 			<p>Az adatainak törlése a profilom->adataim menüpont alatt a profil törlése gombra kattinva, és a művelet megerősítésével a profiljának megszüntetésével lehetséges. Ekkor minden adat törlésre kerül az adatbázisból, a személyes beállításokkal együtt, az adatok visszaállítása nem lehetséges.</p>
-			<h3>Milyen adatokat tárol rólam a Digital Deals, ha regisztrálok?</h3>
+			<hr>
+			<h3>Hogyan juthatok hozzá a rólam tárolt adatokhoz?</h3>
+			<p>A felhasználó a róla tárolt adatokat letöltheti PDF, illetve JSON formátumban. Az adatigénylésre a nagyobb biztonság érdekében, akkor van lehetőség, ha engedélyezve van a kétfaktoros azonosítás a profilhoz. Ezt követően a honlap először az email címre küld egy 5 percnyi érvényességi idejű megerősítő linket, amire kattintva a felhasználó a letöltő linkhez lesz navigálva.</p>
+			<h3>Milyen személyes adatokat tárol rólam a Game Deals Web, ha regisztrálok?</h3>
 				<ul>
+					<li>Felhasználói azonosító</li>
+					<li>Felhasználó szerepköre</li>
 					<li>Vezetéknév</li>
 					<li>Keresztnév</li>
 					<li>Email cím</li>
 					<li>Jelszó kódolt formában</li>
-					<li>Utolsó belépési adatok, beleértve:
+					<li>Utolsó jelszó változtatás időpontja</li>
+					<li>Nyelv</li>
+					<li>Logikai érték, hogy: </li>
+						<ul>
+							<li>hozzájárult-e az oldal adatvédelmi szabályzatához</li>
+							<li>hozzájárult-e a hírlevélküldéshez</li>
+							<li>a regisztrált email cím meg van-e erősítve</li>
+							<li>engedélyezve van-e az alkalmazás hitelesítés</li>
+							<li>engedélyezve van-e az email hitelesítés</li>
+						</ul>
+					<li>Regisztráció időpontja</li>
+					<li>Felhasználói adatok legutóbbi módosításának időpontja</li>
+					<li>Amennyiben engedélyezve lett a kétfaktoros azonosítás, akkor a
+						6 számjegyű biztonsági kód előállításához szükséges egyedi titkos kulcs:
+						<ul>
+							<li>alkalmazás hitelesítéshez</li>
+							<li>és/vagy email hitelesítéshez</li>
+						</ul>
+					</li>
+					<li>Megtekintett játékok adatai:
+						<ul>
+							<li>játék azonosítója</li>
+							<li>megtekintés dátuma</li>
+						</ul>
+					</li>
+					<li>Várólistára felvett játékok:
+						<ul>
+							<li>azonosítója</li>
+							<li>neve</li>
+							<li>maximum ára</li>
+							<li>minimum kedvezménye</li>
+							<li>és azon áruházak listája, ahol a játékot megvenné a felhasználó</li>
+						</ul>	
+					</li>
+					<li>Megbízható eszközök adatai:
 						<ul>
 							<li>IP cím</li>
-							<li>dátum</li>
+							<li>ország</li>
+							<li>hozzáadás dátuma</li>		
+						</ul>
+					</li>
+					<li>Utolsó belépési adatok:
+						<ul>
+							<li>IP cím</li>
+							<li>ország</li>
+							<li>eszköz</li>
 							<li>operációs rendszer</li>
-							<li>ágens</li>
-							<li>eszköz neve</li>
+							<li>böngésző</li>
+							<li>dátum</li>
 						</ul>
 					</li>
 				</ul>
 			<hr>
 			<h3>Milyen biztonsági intézkedések vannak a felhasználók adatainak védelme érdekében?</h3>
-			<p>A regisztrációkor megadott jelszóra az SHA256 egyirányú titkosítási technológiát alkalmazva egy kódsorozat kerül előállításra, és ezt tároljuk az adatbázisban. Amikor a felhasználó bejelentkezik, akkor a jelszó újra kódolva lesz, és a kapott kódsorozatnak az adatbázisban tárolt kódsorozattal való egyezése esetén lesz sikeres a belépés. A nagyobb biztonság érdekében lehetőség van két faktoros azonosítás bekapcsolására is. Ekkor a helyes email cím és jelszó megadását követően egy 6 számjegyű kód szükséges a belépéshez, amit a kiválasztott azonosítási módnak megfelelően az email címére küldött üzenetben vagy egy a telefonjára telepített azonosításra alkalmas alkalmazásban lesz megtalálható. Amennyiben új eszközről jelentkezik be, tehát nem egyezik a legutóbbi belépéskor rögzített IP cím, operációs rendszer, vagy eszköz neve, akkor email címére egy biztonsági értesítő emailt küldünk, amiben megerősítheti, hogy Ön volt aki belépett az új eszközről, vagy ellenkező esetben új jelszót készíthet profiljához.</p>
+			<p>Az adatok tárolását a MongoDB adatbázis hivatalos felhőalapú szolgáltatása, a MongoDB Atlas teszi lehetővé, amin belül az adatbázis egy tűzfallal védett virtuális magánfelhőben van létrehozva. Az adatbázis tartalma és annak adatforgalma a MongoDB Atlas és a szerver között TLS protokollon keresztül titkosított. A kliens, azaz a felhasználó gépe és a szerver között továbbított adatokat az Amazon által kibocsájtott SSL tanúsítvány titkosítja. A regisztrációkor megadott jelszóra az SHA256 egyirányú titkosítási technológiát alkalmazva egy kódsorozat kerül előállításra, és az lesz az adatbázisban tárolva. A regisztráció véglegesítéséhez az email címére kapott 24 óráig érvényes linkre szükséges kattintani. Ennek lejárta után még 1 héten belül új link igényelhető, amit ha túllép a felhasználó, akkor a szerver automatikusan törli a profilt az adatbázisból. Amikor a felhasználó bejelentkezik, akkor a jelszó újra kódolva lesz, és a kapott kódsorozatnak az adatbázisban tárolt kódsorozattal való egyezése esetén lesz sikeres a belépés. A nagyobb biztonság érdekében lehetőség van kétfaktoros azonosítás bekapcsolására is. Ekkor a helyes email cím és jelszó megadását követően egy 6 számjegyű kód szükséges a belépéshez, amit a kiválasztott azonosítási módnak megfelelően az email címére küldött üzenetben vagy egy a telefonjára telepített azonosításra alkalmas alkalmazásban lesz megtalálható. Amennyiben új eszközről jelentkezik be, tehát ha nem egyeznek a legutóbbi belépési adatok a jelenlegivel, akkor az email címére egy biztonsági értesítő emailt küld a rendszer, amiben megerősítheti, hogy Ön volt aki belépett az új eszközről, vagy ellenkező esetben új jelszót készíthet profiljához. Előbbi esetben az eszköz megbízható eszközként lesz minősítve, és az azzal történő bejelentkezés esetében nem lesz szükség kétfaktoros azonosításra a jövőben, ha csak nem törli az eszközt a profilom->biztonság menüpontban a megbízható eszközök listájáról. Ha a felhasználó elfelejtette a jelszavát, akkor a bejelentkezés oldalon az „Elfelejtett jelszó” linkre kattintva új jelszót igényelhet. A regisztrált email címét megadva, majd a „Link küldése” gombra kattintva egy 5 percig érvényes linket tartalmazó üzenetet küld a szerver a felhasználó email címére, ami az új jelszó létrehozására alkalmas aloldalra vezet.</p>
 			<hr>
 		</div>
 	</div>
