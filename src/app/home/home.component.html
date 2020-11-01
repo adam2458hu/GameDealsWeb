@@ -11,7 +11,7 @@
 			<article class="row" *ngFor="let article of articles;index as i">
 				<div class="col-12 col-md-3">
 					<a href="/articles/{{article.slug}}">
-						<img src="{{article.image}}" alt="" width="100%" (loaded)="loadingImages=false">
+						<img src="{{article.image}}" alt="" width="100%" (loaded)="onLoaded()">
 					</a>
 				</div>
 				<div class="col-12 col-md-9">

@@ -30,6 +30,7 @@ export class HomeComponent implements OnInit {
 	) { }
 
 	ngOnInit() {
+		this.loadingScreenService.setAnimation(true);
 		this.loadingImages = true;
 		this.editorOpened = false;
 
@@ -90,5 +91,10 @@ export class HomeComponent implements OnInit {
 			(err)=>{
 				console.log(err);
 			})
+	}
+
+	onLoaded(){
+		this.loadingImages=false
+		this.loadingScreenService.setAnimation(false);
 	}
 }
