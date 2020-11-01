@@ -229,6 +229,7 @@ router.post('/login',function(req,res,next){
 						rememberMeToken: user.generateRememberMeToken()
 					})
 				} else {
+					//res.cookie('accessToken',user.generateAccessToken(),{maxAge: 1000*60*5,httpOnly: true});
 					return res.status(200).json({
 						message: 'successfulLogin',
 						accessToken: user.generateAccessToken(),
