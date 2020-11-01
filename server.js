@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const path = require('path');
 const usersRoutes = require('./routes/users');
@@ -14,9 +15,10 @@ const i18next = require('i18next');
 const i18nextMiddleware = require('i18next-express-middleware');
 const FilesystemBackend = require('i18next-node-fs-backend');
 
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.static(__dirname+'/dist/', { dotfiles: 'allow' } ));
 app.use(bodyParser.json());
+app.use(cookieParser());
 app.use('/api/users',usersRoutes);
 app.use('/api/games',gamesRoutes);
 app.use('/api/currencies',currenciesRoutes);
