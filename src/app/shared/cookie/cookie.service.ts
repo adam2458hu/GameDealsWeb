@@ -40,7 +40,15 @@ export class CookieService {
 
 	setCookie(name: string, value: string){
 		let date = new Date();
-		date.setFullYear(date.getFullYear()+1);
+		if (name==='accessToken') {
+			date.setTime(date.getTime()+1000*60*5);
+		} else if (name==='refreshToken') {
+			date.setTime(date.getTime()+1000*60*60);
+		} else if (name==='rememberMeToken'){
+			date.setTime(date.getTime()+1000*60*60*24*7);
+		} else {
+			date.setFullYear(date.getFullYear()+1);
+		}
 		document.cookie = `${name}=${value}; expires=${date}; path=/`;
 	}
 
