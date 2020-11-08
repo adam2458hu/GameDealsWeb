@@ -28,7 +28,7 @@ export class SlideService {
 		return this.http.put(environment.apiSlidesURL+'/editSlide/'+slide._id,{slide: slide},{headers: headers});
 	}
 
-	deleteSlide(_id: string){
+	deleteSlide(_id: String){
 		var headers = new HttpHeaders({'authorization':'Bearer '+this.userService.getAccessToken()});
 		return this.http.delete(environment.apiSlidesURL+'/deleteSlide/'+_id,{headers: headers});
 	}
