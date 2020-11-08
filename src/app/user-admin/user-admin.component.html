@@ -115,7 +115,7 @@
 			<h3>Adatbázis adatok frissítése</h3>
 			<form #refreshGamesForm="ngForm">
 				<div class="alert alert-info">
-					<div>A frissítés jelenleg {{ refreshState | translate }}</div>
+					<div>A frissítés jelenleg {{ 'refreshState' | translate }}</div>
 					<div *ngIf="currentRefreshType">Módja: {{ currentRefreshType | translate }}</div>
 					<div *ngIf="currentRefreshType==='automatic'">Intervallum: {{ interval.days }} nap {{ interval.hours }} óra {{ interval.minutes }} perc</div>
 					<div *ngIf="currentlyBeingRefreshed">Állapot: {{ currentlyBeingRefreshed }}</div>
