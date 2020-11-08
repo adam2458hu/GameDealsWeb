@@ -1,0 +1,25 @@
+.editor {
+	background-color: white;
+	color: black;
+	padding: 20px;
+
+	h2,label {
+		color: black;
+	}
+
+	button {
+		margin-top: 10px;
+	}
+}
+
+@media screen and (max-width: 992px) {
+	.editor {
+		margin-bottom: 20px;
+	}
+}
+
+@media screen and (max-width: 576px) {
+	.editor {
+		margin-bottom: 60px;
+	}
+}

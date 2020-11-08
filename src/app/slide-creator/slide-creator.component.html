@@ -1,0 +1,35 @@
+<div *ngIf="slide" id="editor" class="editor">
+	<form #slideForm="ngForm" (ngSubmit)="onSubmit(slideForm)">
+		<h2 *ngIf="!slideToEdit;else editHeading">{{ 'createSlide' | translate}}</h2>
+		<ng-template #editHeading>
+			<h2>{{ 'editSlide' | translate }}</h2>
+		</ng-template>
+		<div class="form-group">
+			<label for="title">{{ 'title' | translate }}:</label>
+			<input type="text" class="form-control" name="title" [(ngModel)]="slide.title" #title="ngModel" placeholder="{{ 'title' | translate }}" required>
+		</div>
+		<div class="form-group">
+			<label for="discountPercent">{{ 'discountPercent' | translate }}:</label>
+			<input type="number" min="0" max="100" class="form-control" name="discountPercent" [(ngModel)]="slide.discountPercent" #discountPercent="ngModel" placeholder="{{ 'discountPercent' | translate }}" required>
+		</div>
+		<div class="form-group">
+			<label for="endOfOffer">{{ 'endOfOffer' | translate }}:</label>
+			<input type="date" class="form-control" name="endOfOffer" [ngModel]="slide.endOfOffer | date:'yyyy-MM-dd'" (ngModelChange)="slide.endOfOffer = $event" #endOfOffer="ngModel" placeholder="{{ 'endOfOffer' | translate }}" required>
+		</div>
+		<div class="form-group">
+			<label for="link">{{ 'linkOfOffer' | translate }}:</label>
+			<input type="text" class="form-control" name="link" [(ngModel)]="slide.link" #link="ngModel" placeholder="{{ 'linkOfOffer' | translate }}" required>
+		</div>
+		<div class="form-group">
+			<label for="image">{{ 'imagesLink' | translate }}:</label>
+			<input type="text" class="form-control" name="image" [(ngModel)]="slide.image" #image="ngModel" placeholder="https://images.igdb.com/igdb/image/upload/t_720p/image.jpg" required>
+		</div>
+		<div class="d-flex justify-content-between">
+			<button *ngIf="!slideToEdit;else editButton" type="submit">{{ 'create' | translate }}</button>
+			<ng-template #editButton>
+				<button type="submit">{{ 'edit' | translate }}</button>
+			</ng-template>
+			<button type="button" (click)="onClose()">{{ 'cancel' | translate }}</button>
+		</div>
+	</form>
+</div>
