@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { HttpClient,HttpHeaders } from '@angular/common/http';
+import { DeviceDetectorService } from 'ngx-device-detector';
 import { CookieService } from '../cookie/cookie.service';
 import { Router } from '@angular/router';
 import { User } from './user';
@@ -10,63 +11,25 @@ import { LoginDetails } from '../login-details/login-details';
   providedIn: 'root'
 })
 export class UserService {
+	private accessToken: string;
+	private tempAccessToken: string;
 	private errorMessage: string;
 	private successMessage: string;
 	private maxIdleInMilisecs: number=60000;
 	private timeLeftInMilisecs: number;
 	private timeLeftAsString: String;
-	//private timePassedPercentage: number;
 	private sessionRefreshInterval: number;
 	private authorizedToPasswordReset: boolean;
 	private messages;
 	private messagesUnread;
-	private user: User;/*{
-		role: '',
-		first_name: '',
-		last_name: '',
-		email: '',
-		password: '',
-		language: 'en',
-		rememberMe: false,
-		twoFactorGoogleEnabled: false,
-		twoFactorEmailEnabled: false,
-		consentToNewsletter: false,
-		consentToGDPR: false,
-		lastPasswordChange: '',
-		twoFactorEmailSecret: '',
-		twoFactorGoogleSecret: '',
-		lastLoginDetails : {
-			ip : '',
-			date : new Date('2020-05-31T12:30:36.658+00:00'),
-			userAgent:  '',
-			os: '',
-			browser: '',
-			device: '',
-			os_version: '',
-			browser_version: '',
-			windowWidth: '',
-			windowHeight: ''
-		},
-		createdAt: '',
-		updatedAt: '',
-		messages: [{
-			date: new Date('2020-05-31T12:30:36.658+00:00'),
-			type: '',
-			title: '',
-			text: '',
-			read : false
-		}],
-		trustedDevices: [{
-			ip : '',
-			country : '',
-			trustedDate : new Date()
-		}]
-	};*/
+	private user: User;
+	private loginDetails: any;
 
 	constructor(
 		private http: HttpClient,
 		private router: Router,
-		private cookieService: CookieService
+		private cookieService: CookieService,
+		private deviceDetectorService: DeviceDetectorService
 	) { }
 
 	registerUser(user: User){
@@ -99,8 +62,8 @@ export class UserService {
 	}
 
 	loginRememberedUser(){
-		var headers = new HttpHeaders({'authorization':'Bearer '+this.getRememberMeToken()});
-		return this.http.get(environment.apiUsersURL+'/loginRememberedUser',{headers: headers});
+		//var headers = new HttpHeaders({'authorization':'Bearer '+this.getRememberMeToken()});
+		return this.http.get(environment.apiUsersURL+'/loginRememberedUser',{withCredentials: true});
 	}
 
 	getIPAddress(){
@@ -142,9 +105,10 @@ export class UserService {
 		return this.http.get(environment.apiUsersURL);
 	}
 
-	getUserProfile(){
+	getUserDetails(){
 		var headers = new HttpHeaders({'authorization':'Bearer '+this.getAccessToken()});
-		return this.http.post(environment.apiUsersURL+'/userprofile',{refreshToken: this.getRefreshToken()},{headers:headers});
+		//return this.http.post(environment.apiUsersURL+'/userprofile',{refreshToken: this.getRefreshToken()},{headers:headers});
+		return this.http.get(environment.apiUsersURL+'/userprofile',{headers:headers});
 	}
 
 	markMessagesAsRead(messageIds: number[]){
@@ -255,12 +219,12 @@ export class UserService {
 	}
 
 	verifyTwoFactorCode(code: string){
-		var headers = new HttpHeaders({'authorization':'Bearer '+this.getTempToken()});
+		var headers = new HttpHeaders({'authorization':'Bearer '+this.getTempAccessToken()});
 		return this.http.post(environment.apiUsersURL+'/verifyTwoFactorCode',code,{headers:headers});
 	}
 
 	sendTwoFactorEmail(){
-		var headers = new HttpHeaders({'authorization':'Bearer '+this.getTempToken()});
+		var headers = new HttpHeaders({'authorization':'Bearer '+this.getTempAccessToken()});
 		return this.http.get(environment.apiUsersURL+'/sendTwoFactorEmail',{headers: headers});
 	}
 
@@ -269,28 +233,21 @@ export class UserService {
 		return this.http.delete(environment.apiUsersURL+'/deleteProfile',{headers: headers});
 	}
 
-	refreshAccessToken(){
+	deleteAuthenticationCookies(){
 		var headers = new HttpHeaders({'authorization':'Bearer '+this.getAccessToken()});
-		return this.http.post(environment.apiUsersURL+'/refreshAccessToken',{refreshToken: this.getRefreshToken()},{headers:headers});
+		return this.http.delete(environment.apiUsersURL+'/deleteAuthenticationCookies',{headers: headers,withCredentials: true});
+	}
+
+	refreshAccessToken(){
+		return this.http.get(environment.apiUsersURL+'/refreshAccessToken',{withCredentials: true});
 	}
 
 	setAccessToken(token: string){
-		this.cookieService.setCookie('accessToken',token);
-		//localStorage.setItem('accessToken',token);
+		this.accessToken = token;
 	}
 
-	setTempToken(token: string){
-		localStorage.setItem('tempToken',token);
-	}
-
-	setRefreshToken(token: string){
-		this.cookieService.setCookie('refreshToken',token);
-		//localStorage.setItem('refreshToken',token);
-	}
-
-	setRememberMeToken(token: string){
-		this.cookieService.setCookie('rememberMeToken',token);
-		//localStorage.setItem('rememberMeToken',token);
+	setTempAccessToken(token: string){
+		this.tempAccessToken = token;
 	}
 
 	setLanguage(language: string){
@@ -302,43 +259,19 @@ export class UserService {
 	}
 
 	getAccessToken(){
-		return this.cookieService.getCookie('accessToken');
-		//return localStorage.getItem('accessToken');
+		return this.accessToken;
 	}
 
-	getTempToken(){
-		return localStorage.getItem('tempToken');
+	getTempAccessToken(){
+		return this.tempAccessToken;
 	}
 
-	getRefreshToken(){
-		return this.cookieService.getCookie('refreshToken');
-		//return localStorage.getItem('refreshToken');
+	resetAccessToken(){
+		this.accessToken = null;
 	}
 
-	getRememberMeToken(){
-		return this.cookieService.getCookie('rememberMeToken');
-		//return localStorage.getItem('rememberMeToken');
-	}
-
-	removeAccessToken(){
-		this.cookieService.deleteCookie('accessToken');
-		//localStorage.removeItem('accessToken');
-	}
-
-	removeTempToken(){
-		localStorage.removeItem('tempToken');
-	}
-
-	removeRefreshToken(){
-		this.cookieService.deleteCookie('refreshToken');
-		//localStorage.removeItem('refreshToken');
-		/*var headers = new HttpHeaders({'authorization':'Bearer '+this.getAccessToken()});
-		return this.http.delete(environment.apiUsersURL+'/logout',{token: this.getRefreshToken()},{headers:headers});
-	*/}
-
-	removeRememberMeToken(){
-		this.cookieService.deleteCookie('rememberMeToken');
-		//localStorage.removeItem('rememberMeToken');
+	resetTempAccessToken(){
+		this.tempAccessToken = null;
 	}
 
 	startSessionCountdown(){	
@@ -355,25 +288,27 @@ export class UserService {
 	}
 
 	resetSession(token: string){
-		this.removeAccessToken();
 		this.setAccessToken(token);
 		this.stopSessionCountdown();
 		this.startSessionCountdown();
 	}
 
 	logoutUser(msg: string){
-		if (localStorage.getItem('rememberMeToken')){
-			this.removeRememberMeToken();
-		}
-		this.removeAccessToken();
-		this.removeRefreshToken();
 		this.stopSessionCountdown();
-		this.setSuccessMessage(msg);
-		this.router.navigate(['/login']);
+		this.deleteAuthenticationCookies().subscribe(
+			(res: any)=>{
+				this.resetAccessToken();
+				this.setSuccessMessage(msg);
+				this.router.navigate(['/login']);
+			},
+			(err)=>{
+				console.log(err);
+			}
+		);
 	}
 
 	refreshTimeLeft(){
-		const payload = this.getPayload();
+		const payload = this.getAccessTokenPayload();
 		if (payload) {
 			this.timeLeftInMilisecs = JSON.parse(atob(payload)).exp*1000-Date.now();
 			this.timeLeftAsString = this.getTimeLeftAsString();
@@ -391,7 +326,7 @@ export class UserService {
 		return minutesString+':'+secondsString;
 	}
 
-	getPayload(){
+	getAccessTokenPayload(){
 		const token = this.getAccessToken();
 		if (token){
 			return token.split('.')[1];
@@ -401,13 +336,12 @@ export class UserService {
 	}
 
 	isAuthenticated(){
-		const payload = this.getPayload();
+		const payload = this.getAccessTokenPayload();
 		if (payload){
 			if (JSON.parse(atob(payload)).exp>Date.now()/1000){
 				return true;
 			} else {
-				this.removeAccessToken();
-				this.removeRefreshToken();
+				this.resetAccessToken();
 				return false;
 			}
 		} else {
@@ -533,7 +467,52 @@ export class UserService {
 		return this.http.get(environment.apiUsersURL+'/getGameHistory',{headers: headers});
 	}
 
-	renewCertificate(fileName: string){
-		return this.http.get(environment.apiUsersURL+'/.well-known/pki-validation/'+fileName);
+	onSuccessfullLogin(res: any){
+		this.setSuccessMessage(res.message);
+		this.resetSession(res.accessToken);
+		this.saveLoginDetails(this.loginDetails).subscribe(
+			(res: any)=>{
+				this.setUserDetails();
+			},
+			(err)=>{
+				console.log(err);
+			})
+	}
+
+	setUserDetails(){
+		this.getUserDetails().subscribe(
+			(res: any)=>{
+				this.setUser(res.user);
+				this.router.navigate(['/deals']);
+			},
+			(err)=>{
+				this.setErrorMessage(err.error.message);
+			});
+	}
+
+	getDeviceInfoThenLogin(loginFunction,form?){
+		this.getIPAddress().subscribe(
+			(res: any)=>{
+				this.loginDetails = this.deviceDetectorService.getDeviceInfo();
+				this.loginDetails.ip = res.ip;
+				this.loginDetails.date = new Date();
+				this.loginDetails.windowWidth = window.innerWidth;
+				this.loginDetails.windowHeight = window.innerHeight;
+				this.getGeoLocation(res.ip).subscribe(
+					(res: any)=>{
+						this.loginDetails.country = res.country_name;
+						loginFunction(form);
+					},
+					(err)=>{
+						console.log(err);
+					});
+			},
+			(err)=>{
+				console.log(err);
+			});
+	}
+
+	getLoginDetails(){
+		return this.loginDetails;
 	}
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Filter } from './filter';
 import { CurrencyService } from '../currency/currency.service';
+import { Store } from '../store/store';
 import { StoreService } from '../store/store.service';
 import { CookieService } from '../cookie/cookie.service';
 import { UserService } from '../user/user.service';
@@ -9,26 +10,7 @@ import { UserService } from '../user/user.service';
   providedIn: 'root'
 })
 export class FilterService {
-	filter: Filter = {
-		name: null,
-		minSpecialPrice: null,
-		maxSpecialPrice: null,
-		minOriginalPrice: null,
-		maxOriginalPrice: null,
-		minDiscountPercent: null,
-		maxDiscountPercent: null,
-		minTotalRating: null,
-		maxTotalRating: null,
-		gamesPerRequest: 10,
-		gameRequestOffset: 0,
-		selectedStores: [],
-		direction: -1,
-		sortBy: 'totalRating',
-		currency: 'EUR',
-		currencyPrevious: 'EUR',
-		symbol: '€',
-		decimalPlaces: 2
-	}
+	filter: Filter;
 	private filterOpened: boolean = false;
 	isAllSelected: boolean = true;
 	private allStores: {name: String,isSelected: Boolean}[] = [];
@@ -39,6 +21,7 @@ export class FilterService {
 		private currencyService: CurrencyService,
 		private storeService: StoreService
 	) {
+		this.filter = new Filter();
 		this.storeService.getStoresFromDatabase().subscribe(
 			(res: any)=>{
 				res.forEach(store=>{
@@ -118,30 +101,8 @@ export class FilterService {
 	}
 
 	resetFilter(){
-		this.filter = {
-			name: null,
-			minSpecialPrice: null,
-			maxSpecialPrice: null,
-			minOriginalPrice: null,
-			maxOriginalPrice: null,
-			minDiscountPercent: null,
-			maxDiscountPercent: null,
-			minTotalRating: null,
-			maxTotalRating: null,
-			selectedStores: [],
-			gamesPerRequest: 10,
-			gameRequestOffset: 0,
-			direction: -1,
-			sortBy: 'totalRating',
-			currency: this.filter.currency,
-			currencyPrevious: this.filter.currencyPrevious,
-			symbol: this.filter.symbol,
-			decimalPlaces: this.filter.decimalPlaces
-		}
-
-		//if (this.cookieService.getConsent().functional) {
-			this.setLocalCurrency();
-		//}
+		this.filter.reset(this.filter.currency,this.filter.currencyPrevious,this.filter.symbol,this.filter.decimalPlaces);
+		this.setLocalCurrency();
 	}
 
 	selectAllStores(){

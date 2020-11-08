@@ -69,7 +69,7 @@ const userSchema = new mongoose.Schema({
 		ip : {
 			type: String
 		},
-		location : {
+		country : {
 			type: String
 		},
 		date : {
@@ -212,7 +212,7 @@ userSchema.methods.generateRememberMeToken = function(){
 }
 
 userSchema.methods.generateRefreshToken = function(){
-	return jwt.sign({_id: this._id},process.env.REFRESH_TOKEN_SECRET,{expiresIn: "1h"});
+	return jwt.sign({_id: this._id},process.env.REFRESH_TOKEN_SECRET,{expiresIn: "5m"});
 }
 
 userSchema.methods.generateEmailToken = function(){

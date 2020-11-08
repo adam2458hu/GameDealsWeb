@@ -1,9 +1,13 @@
 import { Component } from '@angular/core';
 import { environment } from '../environments/environment';
 import { SwPush } from '@angular/service-worker';
+import { DeviceDetectorService } from 'ngx-device-detector';
+import { LoadingScreenService } from './shared/loading-screen/loading-screen.service';
 import { CookieService } from './shared/cookie/cookie.service';
+import { FilterService } from './shared/filter/filter.service';
 import { UserService } from './shared/user/user.service';
 import { LanguageService } from './shared/language/language.service';
+import { CurrencyService } from './shared/currency/currency.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
@@ -22,15 +26,25 @@ export class AppComponent {
 	constructor(
 		private swPush: SwPush,
 		private cookieService: CookieService,
+		private filterService: FilterService,
+		private deviceDetectorService: DeviceDetectorService,
 		private userService: UserService,
 		private translateService: TranslateService,
 		private titleService: Title,
 		private languageService: LanguageService,
+		private loadingScreenService: LoadingScreenService,
+		private currencyService: CurrencyService,
 		private router: Router,
 		private activatedRoute: ActivatedRoute
-	) {
-		this.availableLanguages = ['en','hu'];
-		
+	) {		
+		this.checkPushSubscription();
+		this.setLanguageAndCookies();
+		this.setPageTitle();
+
+		this.continueSessionOrLoginRememberedUser();
+	}
+
+	checkPushSubscription(){
 		//EZ A RÉSZ AZÉRT NAGYON FONTOS, MERT HA A SERVICE WORKER-t MÉG NEM HASZNÁLTUK
 		//MIELŐTT OLYAN KOMPONENST HIVNÁNK MEG, AMI TARTALMAZZA A setTimeout VAGY setInterval()
 		//METÓDUSOKAT, PÉLDÁUL A SLIDESHOW LÉPTETÉSÉHEZ HASZNÁLT METÓDUSOKAT,
@@ -60,6 +74,10 @@ export class AppComponent {
 		} else {
 			this.serviceWorkerChecked = true;
 		}
+	}
+
+	setLanguageAndCookies(){
+		this.availableLanguages = this.languageService.getAvailableLanguages();
 
 		this.cookieService.setAnalyticalCookies();
 		this.cookieService.setAdvertisingCookies();
@@ -78,12 +96,9 @@ export class AppComponent {
 			this.translateService.use(this.cookieService.getLanguageCookie());
 			this.languageIsSet=true;
 		}
+	}
 
-		if (this.userService.isAuthenticated()){
-			this.getUserProfile();
-			this.userService.getMessages();
-		}
-
+	setPageTitle(){
 		this.router.events.pipe(
             filter(event => event instanceof NavigationEnd),
             map(() => {
@@ -116,17 +131,13 @@ export class AppComponent {
 						// ha a felhasználó elfogadta a sütiket csak akkor állítjuk be a nyelv sütit
 						if (this.availableLanguages.includes(res.country_code2.toLowerCase())){
 							this.languageService.setLanguage(res.country_code2.toLowerCase());
-							//localStorage.setItem('lang',res.country_code2.toLowerCase());
 							this.cookieService.setLanguageCookie(res.country_code2.toLowerCase());
-							//window.location.reload();
 							this.translateService.use(res.country_code2.toLowerCase());
 						} else {
 							this.languageService.setLanguage('en');
 							this.cookieService.setLanguageCookie('en');
-							//localStorage.setItem('lang','en');
 						}
 						this.languageIsSet=true;
-						//this.languageCookieIsSet=true;
 					},
 					(err)=>{
 						console.log(err);
@@ -137,14 +148,31 @@ export class AppComponent {
 			})
 	}
 
-	getUserProfile(){
-		this.userService.getUserProfile().subscribe(
-			(res: any)=>{
-				this.userService.setUser(res.user);
-				this.userService.resetSession(res.accessToken);
-			},
-			(err)=>{
-				this.userService.setErrorMessage(err.error.message);
+	continueSessionOrLoginRememberedUser(){
+		//ha a felhasználó már belépett, akkor a munkamenet folytatása
+		if (this.cookieService.getCookie('refreshTokenSet')) {
+			this.userService.refreshAccessToken().subscribe(
+				(res: any)=>{
+					this.userService.resetSession(res.accessToken);
+					this.userService.setUserDetails();
+				},
+				(err)=>{
+					console.log(err);
+				})
+		//ha engedélyezve van a rememberMe funkció, akkor a felhasználó beléptetése
+		} else if (this.cookieService.getCookie('rememberMe')){
+			this.loadingScreenService.setAnimation(true);
+			this.userService.getDeviceInfoThenLogin(()=>{
+				this.userService.loginRememberedUser().subscribe(
+					(res: any)=>{
+						this.userService.onSuccessfullLogin(res);
+						this.loadingScreenService.setAnimation(false);
+					},
+					(err)=>{
+						this.userService.setErrorMessage(err.error.message);
+						this.loadingScreenService.setAnimation(false);
+					});
 			});
+		}
 	}
 }

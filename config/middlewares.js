@@ -28,8 +28,9 @@ function isAuthenticated(req,res,next){
 }
 
 function isUserRemembered(req,res,next){
-	const authHeader = req.headers['authorization'];
-	const rememberMeToken = authHeader.split(' ')[1];
+	//const authHeader = req.headers['authorization'];
+	//const rememberMeToken = authHeader.split(' ')[1];
+	const rememberMeToken = req.cookies.rememberMeToken;
 	if (!rememberMeToken) return res.status(403).send('No token provided');
 	jwt.verify(rememberMeToken,process.env.REMEMBER_ME_SECRET,(err,user)=>{
 		if (err) return res.sendStatus(403);
@@ -56,11 +57,13 @@ async function isAdmin(req,res,next){
 function refreshToken(){
 	return async function(req,res,next){
 		try {
-			const u = await User.findById(req._id);
-			const refreshToken = req.body.refreshToken;
+			//const refreshToken = req.body.refreshToken;
+			const refreshToken = req.cookies.refreshToken;
 			if (refreshToken==null) return res.sendStatus(401);
-			jwt.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET,(err,user)=>{
+			jwt.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET,async (err,user)=>{
 				if (err) return res.sendStatus(403);
+				const u = await User.findById(user._id);
+				res.cookie('refreshToken',u.generateRefreshToken(),{maxAge: 1000*60*5,httpOnly: true});
 				req.accessToken = u.generateAccessToken();
 				next();
 			});

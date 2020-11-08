@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
+import { Consent } from '../shared/cookie/consent';
 import { CookieService } from '../shared/cookie/cookie.service';
 
 @Component({
@@ -11,21 +13,15 @@ export class CookieConsentComponent implements OnInit {
 	consented: boolean;
 	popupOpened: boolean;
 	settingsPanelOpened: boolean;
-	consent: {
-		necessary: boolean,
-		functional: boolean,
-		analytical: boolean,
-		advertising: boolean
-	} = {
-		necessary : true,
-		functional : true,
-		analytical : true,
-		advertising : true
-	}
+	consent: Consent;
 
-	constructor(private cookieService: CookieService) { }
+	constructor(
+		private cookieService: CookieService,
+		private router: Router
+	) { }
 
 	ngOnInit() {
+		this.consent = new Consent(true,true,true,false);
 		if (this.cookieService.getConsent().necessary) {
 			this.consented = true;
 			this.consent = this.cookieService.getConsent();
@@ -39,6 +35,10 @@ export class CookieConsentComponent implements OnInit {
 			this.popupOpened = true;
 		}
 		this.settingsPanelOpened = false;
+	}
+
+	getRouter(){
+		return this.router;
 	}
 
 	consentToNecessaryCookies(){
@@ -58,6 +58,7 @@ export class CookieConsentComponent implements OnInit {
 	}
 
 	consentToAllCookies(){
+		this.consent.necessary = true;
 		this.consent.functional = true;
 		this.consent.analytical = true;
 		this.consent.advertising = false;

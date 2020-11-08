@@ -12,15 +12,6 @@ import 'jspdf-autotable';
   styleUrls: ['./user-details.component.scss']
 })
 export class UserDetailsComponent implements OnInit {
-	/*user = {
-		_id: '',
-		first_name:'',
-		last_name:'',
-		email:'',
-		consentToNewsletter: false,
-		twoFactor:false
-	}*/
-
 	documentPDF: any = new jsPDF();
 	popupOpened: boolean=false;
 	propertiesToUpdate = {};
@@ -39,7 +30,7 @@ export class UserDetailsComponent implements OnInit {
 			this.router.navigate(['/login']);
 		} else {
 			this.userService.getMessages();
-			this.getUserProfile();
+			this.getUserDetails();
 		}
 	}
 
@@ -136,11 +127,10 @@ export class UserDetailsComponent implements OnInit {
 			})
 	}
 
-	getUserProfile(){
-		this.userService.getUserProfile().subscribe(
+	getUserDetails(){
+		this.userService.getUserDetails().subscribe(
 			(res: any)=>{
 				this.userService.setUser(res.user);
-				//this.userService.resetSession(res.accessToken);
 			},
 			(err)=>{
 				this.userService.setErrorMessage(err.error.message);

@@ -1,4 +1,4 @@
-<div id="editor" class="editor">
+<div *ngIf="article" id="editor" class="editor">
 	<form #articleForm="ngForm" (ngSubmit)="onSubmit(articleForm)">
 		<h2 *ngIf="!articleToEdit;else editHeading">{{ 'createArticle' | translate}}</h2>
 		<ng-template #editHeading>
@@ -6,7 +6,7 @@
 		</ng-template>
 		<div class="form-group">
 			<label for="title">{{ 'title' | translate }}:</label>
-			<input type="text" class="form-control" name="title" [(ngModel)]="article.title" #title="ngModel" placeholder="{{ 'title' | translate }}" required>
+			<input type="text" class="form-control" name="title" [(ngModel)]="article.title[selectedLanguageIndex].text" #title="ngModel" placeholder="{{ 'title' | translate }}" required>
 		</div>
 		<div class="form-group">
 			<label for="slug">{{ 'slug' | translate }}:</label>
@@ -14,14 +14,20 @@
 		</div>
 		<div class="form-group">
 			<label for="lead">{{ 'lead' | translate }}:</label>
-			<textarea type="text" class="form-control" name="lead" [(ngModel)]="article.lead" #lead="ngModel" placeholder="{{ 'lead' | translate }}" required></textarea>
+			<textarea type="text" class="form-control" name="lead" [(ngModel)]="article.lead[selectedLanguageIndex].text" #lead="ngModel" placeholder="{{ 'lead' | translate }}" required></textarea>
 		</div>
 		<div class="form-group">
-			<label for="image">{{ 'image' | translate }}:</label>
-			<input type="text" class="form-control" name="image" [(ngModel)]="article.image" #image="ngModel" placeholder="{{ 'image' | translate }}" required>
+			<label for="image">{{ 'imagesLink' | translate }}:</label>
+			<input type="text" class="form-control" name="image" [(ngModel)]="article.image" #image="ngModel" placeholder="{{ 'imagesLink' | translate }}" required>
+		</div>
+		<div class="form-group">
+			<label for="selectedLanguageIndex">{{ 'language' | translate }}:</label>
+			<select name="selectedLanguageIndex" id="selectedLanguageIndex" class="form-control" [(ngModel)]="selectedLanguageIndex" required>
+				<option *ngFor="let lang of availableLanguages;index as i" value="{{i}}">{{ availableLanguages[i] }}</option>
+			</select>
 		</div>
 		<label for="body">{{ 'bodyText' | translate }}:</label>
-		<quill-editor id="body" name="body" #body="ngModel" [(ngModel)]="article.body" required></quill-editor>
+		<quill-editor id="body" name="body" #body="ngModel" [(ngModel)]="article.body[selectedLanguageIndex].text" required></quill-editor>
 		<div class="d-flex justify-content-between">
 			<button *ngIf="!articleToEdit;else editButton" type="submit">{{ 'create' | translate }}</button>
 			<ng-template #editButton>

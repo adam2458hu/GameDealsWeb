@@ -66,12 +66,15 @@ mongoose.connection.on('connected',()=>{
 	const port = process.env.PORT || 3000;
 	app.listen(port,()=>{
 		console.log('App is running on port '+port);
+    //árfolyamok frissítése 3 óránként
 		currenciesRoutes.updateExchangeRates();
 		setInterval(currenciesRoutes.updateExchangeRates,1000*60*60*3);
+    /*//játékok frissítése fél óránként
 		gamesRoutes.refreshGames();
-		setInterval(gamesRoutes.refreshGames,1800000);
-        usersRoutes.deleteUnverifiedUsers();
-        setInterval(usersRoutes.deleteUnverifiedUsers,1800000);
-		//usersRoutes.sendWaitlistEmails();
+		setInterval(gamesRoutes.refreshGames,1800000);*/
+    //megerősítetlen felhasználók törlése fél óránként
+    usersRoutes.deleteUnverifiedUsers();
+    setInterval(usersRoutes.deleteUnverifiedUsers,1800000);
+    //usersRoutes.sendWaitlistEmails();
 	});
 });

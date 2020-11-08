@@ -1,4 +1,4 @@
-<div class="container-custom">
+<div *ngIf="refreshState" class="container-custom">
 	<div class="card">
 		<div class="card-header">
 			<h2 class="text-center">Admin felület</h2>
@@ -12,18 +12,6 @@
 						Akciós ajánlatok küldése megtekintési előzmények alapján
 					</label>
 				</div>
-				<!--<div class="form-check">
-					<label class="form-check-label">
-						<input type="radio" name="newsletterType" class="form-check-input" value="feature" [(ngModel)]="newsletterType">
-						Új funkció
-					</label>
-				</div>
-				<div class="form-check">
-					<label class="form-check-label">
-						<input type="radio" name="newsletterType" class="form-check-input" value="information" [(ngModel)]="newsletterType">
-						Tájékoztatás
-					</label>
-				</div>-->
 				<div class="form-check mb-3">
 					<label class="form-check-label">
 						<input type="radio" name="newsletterType" class="form-check-input" value="other" [(ngModel)]="newsletterType">
@@ -104,6 +92,102 @@
 				</div>
 				<button class="btn-block" type="submit">Push értesítés elküldése</button>
 				<hr>
+			</form>
+			<h3>IGDB hozzáférési token</h3>
+			<div class="row">
+				<div class="col-4 text-right">
+					<label for="IGDBAccessToken">Azonosító:</label>
+				</div>
+				<div class="col-8">
+					<input *ngIf="IGDBAccessToken" class="form-control mb-2" id="IGDBAccessToken" type="text" value="{{ IGDBAccessToken }}" disabled>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-4 text-right">
+					<label for="IGDBAccessTokenExpiresAt">Lejárat:</label>
+				</div>
+				<div class="col-8">
+					<input *ngIf="IGDBAccessTokenExpiresAt" class="form-control mb-2" id="IGDBAccessTokenExpiresAt" type="text" value="{{ IGDBAccessTokenExpiresAt | date: 'long'}}" disabled>
+				</div>
+			</div>
+			<button class="btn-block" (click)="requestIGDBAccessToken()">Új token igénylése</button>
+			<hr>
+			<h3>Adatbázis adatok frissítése</h3>
+			<form #refreshGamesForm="ngForm">
+				<div class="alert alert-info">
+					<div>A frissítés jelenleg {{ refreshState | translate }}</div>
+					<div *ngIf="currentRefreshType">Módja: {{ currentRefreshType | translate }}</div>
+					<div *ngIf="currentRefreshType==='automatic'">Intervallum: {{ interval.days }} nap {{ interval.hours }} óra {{ interval.minutes }} perc</div>
+					<div *ngIf="currentlyBeingRefreshed">Állapot: {{ currentlyBeingRefreshed }}</div>
+					<button *ngIf="refreshState==='running'" type="button" class="btn-block mt-2" (click)="getRefreshDetails()"><fa name="refresh"></fa>Információk frissítése</button>
+				</div>
+
+				<div class="row mb-3">
+					<div class="col-12 col-sm-6 mb-2 mb-sm-0">
+						Frissítendő áruházak
+						<div class="form-check" *ngFor="let store of stores;index as i">
+							<label class="form-check-label">
+								<input type="checkbox" class="form-check-input" [(ngModel)]="store.isSelected" [ngModelOptions]="{standalone: true}">
+								{{store.name}}
+							</label>
+						</div>
+					</div>
+					<div class="col-12 col-sm-6">
+						<div class="form-check">
+							<label class="form-check-label">
+								<input type="checkbox" class="form-check-input" name="refreshIGDBData" [(ngModel)]="refreshIGDBData">
+								IGDB adatok frissítése
+							</label>
+						</div>
+					</div>
+				</div>
+
+				<div *ngIf="refreshState==='stopped';else stopRefreshButton">
+					<div class="mb-3">
+						<h5>Játékok egyszeri frissítése</h5>
+						<button class="btn-block" (click)="refreshGamesOnce(refreshGamesForm)">Indítás</button>
+					</div>
+					<div>
+						<h5>Játékok automatikus frissítése</h5>
+						<p>Intervallum megadása (minimum 30 perc ajánlott)</p>
+						<div class="row mb-2">
+							<div class="col-12 col-sm-4">
+								<div class="row">
+									<div class="col-3 col-sm-5 text-right">
+										Nap:
+									</div>
+									<div class="col-9 col-sm-7">
+										<input type="number" class="form-control" min="0" id="refreshIntervalDays" name="refreshIntervalDays" [(ngModel)]="interval.days" placeholder="nap">
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-sm-4">
+								<div class="row">
+									<div class="col-3 col-sm-5 text-right">
+										Óra:
+									</div>
+									<div class="col-9 col-sm-7">
+										<input type="number" class="form-control" min="0" id="refreshIntervalHours" name="refreshIntervalHours" [(ngModel)]="interval.hours" placeholder="óra">
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-sm-4">
+								<div class="row">
+									<div class="col-3 col-sm-5 text-right">
+										Perc:
+									</div>
+									<div class="col-9 col-sm-7">
+										<input type="number" class="form-control" min="1" id="refreshIntervalMinutes" name="refreshIntervalMinutes" [(ngModel)]="interval.minutes" placeholder="perc">
+									</div>
+								</div>
+							</div>
+						</div>
+						<button class="btn-block" type="button" (click)="refreshGamesAutomatically(refreshGamesForm)">Indítás</button>
+					</div>
+				</div>
+				<ng-template #stopRefreshButton>
+					<button class="btn-block" type="button" (click)="stopRefresh()">{{ currentRefreshType | translate | titlecase }} frissítés megállítása</button>
+				</ng-template>
 			</form>
 		</div>
 	</div>

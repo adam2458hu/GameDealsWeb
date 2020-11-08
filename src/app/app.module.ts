@@ -53,6 +53,7 @@ import { ArticleComponent } from './article/article.component';
 import { ArticleCreatorComponent } from './article-creator/article-creator.component';
 import { PushNotificationConsentComponent } from './push-notification-consent/push-notification-consent.component';
 import { SlideshowComponent } from './slideshow/slideshow.component';
+import { SlideCreatorComponent } from './slide-creator/slide-creator.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
     return new TranslateHttpLoader(http);
@@ -105,7 +106,8 @@ export class MyHammerConfig extends HammerGestureConfig {
     ArticleComponent,
     ArticleCreatorComponent,
     PushNotificationConsentComponent,
-    SlideshowComponent
+    SlideshowComponent,
+    SlideCreatorComponent
   ], 
   imports: [
     BrowserModule,

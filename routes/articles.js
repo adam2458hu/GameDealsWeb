@@ -46,14 +46,7 @@ router.get('/articleViewed/:id',async(req,res)=>{
 
 router.post('/createArticle',[m.isAuthenticated,m.isAdmin],async(req,res)=>{
 	try {
-		const newArticle = new Article({
-			title : req.body.article.title,
-			slug : req.body.article.slug,
-			lead : req.body.article.lead,
-			body : req.body.article.body,
-			image : req.body.article.image
-		})
-
+		const newArticle = new Article(req.body.article);
 		await newArticle.save();
 		res.status(200).json({message: 'articleCreated'});
 	} catch(err) {

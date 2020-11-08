@@ -23,6 +23,36 @@ export class GameService {
 		private currencyService: CurrencyService
 	) { }
 
+	getIGDBAccessToken(){
+		var headers = new HttpHeaders({'authorization':'Bearer '+this.userService.getAccessToken()});
+		return this.http.get(environment.apiGamesURL+'/getIGDBAccessToken',{headers:headers});
+	}
+
+	requestIGDBAccessToken(){
+		var headers = new HttpHeaders({'authorization':'Bearer '+this.userService.getAccessToken()});
+		return this.http.get(environment.apiGamesURL+'/requestIGDBAccessToken',{headers:headers});
+	}
+
+	getRefreshDetails(){
+		var headers = new HttpHeaders({'authorization':'Bearer '+this.userService.getAccessToken()});
+		return this.http.get(environment.apiGamesURL+'/getRefreshDetails',{headers:headers});
+	}
+
+	refreshGamesOnce(refreshDetails: any){
+		var headers = new HttpHeaders({'authorization':'Bearer '+this.userService.getAccessToken()});
+		return this.http.post(environment.apiGamesURL+'/refreshGamesOnce',refreshDetails,{headers:headers});
+	}
+
+	refreshGamesAutomatically(refreshDetails: any){
+		var headers = new HttpHeaders({'authorization':'Bearer '+this.userService.getAccessToken()});
+		return this.http.post(environment.apiGamesURL+'/refreshGamesAutomatically',refreshDetails,{headers:headers});
+	}
+
+	stopRefresh(){
+		var headers = new HttpHeaders({'authorization':'Bearer '+this.userService.getAccessToken()});
+		return this.http.get(environment.apiGamesURL+'/stopRefresh',{headers:headers});
+	}
+
 	getGame(_id){
 		return this.http.get(environment.apiGamesURL+'/getGame/'+_id);
 	}
@@ -43,7 +73,7 @@ export class GameService {
 
 		if (this.userService.isAuthenticated()){
 			var headers = new HttpHeaders({'authorization':'Bearer '+this.userService.getAccessToken()});
-			return this.http.post(environment.apiGamesURL+queryString,{refreshToken: this.userService.getRefreshToken()},{headers:headers});
+			return this.http.get(environment.apiGamesURL+queryString,{headers:headers});
 		} else {
 			return this.http.get(environment.apiGamesURL+queryString);
 		}

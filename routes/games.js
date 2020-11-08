@@ -18,8 +18,16 @@ const Genre = require('../models/genre');
 const Currency = require('../models/currency');
 const m = require('../config/middlewares');
 var appList=[];
-var requestStartIndex=32800;
-var requestEndIndex=33000;
+var automaticRefreshInterval;
+var refreshInterval;
+var currentRefreshType;
+var currentlyBeingRefreshed;
+var refreshState='stopped';
+var storesToRefresh=['GoG'];
+var IGDBAccessToken = process.env.IGDB_ACCESS_TOKEN;
+var IGDBAccessTokenIssuedAt;
+var IGDBAccessTokenExpiresAt;
+var refreshIGDBData;
 var stepToNextStore = false;
 
 async function deleteImages(){
@@ -73,15 +81,49 @@ async function deleteFields(nameArray){
 }
 
 function requestIGDBAccessToken(){
-	var options = {
-		method: 'POST',
-		url: encodeURI(`https://id.twitch.tv/oauth2/token?client_id=${process.env.IGDB_CLIENT_ID}&client_secret=${process.env.IGDB_CLIENT_SECRET}&grant_type=client_credentials`)
-	};
+	return new Promise((resolve,reject)=>{
+		var options = {
+			method: 'POST',
+			url: encodeURI(`https://id.twitch.tv/oauth2/token?client_id=${process.env.IGDB_CLIENT_ID}&client_secret=${process.env.IGDB_CLIENT_SECRET}&grant_type=client_credentials`)
+		};
 
-	request(options, async function (error, response, body) {
-		//console.log(body);
-	});
+		request(options, async function (error, response, body) {
+			if (error){
+				reject(error);
+			} else {
+				resolve(body);
+			}
+		});
+	})
 }
+
+router.get('/getIGDBAccessToken',[m.isAuthenticated,m.isAdmin],async(req,res)=>{
+	try {
+		res.status(200).json({
+			IGDBAccessToken: IGDBAccessToken,
+			IGDBAccessTokenExpiresAt: IGDBAccessTokenExpiresAt
+		});
+	} catch(err){
+		res.status(500).json({message: err.message});
+	}
+})
+
+router.get('/requestIGDBAccessToken',[m.isAuthenticated,m.isAdmin],async(req,res)=>{
+	try {
+		const response = JSON.parse(await requestIGDBAccessToken()); 
+		IGDBAccessToken = response.access_token;
+		IGDBAccessTokenIssuedAt = new Date();
+		IGDBAccessTokenExpiresAt = new Date(new Date().getTime()+response.expires_in*1000);
+
+		res.status(200).json({
+			message: 'Sikeres IGDB hozzáférési token igénylés',
+			IGDBAccessToken: IGDBAccessToken,
+			IGDBAccessTokenExpiresAt: IGDBAccessTokenExpiresAt
+		});
+	} catch(err){
+		res.status(500).json({message: err.message});
+	}
+})
 
 function updateIGDBGenres(){
 	var options = {
@@ -89,7 +131,7 @@ function updateIGDBGenres(){
 		url: encodeURI('https://api.igdb.com/v4/genres'),
 		headers: {
 			'Client-ID': process.env.IGDB_CLIENT_ID,
-			'Authorization': `Bearer ${process.env.IGDB_ACCESS_TOKEN}`,
+			'Authorization': `Bearer ${IGDBAccessToken}`,
 			'Accept': 'application/json'
 		},
 		body : `fields *;`
@@ -117,28 +159,51 @@ function updateIGDBGenres(){
 }
 
 async function appendIGDBGameData(){
-	try {
-		const gamesWithoutIGDBData=await Game.find({$and: [
-			{'cover' : {$exists : false}},
-			{'userRating' : {$exists : false}},
-			{'criticRating' : {$exists : false}},
-			{'totalRating' : {$exists : false}},
-			{'description' : {$exists : false}},
-			{'releaseDate' : {$exists : false}},
-			{'genres' : {$exists : false}}]});
-		console.log(gamesWithoutIGDBData.length+' játékhoz IGDB adat keresése folyamatban');
-		let startIndex=0;
-		let interval = setInterval(()=>{
-			if (startIndex>=gamesWithoutIGDBData.length) clearInterval(interval);
-			endIndex=startIndex+4;
-			for(i=startIndex;i<endIndex && i<gamesWithoutIGDBData.length;i++){
-				getIGDBGameData(gamesWithoutIGDBData[i].name);
-			}
-			startIndex+=4;
-		},1000);
-	} catch(err){
-		console.log(err);
-	}
+	currentlyBeingRefreshed = 'IGDB adatok frissítése folyamatban';
+	console.log(currentlyBeingRefreshed);
+	return new Promise(async(resolve,reject)=>{
+		try {
+			const gamesWithoutIGDBData=await Game.find({$and: [
+				{'cover' : {$exists : false}},
+				{'userRating' : {$exists : false}},
+				{'criticRating' : {$exists : false}},
+				{'totalRating' : {$exists : false}},
+				{'description' : {$exists : false}},
+				{'releaseDate' : {$exists : false}},
+				{'genres' : {$exists : false}}]});
+
+			console.log(gamesWithoutIGDBData.length+' játékhoz IGDB adat keresése folyamatban');
+			let startIndex=0;
+			let endIndex=4;
+			let interval = setInterval(()=>{
+				if (refreshState==='stopped') {
+					clearInterval(interval);
+					reject('IGDB adatok keresése leállítva');
+					return;
+				} else if (startIndex<gamesWithoutIGDBData.length) {
+					for(let i=startIndex;i<endIndex && i<gamesWithoutIGDBData.length;i++){
+						getIGDBGameData(gamesWithoutIGDBData[i].name);
+
+						//ha a lekérdezett játékok közül az utolsót is megvizsgáltuk
+						if (i==gamesWithoutIGDBData.length-1){
+							clearInterval(interval);
+							resolve('IGDB adatok lekérdezve');
+							return;
+						} else if (i==endIndex-1 && endIndex%20==0) {
+							currentlyBeingRefreshed = 'IGDB adatok lekérdezve: '+endIndex+'/'+gamesWithoutIGDBData.length+' játékhoz';
+							console.log(currentlyBeingRefreshed);
+						}
+					}
+					startIndex+=4;
+					endIndex=startIndex+4;
+				} else {
+					clearInterval(interval);
+				}
+			},1000);
+		} catch(err){
+			reject(err);
+		}
+	})
 }
 
 function getIGDBGameData(gameName){
@@ -147,7 +212,7 @@ function getIGDBGameData(gameName){
 		url: encodeURI('https://api.igdb.com/v4/games'),
 		headers: {
 			'Client-ID': process.env.IGDB_CLIENT_ID,
-			'Authorization': `Bearer ${process.env.IGDB_ACCESS_TOKEN}`
+			'Authorization': `Bearer ${IGDBAccessToken}`
 		},
 		/*body : `query games "Game Info" {
 				fields name,cover.url,rating,aggregated_rating,total_rating,summary,first_release_date,genres.name;where slug="${names}";
@@ -278,7 +343,6 @@ router.get('/',async(req,res)=>{
 	try {
 		const totalGamesCount = await Game.countDocuments({'stores.expired':false});
 		const filteredGamesCount = await Game.countDocuments(filter);
-		//const discountedGames = await Game.find(filter).sort(sortObject).limit(10).skip(parseInt(req.query.gameRequestOffset));
 		const unwindedDiscountedGames = await Game.aggregate([
 			{$match: {'stores.expired':false}},
 			{$unwind:"$stores"},
@@ -297,19 +361,14 @@ router.get('/',async(req,res)=>{
 						unwindedDiscountedGames: result
 					});
 				}
-		});/*
-		const discountedGames = await Game.find(filter).sort(sortObject).limit(10).skip(parseInt(req.query.gameRequestOffset));
-		res.status(200).json({
-			totalGamesCount: totalGamesCount,
-			filteredGamesCount: filteredGamesCount,
-			discountedGames: discountedGames
-		});*/
+		});
 	} catch(err){
 		res.status(500).json({message: err.message});
 	}
 });
 
-router.post('/',[m.isAuthenticated,m.refreshToken()],async(req,res)=>{
+//router.post('/',[m.isAuthenticated,m.refreshToken()],async(req,res)=>{
+router.get('/',m.isAuthenticated,async(req,res)=>{
 	let filter=getFilter(req);
 	let sortObject=getSortObject(req);
 
@@ -331,18 +390,10 @@ router.post('/',[m.isAuthenticated,m.refreshToken()],async(req,res)=>{
 				    	accessToken: req.accessToken,
 						totalGamesCount: totalGamesCount,
 						filteredGamesCount: filteredGamesCount,
-						//discountedGames: discountedGames,
 						unwindedDiscountedGames: result
 					});
 				}
 		});
-		/*const discountedGames = await Game.find(filter).sort(sortObject).limit(10).skip(parseInt(req.query.gameRequestOffset));
-		res.status(200).json({
-			accessToken: req.accessToken,
-			totalGamesCount: totalGamesCount,
-			filteredGamesCount: filteredGamesCount,
-			discountedGames: discountedGames
-		});*/
 	} catch(err){
 		res.status(500).json({message: err.message});
 	}
@@ -586,18 +637,22 @@ async function resetStillOnSaleFields(storeName){
 	})
 }
 
-async function markExpiredDeals(storeName){
-	let games = await Game.find({'stores.name':storeName});
-	games.forEach(async game=>{
-		for(var i=0;i<game.stores.length;i++){
-			if (game.stores[i].name==storeName && !game.stores[i].expired && !game.stores[i].stillOnSale){
-				game.stores[i].expired = true;
-				game.stores[i].specialPrice = game.stores[i].originalPrice;
-				game.stores[i].discountPercent = 0;
-				break;
+function markExpiredDeals(storeName){
+	return new Promise(async(resolve,reject)=>{
+		let games = await Game.find({'stores.name':storeName});
+		games.forEach(async (game,index,arr)=>{
+			for(var i=0;i<game.stores.length;i++){
+				if (game.stores[i].name==storeName && !game.stores[i].expired && !game.stores[i].stillOnSale){
+					game.stores[i].expired = true;
+					game.stores[i].specialPrice = game.stores[i].originalPrice;
+					game.stores[i].discountPercent = 0;
+					break;
+				}
 			}
-		}
-		await game.save();
+			
+			await game.save();
+			if (index==arr.length-1) resolve('ok');
+		})
 	})
 }
 
@@ -670,7 +725,8 @@ function getProxyList(){
 }
 
 function scrapeStore(storeName,storeUrl,useProxy,needsTimeout,multiPage){
-	console.log(`${storeName} játékok frissítése folyamatban`);
+	currentlyBeingRefreshed = `${storeName} játékok frissítése folyamatban`;
+	console.log(currentlyBeingRefreshed);
 	return new Promise((resolve,reject)=>{
 		(async()=>{
 			try {
@@ -723,9 +779,16 @@ function scrapeStore(storeName,storeUrl,useProxy,needsTimeout,multiPage){
 					})
 				}
 
-				for(i=0;i<scrapedPage?scrapedPage.gameUrlList.length:1;i++){
+				for(i=0;i<(scrapedPage?scrapedPage.gameUrlList.length:1);i++){
 
 					if (multiPage){
+						//ha az admin megállította a frissítést, akkor az aktuális oldalt már nem vizsgáljuk
+						if (refreshState==='stopped') {
+							reject(storeName + ' játékok frissítése leállítva');
+							return;
+						}
+						currentlyBeingRefreshed = `${storeName} játékok átnézve: `+(i+1)+'/'+scrapedPage.gameUrlList.length+' oldal';
+						console.log(currentlyBeingRefreshed);
 						await page.goto(scrapedPage.gameUrlList[i],{waitUntil: 'networkidle2'});
 					}
 					
@@ -797,9 +860,21 @@ function scrapeStore(storeName,storeUrl,useProxy,needsTimeout,multiPage){
 						}
 					},{storeName,needsTimeout})
 
-					if (await checkScrapedGames(storeName,scrapedGames,multiPage?i==scrapedPage.gameUrlList.length-1:true)) {
-						markExpiredDeals(storeName);
-						resolve(`${storeName} játékok frissítve`);
+					/*if (await checkScrapedGames(storeName,scrapedGames,multiPage?i==scrapedPage.gameUrlList.length-1:true)) {
+						setTimeout(async()=>{
+							await markExpiredDeals(store.name);
+							resolve(`${store.name} játékok frissítve`);
+						},1000);
+					}*/
+					let scrapedGamesChecked = await checkScrapedGames(storeName,scrapedGames,multiPage?i==scrapedPage.gameUrlList.length-1:true);
+					if (scrapedGamesChecked===true) {
+						setTimeout(async()=>{
+							await markExpiredDeals(storeName);
+							resolve(`${storeName} játékok frissítve`);
+						},1000);
+					} else if (scrapedGamesChecked==='stopped'){
+						reject(storeName + ' játékok frissítése leállítva');
+						return;
 					}
 				}
 				debugger;
@@ -829,6 +904,11 @@ function checkScrapedGames(storeName,scrapedGames,lastPage){
 			}
 
 			gameObjects.forEach(async (game,index,arr)=>{
+				if (refreshState==='stopped') {
+					reject('stopped');
+					return;
+				}
+
 				try {
 					let gameFoundInDatabase = await Game.findOne({name: game.title});
 
@@ -937,7 +1017,8 @@ function checkScrapedGames(storeName,scrapedGames,lastPage){
 }
 
 function requestGameList(store){
-	console.log(store.name + ' játékok frissítése folyamatban');
+	currentlyBeingRefreshed = store.name + ' játékok frissítése folyamatban';
+	console.log(currentlyBeingRefreshed);
 	return new Promise((resolve,reject)=>{
 		resetStillOnSaleFields(store.name);
 
@@ -947,142 +1028,153 @@ function requestGameList(store){
 				process.exit(1);
 			}
 
+			let fromPageIndex=0;
 			let totalPages = JSON.parse(body)[`${store.totalPagesField}`];
-			let maxIteration=Math.floor(totalPages/store.maxRequests);
-			for(let iteration=0;iteration<=maxIteration;iteration++){
-				let currentIteration = iteration;
-				setTimeout(()=>{
-					let fromPageIndex=currentIteration*store.maxRequests;
-					let toPageIndex=(currentIteration*store.maxRequests+store.maxRequests);
+			let interval = setInterval(()=>{
+				if (refreshState==='stopped') {
+					clearInterval(interval);
+					reject(store.name + ' játékok frissítése leállítva');
+					return;
+				} else if (fromPageIndex>=totalPages) clearInterval(interval);
+				let toPageIndex=fromPageIndex+4;
 
-					for(page=fromPageIndex;page<totalPages && page<toPageIndex;page++){
-						let currentPageIndex=page;
-										
-						request(store.gameListUrl+`&page=${page + store.gameListUrlQueryOffset}`,function(error,response,body){
-							if (error) {
-								reject(error);
-								process.exit(1);
+				for(page=fromPageIndex;page<totalPages && page<toPageIndex;page++){
+					let currentPageIndex=page;	
+					request(store.gameListUrl+`&page=${page + store.gameListUrlQueryOffset}`,function(error,response,body){
+						if (error) {
+							reject(error);
+							process.exit(1);
+						}
+
+						gameList = JSON.parse(body)[`${store.gameArrayField}`];
+						gameList.forEach(async (game,index,arr)=>{
+							if (refreshState==='stopped') {
+								clearInterval(interval);
+								reject(store.name + ' játékok frissítése leállítva');
+								return;
 							}
 
-							gameList = JSON.parse(body)[`${store.gameArrayField}`];
-							gameList.forEach(async (game,index,arr)=>{
-								try {
-									
-									let originalPrice=game[`${store.fieldsToOriginalPrice[0]}`];
-									let specialPrice=game[`${store.fieldsToSpecialPrice[0]}`];
-									for(let i=0;i<store.fieldsToOriginalPrice.length-1;i++){
-										originalPrice = originalPrice[`${store.fieldsToOriginalPrice[i+1]}`]
-										specialPrice = specialPrice[`${store.fieldsToSpecialPrice[i+1]}`];
-									}
-
-									if (originalPrice==specialPrice){
-										if (currentPageIndex==totalPages-1 && index==arr.length-1) {
-											markExpiredDeals(store.name);
-											resolve(`${store.name} játékok frissítve`);
-										}
-										return;
-									}
-
-									let gameFoundInDatabase = await Game.findOne({name: game[`${store.gameTitleField}`]});
-									if (!gameFoundInDatabase && originalPrice>0.5) {
-										let newGame = new Game({
-											name : game[`${store.gameTitleField}`]
-										})
-										if (store.genresField) {
-											newGame.genres = game[`${store.genresField}`];
-										}
-
-										saveNewStore(newGame,store,game,originalPrice,specialPrice);
-
-										if (currentPageIndex==totalPages-1 && index==arr.length-1){
-											markExpiredDeals(store.name);
-											resolve(`${store.name} játékok frissítése befejezve`);
-										} else if (currentPageIndex==toPageIndex-1 && index==arr.length-1) {
-											console.log(`${store.name}`+' játékok átnézve: '+toPageIndex+'/'+totalPages+' oldal');
-										}
-									} else if (gameFoundInDatabase){
-
-										if (gameFoundInDatabase.stores.filter(function(s){
-										return s.name==store.name; }).length > 0) {
-											let gameStillOnSale = await Game.findOne({
-												name: game[`${store.gameTitleField}`],
-												$and:[
-													{'stores.name':store.name},
-													{'stores.specialPrice':specialPrice},
-													{'stores.expired':false}
-												]
-											});
-											//ha a játék szerepel az adatbázisban és még akciós, akkor rögzítjük
-											//az adatbázisban hogy még akciós, amit azért kell, hogy az iteráció végén
-											//ne állítjuk az akciót lejártra.
-											if (gameStillOnSale){
-												gameStillOnSale.stores.forEach(s=>{
-													if (s.name==store.name){
-														s.stillOnSale = true;
-														s.linkToGame = store.url+game[`${store.gameUrlField}`];
-													}
-												});
-
-												await gameStillOnSale.save();
-											} else {
-												//ha a játék már szerepel az adatbázisban és az előző akciós ár lejárt
-												//vagy eltérő a jelenlegi akciós ártól, akkor a korábbi adatokat
-												//felül írjuk
-												gameFoundInDatabase.stores.forEach(s=>{
-													if (s.name==store.name){
-														s.originalPrice = originalPrice;
-														s.specialPrice = specialPrice;
-														s.discountPercent = Math.round((1-((specialPrice)/(originalPrice)))*100);
-														s.linkToGame = store.url+game[`${store.gameUrlField}`];
-														s.expired = false;
-														s.stillOnSale = true;
-													}
-													if (specialPrice<store.historicalLowPrice){
-														s.historicalLowPrice=specialPrice;
-													}
-												})
-
-												await gameFoundInDatabase.save();
-											}
-										} else {
-											saveNewStore(gameFoundInDatabase,store,game,originalPrice,specialPrice);
-										}
-
-										//ha a lekérdezett játékok közül az utolsót is megvizsgáltuk
-										if (currentPageIndex==totalPages-1 && index==arr.length-1){
-											markExpiredDeals(store.name);
-											resolve(`${store.name} játékok frissítve`);
-										} else if (currentPageIndex==toPageIndex-1 && index==arr.length-1) {
-											console.log(`${store.name}`+' játékok átnézve: '+toPageIndex+'/'+totalPages+' oldal');
-										}
-									}
-								} catch(err){
-									reject(err);
+							try {
+								
+								let originalPrice=game[`${store.fieldsToOriginalPrice[0]}`];
+								let specialPrice=game[`${store.fieldsToSpecialPrice[0]}`];
+								for(let i=0;i<store.fieldsToOriginalPrice.length-1;i++){
+									originalPrice = originalPrice[`${store.fieldsToOriginalPrice[i+1]}`]
+									specialPrice = specialPrice[`${store.fieldsToSpecialPrice[i+1]}`];
 								}
-							})
-						});
-					}
-				},35000*currentIteration);
-			}
+
+								if (originalPrice==specialPrice){
+									if (currentPageIndex==totalPages-1 && index==arr.length-1) {
+										//ha az utolsó játékot is végignéztük, akkor kis várakozás után kilépés.
+										//ha nem várunk, akkor hiába van az await saveNewStore(..), nem várja meg amíg minden játék
+										//az adatbázisba kerül és úgy lépne tovább a programkód
+										setTimeout(async()=>{
+											await markExpiredDeals(store.name);
+											resolve(`${store.name} játékok frissítve`);
+										},1000);
+									}
+									return;
+								}
+
+								let gameFoundInDatabase = await Game.findOne({name: game[`${store.gameTitleField}`]});
+								if (!gameFoundInDatabase && originalPrice>0.5) {
+									let newGame = new Game({
+										name : game[`${store.gameTitleField}`]
+									})
+
+									await saveNewStore(newGame,store,game,originalPrice,specialPrice);
+									
+								} else if (gameFoundInDatabase){
+									if (gameFoundInDatabase.stores.filter(function(s){
+									return s.name==store.name; }).length > 0) {
+										let gameStillOnSale = await Game.findOne({
+											name: game[`${store.gameTitleField}`],
+											$and:[
+												{'stores.name':store.name},
+												{'stores.specialPrice':specialPrice},
+												{'stores.expired':false}
+											]
+										});
+										//ha a játék szerepel az adatbázisban és még akciós, akkor rögzítjük
+										//az adatbázisban hogy még akciós, amit azért kell, hogy az iteráció végén
+										//ne állítjuk az akciót lejártra.
+										if (gameStillOnSale){
+											gameStillOnSale.stores.forEach(s=>{
+												if (s.name==store.name){
+													s.stillOnSale = true;
+													s.linkToGame = store.url+game[`${store.gameUrlField}`];
+												}
+											});
+
+											await gameStillOnSale.save();
+										} else {
+											//ha a játék már szerepel az adatbázisban és az előző akciós ár lejárt
+											//vagy eltérő a jelenlegi akciós ártól, akkor a korábbi adatokat
+											//felül írjuk
+											gameFoundInDatabase.stores.forEach(s=>{
+												if (s.name==store.name){
+													s.originalPrice = originalPrice;
+													s.specialPrice = specialPrice;
+													s.discountPercent = Math.round((1-((specialPrice)/(originalPrice)))*100);
+													s.linkToGame = store.url+game[`${store.gameUrlField}`];
+													s.expired = false;
+													s.stillOnSale = true;
+												}
+												if (specialPrice<store.historicalLowPrice){
+													s.historicalLowPrice=specialPrice;
+												}
+											})
+
+											await gameFoundInDatabase.save();
+										}
+									} else await saveNewStore(gameFoundInDatabase,store,game,originalPrice,specialPrice);
+								}
+
+								//ha a lekérdezett játékok közül az utolsót is megvizsgáltuk
+								if (currentPageIndex==totalPages-1 && index==arr.length-1){
+									setTimeout(async()=>{
+										await markExpiredDeals(store.name);
+										resolve(`${store.name} játékok frissítve`);
+									},1000);
+								} else if (currentPageIndex==toPageIndex-1 && index==arr.length-1) {
+									currentlyBeingRefreshed = `${store.name}`+' játékok átnézve: '+toPageIndex+'/'+totalPages+' oldal';
+									console.log(currentlyBeingRefreshed);
+								}
+							} catch(err){
+								reject(err);
+							}
+						})
+					});
+				}
+
+				fromPageIndex+=4;
+			},1000);
 		});
 	})
 }
 
 async function saveNewStore(gameInstance,store,game,originalPrice,specialPrice){
-	//a még nem rögzített áruházban szereplő játék adatait tartalmazó objektum
-	let newStore = {
-		name : store.name,
-		originalPrice : originalPrice,
-		specialPrice : specialPrice,
-		historicalLowPrice : specialPrice,
-		discountPercent : Math.round((1-((specialPrice)/(originalPrice)))*100),
-		linkToGame : store.url+game[`${store.gameUrlField}`],
-		expired : false,
-		stillOnSale : true
-	};
-	gameInstance.stores.push(newStore);
+	return new Promise(async(resolve,reject)=>{
+		try {
+			//a még nem rögzített áruházban szereplő játék adatait tartalmazó objektum
+			let newStore = {
+				name : store.name,
+				originalPrice : originalPrice,
+				specialPrice : specialPrice,
+				historicalLowPrice : specialPrice,
+				discountPercent : Math.round((1-((specialPrice)/(originalPrice)))*100),
+				linkToGame : store.url+game[`${store.gameUrlField}`],
+				expired : false,
+				stillOnSale : true
+			};
+			gameInstance.stores.push(newStore);
 
-	await gameInstance.save();	
+			await gameInstance.save();
+			resolve('játék mentve az adatbázisba');
+		} catch(err){
+			reject(err);
+		}
+	});
 }
 
 function refreshSteamGames(callback){
@@ -1097,79 +1189,154 @@ function refreshSteamGames(callback){
 	});
 }
 
-function printOutIP(){		
-	const { networkInterfaces } = require('os');
-	const nets = networkInterfaces();
-	const results = {} // or just '{}', an empty object
-
-	for (const name of Object.keys(nets)) {
-	    for (const net of nets[name]) {
-	        // skip over non-ipv4 and internal (i.e. 127.0.0.1) addresses
-	        if (net.family === 'IPv4' && !net.internal) {
-	            if (!results[name]) {
-	                results[name] = [];
-	            }
-
-	            results[name].push(net.address);
-	        }
-	    }
-	}
-	console.log(results);
-}
-
 async function refreshGames() {
+	refreshState='running';
+	console.log('----------------');
+	console.log('A játékok frissítése folyamatban:');
+	console.log('Frissítés módja: '+currentRefreshType);
+	if (refreshInterval) console.log('Frissítés intervalluma: '+refreshInterval);
+	console.log('Frissítendő áruházak: '+storesToRefresh);
+	console.log('IGDB adatok frissítése: '+refreshIGDBData);
+	console.log('----------------');
 	try {
 		let response;
-		//deleteFields(['genres','userRating','description','releaseDate']);
-		//deleteImages();
-		//updateIGDBGenres();
-		//appendIGDBGameData();
-		/*response = await insertHistoricalLowPrices();
-		console.log(response);
-		response = await setExpiredPrices();
-		console.log(response);
-		response = await deleteFalseStoreFields();
-		console.log(response);
-		response = await deleteGamesWithNoStore();
-		console.log(response);*/
-		/*
-		response = await scrapeStore('Blizzard',process.env.BLIZZARD_GAMES_URL,false,false,true);
-		console.log(response);*//*
-		response = await scrapeStore('Epic Games Store',process.env.EPIC_GAMES_ALL_GAMES_URL,true,true,false);
-		console.log(response);*//*
-		response = await requestGameList({
-			name : 'Humble Bundle',
-			url : process.env.HUMBLE_BUNDLE_URL,
-			gameListUrl : process.env.HUMBLE_BUNDLE_DISCOUNTED_GAMES_URL,
-			gameListUrlQueryOffset : 0,
-			totalPagesField : 'num_pages',
-			gameUrlField : 'human_url',
-			gameArrayField : 'results',
-			gameTitleField : 'human_name',
-			fieldsToOriginalPrice : ['full_price','amount'],
-			fieldsToSpecialPrice : ['current_price','amount'],
-			maxRequests : 20,
-		});
-		console.log(response);
-		response = await requestGameList({
-			name : 'GoG',
-			url : process.env.GOG_URL,
-			gameListUrl : process.env.GOG_DISCOUNTED_GAMES_URL,
-			gameListUrlQueryOffset : 1,
-			totalPagesField : 'totalPages',
-			gameUrlField : 'url',
-			gameArrayField : 'products',
-			gameTitleField : 'title',
-			genresField : 'genres',
-			fieldsToOriginalPrice : ['price','baseAmount'],
-			fieldsToSpecialPrice : ['price','finalAmount'],
-			maxRequests : 1000,
-		});
-		console.log(response);*/
+		
+		if (storesToRefresh.includes('Blizzard')) {
+			response = await scrapeStore('Blizzard',process.env.BLIZZARD_GAMES_URL,false,false,true);
+			console.log(response);
+			if (refreshState==='stopped') return;
+		}
+
+		if (storesToRefresh.includes('Epic Games Store')) {
+			response = await scrapeStore('Epic Games Store',process.env.EPIC_GAMES_ALL_GAMES_URL,true,true,false);
+			console.log(response);
+			if (refreshState==='stopped') return;
+		}
+
+		if (storesToRefresh.includes('Humble Bundle')) {
+			response = await requestGameList({
+				name : 'Humble Bundle',
+				url : process.env.HUMBLE_BUNDLE_URL,
+				gameListUrl : process.env.HUMBLE_BUNDLE_DISCOUNTED_GAMES_URL,
+				gameListUrlQueryOffset : 0,
+				totalPagesField : 'num_pages',
+				gameUrlField : 'human_url',
+				gameArrayField : 'results',
+				gameTitleField : 'human_name',
+				fieldsToOriginalPrice : ['full_price','amount'],
+				fieldsToSpecialPrice : ['current_price','amount'],
+				maxRequests : 20,
+			});
+			console.log(response);
+			if (refreshState==='stopped') return;
+		}
+
+		if (storesToRefresh.includes('GoG')) {
+			response = await requestGameList({
+				name : 'GoG',
+				url : process.env.GOG_URL,
+				gameListUrl : process.env.GOG_DISCOUNTED_GAMES_URL,
+				gameListUrlQueryOffset : 1,
+				totalPagesField : 'totalPages',
+				gameUrlField : 'url',
+				gameArrayField : 'products',
+				gameTitleField : 'title',
+				fieldsToOriginalPrice : ['price','baseAmount'],
+				fieldsToSpecialPrice : ['price','finalAmount'],
+				maxRequests : 1000,
+			});
+			console.log(response);
+			if (refreshState==='stopped') return;
+		}
+
+		if (refreshIGDBData) {
+			response = await appendIGDBGameData();
+			console.log(response);
+			if (refreshState==='stopped') return;
+		}
+
+		refreshState = 'stopped';
+		currentRefreshType=null;
+		currentlyBeingRefreshed=null;
+		console.log("Frissítés vége");
 	} catch(err){
 		console.log(err);
 	}
 }
+
+router.get('/getRefreshDetails',[m.isAuthenticated,m.isAdmin],(req,res)=>{
+	res.status(200).json({
+		currentRefreshType: currentRefreshType,
+		currentlyBeingRefreshed: currentlyBeingRefreshed,
+		refreshState: refreshState,
+		refreshInterval: refreshInterval,
+		refreshIGDBData: refreshIGDBData,
+		storesToRefresh: storesToRefresh
+	});
+})
+
+router.post('/refreshGamesAutomatically',[m.isAuthenticated,m.isAdmin],(req,res)=>{
+	if (currentRefreshType !== 'automatic') currentRefreshType='automatic';
+
+	storesToRefresh = req.body.selectedStores;
+	refreshIGDBData = req.body.refreshIGDBData;
+
+	refreshInterval = (1000*60*req.body.refreshIntervalMinutes)+
+	(1000*60*60*req.body.refreshIntervalHours)+
+	(1000*60*60*24*req.body.refreshIntervalDays);
+
+	refreshGames();
+	automaticRefreshInterval = setInterval(refreshGames,refreshInterval);
+
+	res.status(200).json({
+		message: 'Játékok automatikus frissítése folyamatban',
+		currentRefreshType: currentRefreshType,
+		currentlyBeingRefreshed: currentlyBeingRefreshed,
+		refreshState: refreshState,
+		refreshInterval: refreshInterval,
+		refreshIGDBData: refreshIGDBData
+	});
+})
+
+router.post('/refreshGamesOnce',[m.isAuthenticated,m.isAdmin],(req,res)=>{
+	if (currentRefreshType !== 'manual') currentRefreshType='manual';
+	
+	storesToRefresh = req.body.selectedStores;
+	refreshIGDBData = req.body.refreshIGDBData;
+
+	refreshGames();
+	res.status(200).json({
+		message: 'Játékok egyszeri frissítése folyamatban',
+		currentRefreshType: currentRefreshType,
+		currentlyBeingRefreshed: currentlyBeingRefreshed,
+		refreshState: refreshState,
+		refreshIGDBData: refreshIGDBData
+	});
+})
+
+router.get('/stopRefresh',[m.isAuthenticated,m.isAdmin],(req,res)=>{
+	if (refreshState==='running') {
+		if (currentRefreshType === 'automatic') {
+			clearInterval(automaticRefreshInterval);
+			refreshInterval=null;
+		}
+
+		refreshState = 'stopped';
+		currentlyBeingRefreshed = null;
+
+		console.log('Admin parancsra a(z) '+ currentRefreshType+" frissítés leállítása");
+		res.status(200).json({
+			message: `Játékok ${currentRefreshType} frissítése leállítva`,
+			currentRefreshType: null,
+			currentlyBeingRefreshed: currentlyBeingRefreshed,
+			refreshState: refreshState,
+			refreshInterval: refreshInterval
+		});
+		currentRefreshType=null;
+	} else {
+		res.status(400).json({message: 'Jelenleg nem fut a frissítés'});
+	}
+})
 
 function getGameDetails(){
 	//lekérdezendő játékok azonosítójából álló lista

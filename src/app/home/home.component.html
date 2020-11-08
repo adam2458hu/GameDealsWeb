@@ -1,9 +1,13 @@
 <!--<div [class.loadingImages]="loadingImages">-->
 <div [class.loadingImages]="loadingImages">
+	<!--<app-slide-creator *ngIf="slideEditorOpened" (created)="getSlides()" (close)="onCloseSlideEditor()" [slideToEdit]="slideToEdit"></app-slide-creator>
+	<div *ngIf="isAdmin() && !slideEditorOpened" class="adminButtons">
+		<button type="button" (click)="slideEditorOpened=true"><fa name="plus"></fa>{{ 'createSlide' | translate}}</button>
+	</div>-->
 	<app-slideshow></app-slideshow>
 	<app-article-creator *ngIf="editorOpened" (created)="getArticles()" (close)="onCloseEditor()" [articleToEdit]="articleToEdit"></app-article-creator>
 	<div *ngIf="isAdmin() && !editorOpened" class="adminButtons">
-		<button type="button" (click)="editorOpened=true"><fa name="plus"></fa>{{ 'createArticle' | translate}}</button>
+		<button type="button" class="mb-1" (click)="editorOpened=true"><fa name="plus"></fa>{{ 'createArticle' | translate}}</button>
 	</div>
 	<div class="row content">
 		<div class="col-12 col-lg-8 news">

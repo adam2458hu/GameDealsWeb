@@ -48,7 +48,7 @@
 						</a>
 					</li>
 					<li *ngIf="getUserService().isAuthenticated()" class="nav-item" [attr.data-toggle]="isMobile()? 'collapse':''" [attr.data-target]="isMobile() ? '#responsiveNavbar' : '' ">
-						<a class="nav-link" [routerLink]="['/logout']" routerLinkActive="active" (click)="getUserService().logoutUser('successfulLogout')">
+						<a class="nav-link" [routerLink]="" (click)="getUserService().logoutUser('successfulLogout')">
 							<fa name="sign-out"></fa>{{ 'logout' | translate }}
 						</a>
 					</li>
@@ -62,7 +62,7 @@
 		<span>{{ 'timeLeft' | translate }}: </span>
 		<span [innerHTML]="getTimeLeftAsString()"></span>
 	</div>
-	<div *ngIf="getUserService().getErrorMessage() || getUserService().getSuccessMessage()" id="info-box" class="animated text-center">
+	<div *ngIf="getUserService().getErrorMessage() || getUserService().getSuccessMessage()" class="animated text-center info-box" [class.success]="getUserService().getSuccessMessage()" [class.error]="getUserService().getErrorMessage()">
 		<div class="container">
 			<strong *ngIf="getUserService().getErrorMessage()">
 				{{ getUserService().getErrorMessage() | translate }}

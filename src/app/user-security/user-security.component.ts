@@ -44,7 +44,7 @@ export class UserSecurityComponent implements OnInit {
 	updateUser(propertiesToUpdate: any){
 		this.userService.updateUser(propertiesToUpdate).subscribe(
 			(res: any)=>{
-				this.getUserProfile();
+				this.getUserDetails();
 				this.setPopup(false);
 				this.loadingScreenService.setAnimation(false);
 				this.userService.setSuccessMessage(res.message);
@@ -59,7 +59,7 @@ export class UserSecurityComponent implements OnInit {
 	deleteProperties(propertiesToDelete: any){
 		this.userService.deleteProperties(propertiesToDelete).subscribe(
 			(res: any)=>{
-				this.getUserProfile();
+				this.getUserDetails();
 				this.setPopup(false);
 				this.loadingScreenService.setAnimation(false);
 			},
@@ -130,8 +130,8 @@ export class UserSecurityComponent implements OnInit {
 			});
 	}
 
-	getUserProfile(){
-		this.userService.getUserProfile().subscribe(
+	getUserDetails(){
+		this.userService.getUserDetails().subscribe(
 			(res: any)=>{
 				this.userService.setUser(res.user);
 				this.userService.resetSession(res.accessToken);
@@ -146,7 +146,7 @@ export class UserSecurityComponent implements OnInit {
 		this.userService.untrustDevice(device).subscribe(
 			(res:any)=>{
 				this.loadingScreenService.setAnimation(false);
-				this.getUserProfile();
+				this.getUserDetails();
 				this.userService.setSuccessMessage(res.message);
 			},
 			(err)=>{

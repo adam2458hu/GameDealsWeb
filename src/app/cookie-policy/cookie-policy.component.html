@@ -5,8 +5,8 @@
 <h3>{{ 'whatIsACookieQuestion' | translate }}</h3>
 <p>{{ 'whatIsACookieAnswer' | translate }}</p>
 <hr>
-<h3>Mit kell érteni a "hasonló technológia" alatt?</h3>
-<p>A hasonló technológián a sütikhez hasonló célt betöltő, webes tárolásra szolgáló HTML5 localStorage objektumot kell érteni, amiben kulcs – érték párok tárolhatóak. A Local Storage-ben olyan adatok kerülnek tárolásra, amelyeket csak a felhasználó gépe használ fel, és a szervernek nem szükségesek. Ennek megfelelően a webhelyen a honlap nyelve és az árak pénzneme van a Local Storage-ben tárolva. A sütikkel ellentétben nem rendelkeznek lejárati dátummal, ezért nem törlődnek automatikusan a böngészőből, viszont manuálisan törölhetőek a böngésző beállításaiban.</p>
+<h3>Mit kell érteni a "hasonló technológiák" alatt?</h3>
+<p>A hasonló technológiákon egyrészt a sütikhez hasonló célt betöltő, webes tárolásra szolgáló HTML5 localStorage objektumot kell érteni, amiben kulcs – érték párok tárolhatóak, másrészt a böngésző memóriáját, ahol a hozzáférést biztosító "accessToken" van tárolva. A Local Storage-ben olyan adatok kerülnek tárolásra, amelyeket csak a felhasználó gépe használ fel, és a szervernek nem szükségesek. Ennek megfelelően a webhelyen a honlap nyelve és az árak pénzneme van a Local Storage-ben tárolva. A sütikkel ellentétben nem rendelkeznek lejárati dátummal, ezért nem törlődnek automatikusan a böngészőből, viszont manuálisan törölhetőek a böngésző beállításaiban.</p>
 <hr>
 <h3>Hol állíthatom be a sütik használatát a böngészőben?</h3>
 <p>A sütik kezelése böngészőnként eltérő, így ezek módja az alábbi linkeken található meg:</p>
@@ -28,13 +28,13 @@
 <b>{{ 'advertisingCookies' | translate }}</b>
 <p>{{ 'advertisingCookiesInfo' | translate }}</p>
 <hr>
-<h3>Használt sütik</h3>
+<h3>A látogató gépén elhelyezett, ugyanakkor a látogatóval összefüggésbe hozható adatok, amelyeket a webhely felhasznál:</h3>
 <div class="table-responsive">
 	<table class="table table-hover">
 		<thead>
 			<tr>
 				<th width="10%">{{ 'type' | translate }}</th>
-				<th width="15%">{{ 'cookieName' | translate }}</th>
+				<th width="15%">{{ 'name' | translate }}</th>
 				<th>Tárolás helye</th>
 				<th>Adatkezelés jogalapja</th>
 				<th width="50%">Adatkezelés célja</th>
@@ -43,27 +43,38 @@
 		</thead>
 		<tbody>
 			<tr>
-				<td rowspan="4">{{ 'necessary' | translate }}</td>
-				<td>cookieConsent</td>
-				<td rowspan="4">Cookies</td>
-				<td rowspan="4">Jogos érdek</td>
-				<td>A felhasználó - egyes süti típusokhoz való - hozzájárulásának megismerése, ami meghatározza, hogy milyen süti típusok helyezhetőek el a felhasználó gépén.</td>
-				<td>1 év</td>
+				<td rowspan="6">{{ 'necessary' | translate }}</td>
+				<td>accessToken</td>
+				<td>Böngésző memóriája</td>
+				<td rowspan="6">Jogos érdek (a weboldal alapvető funkcióinak biztosítása)</td>
+				<td>A sikeres bejelentkezést követően a regisztrációhoz kötött tartalmakhoz szükséges hozzáférés biztosítása.</td>
+				<td>5 perc</td>
 			</tr>
 			<tr>
-				<td>accessToken</td>
-				<td>A sikeres bejelentkezést követően a regisztrációhoz kötött tartalmakhoz való hozzáférés biztosítása.</td>
+				<td>refreshTokenSet</td>
+				<td rowspan="5">Cookies</td>
+				<td>Amennyiben a felhasználó már sikeresen bejelentkezett, és egy új lapon vagy ablakban nyitja meg a weboldalt, akkor a munkamenet folytatása, ha még nem járt le az 5 perc hosszúságú munkamenet.</td>
 				<td>5 perc</td>
 			</tr>
 			<tr>
 				<td>refreshToken</td>
-				<td>Amennyiben még nem járt le az 5 perc hosszúságú munkamenet, akkor a refreshToken segítségével egy új hozzáférési token(accessToken) biztosítása a felhasználónak anélkül, hogy újra meg kellene adnia a belépési adatait, így a munkamenetből hátralévő 5 percnyi idő számlálása előről kezdődhet. </td>
-				<td>1 óra</td>
+				<td>Amennyiben a felhasználó már sikeresen bejelentkezett, és még nem járt le az 5 perc hosszúságú munkamenet, akkor a refreshToken segítségével egy új hozzáférési token (ami egy változóban lesz tárolva accessToken néven) biztosítása a felhasználónak anélkül, hogy újra meg kellene adnia a belépési adatait, így a munkamenet tovább folytatódhat újabb 5 percig.</td>
+				<td>5 perc</td>
+			</tr>
+			<tr>
+				<td>rememberMe</td>
+				<td>Az "emlékezz rám" funkció engedélyezése</td>
+				<td>7 nap</td>
 			</tr>
 			<tr>
 				<td>rememberMeToken</td>
-				<td>Az "emlékezz rám" funkció használatakor a felhasználó azonosítását szolgáló token segítségével a felhasználó azonnali beléptetése.</td>
+				<td>Az "emlékezz rám" funkció használatakor a felhasználóhoz tartozó egyedi rememberMeToken segítségével egy új hozzáférési token biztosítása anélkül, hogy a felhasználónak meg kellene adnia a belépési adatait.</td>
 				<td>7 nap</td>
+			</tr>
+			<tr>
+				<td>cookieConsent</td>
+				<td>A felhasználó - egyes süti típusokhoz való - hozzájárulásának megismerése, ami meghatározza, hogy milyen süti típusok helyezhetőek el a felhasználó gépén.</td>
+				<td>1 év</td>
 			</tr>
 			<tr>
 				<td rowspan="2">{{ 'functional' | translate }}</td>
@@ -71,7 +82,7 @@
 				<td rowspan="2">Local Storage</td>
 				<td rowspan="2">Érintett hozzájárulása</td>
 				<td>A honlap nyelvének meghatározása</td>
-				<td rowspan="2">addig tart, amíg a felhasználó önként nem törli ezen sütiket a böngésző beállításaiban</td>
+				<td rowspan="2">addig tart, amíg a felhasználó önként nem törli ezeket az adatokat a böngésző beállításaiban</td>
 			</tr>
 			<tr>
 				<td>currency</td>

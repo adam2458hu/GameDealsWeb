@@ -37,7 +37,6 @@ export class WaitlistComponent implements OnInit {
 
 	ngOnInit() {
 		this.getStores();
-		console.log(this.stores);
 		this.waitlist.gameID = this.selectedGame._id;
 		this.waitlist.name = this.selectedGame.name;
 		if (this.gameIsOnWaitlist){

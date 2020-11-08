@@ -6,7 +6,6 @@ import { CurrencyService } from '../shared/currency/currency.service';
 import { StoreService } from '../shared/store/store.service';
 
 @Component({
-  //selector: 'tr[app-filter]',
   selector: 'app-filter',
   templateUrl: './filter.component.html',
   styleUrls: ['./filter.component.scss']

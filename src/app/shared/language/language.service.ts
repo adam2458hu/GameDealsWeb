@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class LanguageService {
 	lang: string;
+	availableLanguages: String[] = ['en','hu'];
 
 	constructor() { }
 
@@ -14,5 +15,9 @@ export class LanguageService {
 
 	getLanguage(){
 		return this.lang;
+	}
+
+	getAvailableLanguages(){
+		return this.availableLanguages;
 	}
 }

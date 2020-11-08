@@ -96,6 +96,12 @@ fa {
 	display: none;
 }
 
+.adminActionIcons {
+	fa {
+		cursor: pointer;
+	}
+}
+
 .table-responsive {
 	box-shadow: 0 0 5px 2px darken($color-primary,8%);
 	//margin-top: 50px;
@@ -364,22 +370,6 @@ input[type="submit"],button,a.salelink {
 		right: -22px;
 		border: 22px solid;
 		border-color: $color-secondary transparent transparent transparent;
-	}
-}
-
-#info-box {
-	position: absolute;
-	background-color: $color-secondary;
-	width: 100%;
-	//height: 30px;
-	font-size: 14px;
-	height: 0;
-	padding: 0px;
-	overflow: hidden;
-	z-index: 99;
-
-	&.animated {
-		animation: slideDownAlert 3s linear;
 	}
 }
 

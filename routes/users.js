@@ -19,7 +19,8 @@ const qrcode = require('qrcode');
 const i18next = require('i18next');
 initializePassport(passport);
 
-router.post('/userprofile',[m.isAuthenticated,m.refreshToken()],async function(req,res){
+//router.post('/userprofile',[m.isAuthenticated,m.refreshToken()],async function(req,res){
+router.get('/userprofile',m.isAuthenticated,async function(req,res){
 	try {
 		const user = await User.findById(req._id);
 		res.status(200).json({user: user,accessToken: req.accessToken});
@@ -64,7 +65,7 @@ function loopThroughUnverifiedUsers(unverifiedUsers){
 			const registrationDate = user.createdAt;
 			const now = new Date();
 			const timePassed = now.getTime()-registrationDate.getTime();
-			if (timePassed>(1000*60*60*24*7)) {
+			if (timePassed>(1000*60*5*24*7)) {
 				await user.remove();
 				++counter;
 			}
@@ -201,10 +202,16 @@ router.post('/login',function(req,res,next){
 			}
 
 			if (user.trustedDevices.filter(device=>device.ip==req.body.ip).length>0){
+				res.cookie('refreshToken',user.generateRefreshToken(),{
+					maxAge: 1000*60*5,
+					httpOnly: true,
+					secure: process.env.NODE_ENV !== 'production'?false:true,
+					sameSite: process.env.NODE_ENV !== 'production'?'lax':'strict'
+				});
+				res.cookie('refreshTokenSet',true,{maxAge: 1000*60*5});
 				return res.status(200).json({
 						message: 'successfulLogin',
-						accessToken: user.generateAccessToken(),
-						refreshToken: user.generateRefreshToken()
+						accessToken: user.generateAccessToken()
 					});
 			} else if (user.twoFactorGoogleEnabled && user.twoFactorEmailEnabled){
 				return res.status(200).json({
@@ -222,18 +229,35 @@ router.post('/login',function(req,res,next){
 				sendTwoFactorEmail(res,user);
 			} else {
 				if (req.body.rememberMe){
+					res.cookie('refreshToken',user.generateRefreshToken(),{
+						maxAge: 1000*60*5,
+						httpOnly: true,
+						secure: process.env.NODE_ENV !== 'production'?false:true,
+						sameSite: process.env.NODE_ENV !== 'production'?'lax':'strict'
+					});
+					res.cookie('refreshTokenSet',true,{maxAge: 1000*60*5});
+					res.cookie('rememberMeToken',user.generateRememberMeToken(),{
+						maxAge: 1000*60*60*24*7,
+						httpOnly: true,
+						secure: process.env.NODE_ENV !== 'production'?false:true,
+						sameSite: process.env.NODE_ENV !== 'production'?'lax':'strict'
+					});
+					res.cookie('rememberMe',true,{maxAge: 1000*60*60*24*7});
 					return res.status(200).json({
 						message: 'successfulLogin',
-						accessToken: user.generateAccessToken(),
-						refreshToken: user.generateRefreshToken(),
-						rememberMeToken: user.generateRememberMeToken()
+						accessToken: user.generateAccessToken()
 					})
 				} else {
-					//res.cookie('accessToken',user.generateAccessToken(),{maxAge: 1000*60*5,httpOnly: true});
+					res.cookie('refreshToken',user.generateRefreshToken(),{
+						maxAge: 1000*60*5,
+						httpOnly: true,
+						secure: process.env.NODE_ENV !== 'production'?false:true,
+						sameSite: process.env.NODE_ENV !== 'production'?'lax':'strict'
+					});
+					res.cookie('refreshTokenSet',true,{maxAge: 1000*60*5});
 					return res.status(200).json({
 						message: 'successfulLogin',
-						accessToken: user.generateAccessToken(),
-						refreshToken: user.generateRefreshToken()
+						accessToken: user.generateAccessToken()
 					});
 				}
 			}
@@ -244,11 +268,16 @@ router.post('/login',function(req,res,next){
 router.get('/loginRememberedUser',m.isUserRemembered,async(req,res)=>{
 	try {
 		const user = await User.findById(req._id);
-		console.log(user);
 		if (user) {
+			res.cookie('refreshToken',user.generateRefreshToken(),{
+				maxAge: 1000*60*5,
+				httpOnly: true,
+				secure: process.env.NODE_ENV !== 'production'?false:true,
+				sameSite: process.env.NODE_ENV !== 'production'?'lax':'strict'
+			});
+			res.cookie('refreshTokenSet',true,{maxAge: 1000*60*5});
 			return res.status(200).json({
-				accessToken: user.generateAccessToken(),
-				refreshToken: user.generateRefreshToken()
+				accessToken: user.generateAccessToken()
 			});
 		}
 	} catch(err){
@@ -451,10 +480,16 @@ router.post('/verifyTwoFactorCode',m.isTempAuthenticated,async(req,res)=>{
 				}
 			}
 
+			res.cookie('refreshToken',user.generateRefreshToken(),{
+				maxAge: 1000*60*5,
+				httpOnly: true,
+				secure: process.env.NODE_ENV !== 'production'?false:true,
+				sameSite: process.env.NODE_ENV !== 'production'?'lax':'strict'
+			});
+			res.cookie('refreshTokenSet',true,{maxAge: 1000*60*5});
 			res.status(200).json({
 				message: 'Sikeres belépés',
-				accessToken: user.generateAccessToken(),
-				refreshToken: user.generateRefreshToken()
+				accessToken: user.generateAccessToken()
 			});
 		} else {
 			return res.status(400).json({message: 'wrongOrExpiredCode'});
@@ -517,10 +552,7 @@ router.post('/sendPersonalInformations',m.isAuthenticated,async(req,res)=>{
 router.post('/saveLoginDetails',m.isAuthenticated,async(req,res)=>{
 	try {
 		const user = await User.findById(req._id);
-		/*console.log(user.lastLoginDetails.ip!=null);
-		console.log(req.body.loginDetails.ip!==user.lastLoginDetails.ip);
-		console.log(user.lastLoginDetails);
-		console.log(req.body.loginDetails);*/
+		
 		if (user.lastLoginDetails.ip!=null && req.body.loginDetails.ip!==user.lastLoginDetails.ip
 			&& user.trustedDevices.filter(device=>device.ip==req.body.loginDetails.ip).length==0){
 			i18next.changeLanguage(user.language,()=>{
@@ -739,13 +771,21 @@ router.get('/isResetTokenValid/:token',async(req,res)=>{
 	}
 })
 
-router.post('/refreshAccessToken',[m.isAuthenticated,m.refreshToken()],async function(req,res){
+//router.post('/refreshAccessToken',[m.isAuthenticated,m.refreshToken()],async function(req,res){
+router.get('/refreshAccessToken',m.refreshToken(),async function(req,res){			
 	res.json({accessToken: req.accessToken});
 });
 
-router.delete('/logout',m.isAuthenticated,(req,res)=>{
-	refreshTokens = refreshTokens.filter(token=>token!==req.body.token);
-	res.sendStatus(204);
+router.delete('/deleteAuthenticationCookies',async(req,res)=>{
+	try {
+		res.clearCookie('rememberMe');
+		res.clearCookie('rememberMeToken');
+		res.clearCookie('refreshToken');
+		res.clearCookie('refreshTokenSet');
+		res.status(200).json({message: 'Sütik törölve'});
+	} catch(err){
+		res.status(500).json({message: err.message});
+	}
 });
 
 router.put('/updatePassword/:token',async(req,res)=>{

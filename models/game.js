@@ -68,4 +68,11 @@ const gameSchema = new mongoose.Schema({
 	}
 );
 
+gameSchema.pre('save',function(next){
+  if (this.genres.length === 0) {
+    this.genres= undefined;                                                                                                                                   
+  }
+  next();
+})
+
 module.exports = mongoose.model('Game',gameSchema);

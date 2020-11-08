@@ -1,4 +1,4 @@
-<div *ngIf="!consented || popupOpened" id="cookieConsent" class="centered">
+<div *ngIf="(!consented || popupOpened) && !settingsPanelOpened && getRouter().url!=='/cookie-policy'" id="cookieConsent" class="centered">
 	<h1>{{ 'cookieSettings' | translate }}</h1>
 	<div class="container">
 		<div class="row">
@@ -23,22 +23,34 @@
 		</div>
 	</div>
 </div>
-<!--
-<div *ngIf="!consented || popupOpened" id="cookieConsent" class="bottom">
+<div *ngIf="(!consented || popupOpened) && !settingsPanelOpened && getRouter().url==='/cookie-policy'" id="cookieConsent" class="bottom">
 	<div class="container">
 		<div class="row">
-			<div class="col-12 col-lg-8 text-center text-sm-center text-lg-left mb-2 mb-lg-0">
+			<div class="col-12 text-center text-sm-center text-lg-left mb-2 mb-lg-0">
 				{{ 'cookieConsentInfoStart' | translate }}
 				<a [routerLink]="['/cookie-policy']">{{ 'cookieConsentInfoLink' | translate }}</a>
 				{{ 'cookieConsentInfoEnd' | translate }}
 			</div>
-			<div class="col-12 col-lg-4 text-center text-sm-center text-lg-right">
-				<button type="button" class="btn-block mb-2" (click)="consentToAllCookies()"><b>{{'acceptAll' | translate }}</b></button>
-				<button class="btn-block btn-outline-custom" type="button" (click)="toggleSettingsPanel()"><b>{{ 'customSettings' | translate }}</b></button>
+			<div class="col-12 text-center text-sm-center text-lg-right">
+				<div class="row">
+					<div class="col-12 col-sm-4">
+						<button type="button" class="btn-block mb-2" (click)="consentToAllCookies()"><b>{{'acceptAll' | translate }}</b>
+						</button>
+					</div>
+					<div class="col-12 col-sm-4">
+						<button class="btn-block btn-outline-custom mb-2" type="button" (click)="consentToNecessaryCookies()">
+							<b>{{ 'acceptOnlyNecessary' | translate }}</b>
+						</button>
+					</div>
+					<div class="col-12 col-sm-4">
+						<button class="btn-block btn-outline-custom" type="button" (click)="toggleSettingsPanel()"><b>{{ 'customSettings' | translate }}</b></button>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>-->
+</div>
+<div *ngIf="(!consented || popupOpened) && getRouter().url!=='/cookie-policy'" class="greyBackground"></div>
 
 <div *ngIf="settingsPanelOpened" id="settingsPanel" class="container">
 	<span class="close" (click)="toggleSettingsPanel()">&times;</span>

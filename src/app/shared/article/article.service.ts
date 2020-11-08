@@ -36,7 +36,6 @@ export class ArticleService {
 	}
 
 	editArticle(article: Article) {
-		console.log(article);
 		var headers = new HttpHeaders({'authorization':'Bearer '+this.userService.getAccessToken()});
 		return this.http.put(environment.apiArticlesURL+'/editArticle/'+article._id,{article: article},{headers: headers});
 	}

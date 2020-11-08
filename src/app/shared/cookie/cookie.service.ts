@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
+import { Consent } from './consent';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CookieService {
+	consent: Consent;
 	cookieNames = {
 		necessary : ['cookieConsent'],
 		functional : ['lang','currency'],
@@ -11,14 +13,8 @@ export class CookieService {
 		advertising : []
 	};
 
-	consent = {
-		necessary : false,
-		functional : false,
-		analytical : false,
-		advertising : false
-	}
-
 	constructor() {
+		this.consent = new Consent(false,false,false,false);
 	}
 
 	consentToCookies(c){
@@ -30,10 +26,10 @@ export class CookieService {
 				})
 			}
 		})
-		this.consent.necessary=c.necessary;
-		this.consent.functional=c.functional;
-		this.consent.analytical=c.analytical;
-		this.consent.advertising=c.advertising;
+		this.consent.necessary = c.necessary;
+		this.consent.functional = c.functional;
+		this.consent.analytical = c.analytical;
+		this.consent.advertising = c.advertising;
 		if (!this.consent.analytical) window['ga-disable-UA-115370291-4'] = true;
 		this.setCookie("cookieConsent",JSON.stringify(this.consent));
 	}

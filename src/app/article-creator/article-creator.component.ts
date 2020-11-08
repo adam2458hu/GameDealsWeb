@@ -1,6 +1,8 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Article } from '../shared/article/article';
 import { ArticleService } from '../shared/article/article.service';
+import { LanguageService } from '../shared/language/language.service';
 import { LoadingScreenService } from '../shared/loading-screen/loading-screen.service';
 import { UserService } from '../shared/user/user.service';
 
@@ -14,24 +16,26 @@ export class ArticleCreatorComponent implements OnInit {
 	@Output() created = new EventEmitter();
 	@Output() close = new EventEmitter();
 	@Input() articleToEdit;
-	article = {
-		title : '',
-		slug: '',
-		lead: '',
-		body: '',
-		image: ''
-	}
+	article;
+	availableLanguages: String[];
+	selectedLanguageIndex=1;
 
 
 	constructor(
 		private articleService: ArticleService,
 		private loadingScreenService: LoadingScreenService,
+		private languageService: LanguageService,
 		private userService: UserService
 	) { }
 
 	ngOnInit() {
+		this.availableLanguages = this.languageService.getAvailableLanguages();
 		if (this.articleToEdit) this.article = this.articleToEdit;
-		window.scrollTo(0,document.getElementById("editor").offsetTop-document.getElementById("navbar").scrollHeight);
+		else this.article = new Article(this.availableLanguages);
+
+		setTimeout(()=>{
+			window.scrollTo(0,document.getElementById("editor").offsetTop-document.getElementById("navbar").scrollHeight);
+		});
 	}
 
 	onClose(){
@@ -41,8 +45,9 @@ export class ArticleCreatorComponent implements OnInit {
 	onSubmit(form: NgForm){
 		if (!this.articleToEdit) {
 			this.loadingScreenService.setAnimation(true);
-			this.articleService.createArticle(form.value).subscribe(
+			this.articleService.createArticle(this.article).subscribe(
 				(res: any)=>{
+					this.created.emit();
 					this.onClose();
 					this.loadingScreenService.setAnimation(false);
 					this.userService.setSuccessMessage(res.message);
@@ -52,9 +57,8 @@ export class ArticleCreatorComponent implements OnInit {
 					this.userService.setErrorMessage(err.error.message);
 				})
 		} else {
-			form.value._id=this.articleToEdit._id;
 			this.loadingScreenService.setAnimation(true);
-			this.articleService.editArticle(form.value).subscribe(
+			this.articleService.editArticle(this.article).subscribe(
 				(res: any)=>{
 					this.onClose();
 					this.loadingScreenService.setAnimation(false);
