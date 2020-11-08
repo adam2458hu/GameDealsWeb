@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Slide } from '../shared/slide/slide';
 import { SlideService } from '../shared/slide/slide.service';
+import { LoadingScreenService } from '../shared/loading-screen/loading-screen.service';
+import { TranslateService } from '@ngx-translate/core';
 import { LanguageService } from '../shared/language/language.service';
+import { UserService } from '../shared/user/user.service';
 
 @Component({
   selector: 'app-slideshow',
@@ -11,8 +14,10 @@ import { LanguageService } from '../shared/language/language.service';
 export class SlideshowComponent implements OnInit {
 	index;
 	mobile: Boolean;
+	editorOpened: Boolean;
 	loadingImages;
 	slides: Slide[];
+	slideToEdit;
 	scrollingInterval;
 	fadeInTimeout;
 	fadeIn: Boolean;
@@ -23,11 +28,14 @@ export class SlideshowComponent implements OnInit {
 
 	constructor(
 		private slideService: SlideService,
-		private languageService: LanguageService
+		private loadingScreenService: LoadingScreenService,
+		private translateService: TranslateService,
+		private languageService: LanguageService,
+		private userService: UserService
 	) { }
 
 	ngOnInit() {
-		this.loadingImages = true;
+		this.editorOpened = false;
 		this.index = 0;
 
 		if (window.screen.width <= 992) {
@@ -47,7 +55,16 @@ export class SlideshowComponent implements OnInit {
 		return this.mobile;
 	}
 
-	resetTimers(){
+	isAdmin(){
+		return this.userService.isAdmin();
+	}
+
+	onCloseEditor(){
+		this.editorOpened=false;
+		if (this.slideToEdit) this.slideToEdit=null;
+	}
+
+	stopAutomaticSlideshow(){
 		clearTimeout(this.fadeInTimeout);
 		clearInterval(this.scrollingInterval);
 	}
@@ -76,7 +93,7 @@ export class SlideshowComponent implements OnInit {
 	}
 
 	next(){
-		this.resetTimers();
+		this.stopAutomaticSlideshow();
 		this.resetFadeIn();
 
 		if (this.index+1>this.slides.length-1){
@@ -89,7 +106,7 @@ export class SlideshowComponent implements OnInit {
 	}
 
 	previous(){
-		this.resetTimers();
+		this.stopAutomaticSlideshow();
 		this.resetFadeIn();
 
 		if (this.index-1<0){
@@ -104,7 +121,7 @@ export class SlideshowComponent implements OnInit {
 
 	changeNews(i){
 		if (this.index!=i){
-			this.resetTimers();
+			this.stopAutomaticSlideshow();
 			this.resetFadeIn();
 		
 			this.index = i;
@@ -119,10 +136,32 @@ export class SlideshowComponent implements OnInit {
 				this.slides.forEach(slide=>{
 					slide.endOfOffer = new Date(slide.endOfOffer);
 				})
+				this.loadingImages = true;
 				this.startAutomaticSlideshow();
 			},
 			(err)=>{
 				console.log(err);
 			})
+	}
+
+	editSlide(slide: Slide){
+		this.slideToEdit = slide;
+		this.editorOpened = true;
+	}
+
+	deleteSlide(_id: string){
+		if (confirm(this.translateService.instant('confirmDelete'))) {
+			this.loadingScreenService.setAnimation(true);
+			this.slideService.deleteSlide(_id).subscribe(
+				(res: any)=>{
+					this.slides.filter(slide=>slide._id!==_id);
+					this.loadingScreenService.setAnimation(false);
+					this.userService.setSuccessMessage(res.message);
+				},
+				(err)=>{
+					this.loadingScreenService.setAnimation(false);
+					this.userService.setErrorMessage(err.error.message);
+				})
+		}
 	}
 }
