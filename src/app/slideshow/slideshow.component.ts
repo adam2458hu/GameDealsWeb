@@ -149,7 +149,7 @@ export class SlideshowComponent implements OnInit {
 		this.editorOpened = true;
 	}
 
-	deleteSlide(_id: string){
+	deleteSlide(_id: String){
 		if (confirm(this.translateService.instant('confirmDelete'))) {
 			this.loadingScreenService.setAnimation(true);
 			this.slideService.deleteSlide(_id).subscribe(
